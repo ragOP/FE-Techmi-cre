@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* slider css */
+.slick-track {
+  display: flex !important;
+  gap: 20px !important;
+}
+
+.slick-arrow {
+  display: none !important;
+}

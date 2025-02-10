@@ -25,22 +25,22 @@ const HealthCondition = () => {
   ]);
 
   return (
-    <div className="xl:w-4/5 lg:w-full mx-auto mt-20">
+    <div className="xl:w-4/5 lg:w-full mx-auto flex flex-col mt-20">
     <h2 className="text-center text-3xl font-semibold text-[#00008B] mb-5">
       Browse by Health Condition
     </h2>
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5  gap-4 p-4">
       {conditions.map((condition, index) => (
         <div
           key={condition.id}
-          className={`flex  items-center lg:justify-around xl:justify-evenly border lg:p-2 xl:p-4 rounded-lg shadow-md 
+          className={`flex  items-center lg:justify-around xl:justify-evenly gap-x-2 border  lg:p-2 xl:p-4 rounded-lg shadow-md 
             hover:shadow-lg transition-all 
             ${index < 5 ? "bg-[#A0D8EC]" : "bg-[#82C8E5]"}`}
         >
-          <div className="bg-white flex items-center justify-center w-10 h-10 rounded-md mb-2">
-            <img src={condition.img} alt={condition.title} className="w-10 h-10" />
+          <div className="bg-white w-10 h-10 ml-1  mt-1 rounded-md mb-2">
+            <img src={condition.img} alt={condition.title} className="w-10 h-10  " />
           </div>
-          <span className="text-gray-700 font-medium lg:text-base xl:text-lg text-center">{condition.title}</span>
+          <span className="text-gray-700 font-medium lg:text-sm xl:text-base text-center">{condition.title}</span>
         </div>
       ))}
     </div>

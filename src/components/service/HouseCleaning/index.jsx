@@ -1,10 +1,16 @@
 import React from "react";
+import Pricing from "../service_components/House_Cleaning.jsx/Price_offer";
+import ServicesInfo from "../service_components/House_Cleaning.jsx/Service_info";
+import Aboutus from "../service_components/House_Cleaning.jsx/About_us";
+import Services from "../service_components/House_Cleaning.jsx/Our_service";
 
 const HouseCleaning = () => {
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">House Cleaning Service</h2>
-      <p className="text-gray-600">We provide top-quality house cleaning services for your home.</p>
+    <div className="space-y-10">
+      <Services />
+      <Aboutus />
+      <ServicesInfo />
+      <Pricing />
     </div>
   );
 };

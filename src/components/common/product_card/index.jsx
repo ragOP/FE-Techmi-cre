@@ -4,10 +4,10 @@ import arrow from "../../../assets/product_card/arrow-up-right.svg"
 
 const ProductCard = ({ item: { id, img, price, originalPrice, title, desc } }) => {
   return (
-    <div className="shadow-[#0000004D] shadow-lg mb-5 lg:h-[30rem] xl:h-[40rem] rounded-2xl p-4 max-h-fit relative">
+    <div className="shadow-[#0000004D] shadow-lg mb-5 lg:h-[30rem] h-[30rem] xl:h-[40rem] rounded-2xl p-4 max-h-fit relative">
       <img
         src={arrow}
-        className="bg-[#82C8E5] rounded-full scale-75 p-2 absolute right-0 top-0"
+        className="bg-[#82C8E5] rounded-full scale-75 p-2 absolute right-2 top-2"
         alt=""
       />
       <Image
@@ -24,10 +24,10 @@ const ProductCard = ({ item: { id, img, price, originalPrice, title, desc } }) =
       </div>
 
       <p className="text-[#191919] mt-0.5">
-        {title.length <= 23 ? title : `${title.slice(0, 23)}...`}
+        {title.length <= 20 ? title : `${title.slice(0, 20)}...`}
       </p>
       <p className="text-[#444444] mt-0.5 text-sm">
-        {desc.length <= 27 ? desc : `${desc.slice(0, 27)}...`}
+        {desc.length <= 25 ? desc : `${desc.slice(0, 25)}...`}
       </p>
     </div>
   )

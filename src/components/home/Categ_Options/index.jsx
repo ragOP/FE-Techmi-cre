@@ -38,7 +38,7 @@ const CategoryGrid = () => {
   const highlightedCard = location.state?.selectedCard || null;
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 justify-center items-center">
+    <div className="flex flex-col md:flex-row gap-2 space-y-4 justify-center mb-20 items-center">
       {categories.map((category) => (
         <CategoryCard
           key={category.id}

@@ -9,18 +9,18 @@ const DiscountBanner = () => {
   const [medicineImage, setMedicineImage] = useState(medicine); 
 
   return (
-    <div className="relative mt-52 mb-10 flex justify-center">
+    <div className="relative mt-52 mb-10 flex  justify-center">
       <img 
         src={backgroundgreen} 
         alt="Background Green" 
-        className="h-36 w-full rounded-lg"
+        className=" sm:h-36 h-80 w-full rounded-lg"
       />
 
-      <div className="absolute inset-0 flex items-center justify-start px-6  ">
+      <div className="absolute inset-0 flex flex-col sm:flex-row justify-center  items-center md:justify-start px-6  ">
         <Image 
           src={medicineImage} 
           alt="medicine"
-          css="h-48 md:h-72 lg:h-96"
+          css="h-56 sm:h-72 lg:h-96"
         />
         
         <div className="text-center md:text-left md:ml-6">

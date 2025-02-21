@@ -34,8 +34,8 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#FBF6F1E5] py-10 px-6 text-sm text-gray-800 mt-20">
-      <div className="max-w-[90%] w-full mx-auto flex flex-wrap justify-between ">
+    <footer className="bg-[#FBF6F1E5] py-10 px-6 text-sm  text-gray-800 mt-20">
+      <div className="max-w-[90%] w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 space-y-6 lg:space-x-8 lg:place-items-center ">
         <div className="flex flex-col gap-y-7">
           <div className="flex items-center gap-1.5">
             <img src={logo} alt="" className="h-[60px] w-[60px]" />
@@ -69,7 +69,7 @@ const Footer = () => {
         </div>
 
         <div className="flex flex-col gap-y-5 ">
-          <h3 className="font-bold xl:text-3xl lg:text-xl text-blue-900">Information</h3>
+          <h3 className="font-bold xl:text-3xl lg:text-xl text-lg text-blue-900">Information</h3>
           <ul className="space-y-2 text-base xl:text-lg">
             {data.data2.information.map((item) => (
               <li key={item.id}>
@@ -82,7 +82,7 @@ const Footer = () => {
         </div>
 
         <div className="flex flex-col gap-y-5 ">
-          <h3 className="font-bold xl:text-3xl lg:text-xl text-blue-900">Account</h3>
+          <h3 className="font-bold xl:text-3xl lg:text-xl  text-lg text-blue-900">Account</h3>
           <ul className="space-y-2  text-base xl:text-lg">
             {data.data3.account.map((item) => (
               <li key={item.id}>

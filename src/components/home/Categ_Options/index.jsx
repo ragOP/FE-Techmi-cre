@@ -15,7 +15,7 @@ const CategoryCard = ({ imageSrc, title, onClick, isHighlighted }) => {
   return (
     <div
       onClick={onClick}
-      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer border-4 transition-transform duration-300 ${
+      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer  transition-transform duration-300 ${
         isHighlighted ? "border-[#00008B] scale-110" : "border-transparent"
       }`}
       style={{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -38,7 +38,7 @@ const CategoryGrid = () => {
   const highlightedCard = location.state?.selectedCard || null;
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 justify-center items-center">
+    <div className="flex flex-col md:flex-row gap-2  justify-center mb-20 items-center">
       {categories.map((category) => (
         <CategoryCard
           key={category.id}

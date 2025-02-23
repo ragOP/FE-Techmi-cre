@@ -22,43 +22,48 @@ const NextArrow = ({ onClick }) => (
   </button>
 );
 
-const settings = {
-  infinite: true,
-  speed: 500,
-  slidesToShow: 4.5,
-  slidesToScroll: 1,
-  swipeToSlide: true,
-  dots: false,
-  prevArrow: <PrevArrow />,
-  nextArrow: <NextArrow />,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 4.5,
-        dots: false,
-      },
-    },
-    {
-      breakpoint: 768,
-      settings: {
-        slidesToShow: 3,
-        dots: true,
-        arrows:false,
-      },
-    },
-    {
-      breakpoint: 640,
-      settings: {
-        slidesToShow: 1,
-        dots: true, 
-        arrows: false,
-      },
-    },
-  ],
-};
+
 
 const AnimationSlider = ({ children }) => {
+
+  const settings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4.5,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    dots: false,
+    centerMode: true,
+    centerPadding: "0",
+    prevArrow: <PrevArrow />,
+    nextArrow: <NextArrow />,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: Math.min(4.5, React.Children.count(children)),
+          dots: false,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: Math.min(4.5, React.Children.count(children)),
+          dots: true,
+          arrows: false,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
+          dots: true,
+          arrows: false,
+        },
+      },
+    ],
+  };
+
   return (
     <div className="mb-10 relative">
       <Slider {...settings}>{children}</Slider>

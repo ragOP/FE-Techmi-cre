@@ -51,9 +51,15 @@ const Trendingnew = () => {
             <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">
                 Trending near you products          </h1>
             <AnimationSlider>
-                {newproducts.map((item) => (
-                    <div key={item.id}>
-                        <ProductCard item={item} />
+                {newproducts.map((product) => (
+                    <div key={product.id}>
+                        <ProductCard
+                            image={product.banner_image}
+                            price={product.price}
+                            name={product.name}
+                            discountedPrice={product.discounted_price}
+                            smallDescription={product.small_description}
+                        />
                     </div>
                 ))}
             </AnimationSlider>

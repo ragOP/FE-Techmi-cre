@@ -5,9 +5,9 @@ import SearchBar from "../../common/Search_Bar";
 import Filter from "../filter";
 
 const SearchResult = () => {
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const searchQuery = searchParams.get("q") || "";
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get("q") || "";
 
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -85,7 +85,14 @@ const SearchResult = () => {
         <SearchBar />
         <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-x-4 ">
           {filteredProducts?.map((product) => (
-            <ProductCard key={product?.id} item={product} />
+            <ProductCard
+              key={product?.id}
+              image={product.banner_image}
+              price={product.price}
+              name={product.name}
+              discountedPrice={product.discounted_price}
+              smallDescription={product.small_description}
+            />
           ))}
         </div>
       </div>

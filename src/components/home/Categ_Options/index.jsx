@@ -5,7 +5,7 @@ import Frame1 from '../../../assets/cateoptions/Frame1.png';
 import Frame2 from '../../../assets/cateoptions/Frame2.png';
 import Frame3 from '../../../assets/cateoptions/Frame3.png';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCategories } from "./helpers/fetchCategories";
+import { fetchServices } from "./helpers/fetchServices";
 
 const categories = [
   { id: 1, imageSrc: Frame1, title: "House Cleaning" },
@@ -38,15 +38,12 @@ const CategoryGrid = () => {
   const highlightedCard = location.state?.selectedCard || null;
 
   const { data: fetchedCategories, isLoading, error } = useQuery({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
-    onSuccess: (data) => {
-      console.log("Data", data)
-    }
+    queryKey: ['services'],
+    queryFn: fetchServices,
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading categories</div>;
+  if (error) return <div>Error loading services</div>;
 
   const categories = fetchedCategories || [];
 

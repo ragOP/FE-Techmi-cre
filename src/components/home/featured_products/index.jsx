@@ -44,11 +44,8 @@ import { fetchTopProducts } from "./helper/fetchTopProducts"
 
 const FeaturedProducts = () => {
   const { data: topProducts, isLoading, error } = useQuery({
-    queryKey: ['products'],
+    queryKey: ['top_products'],
     queryFn: fetchTopProducts,
-    onSuccess: (data) => {
-      console.log("Data", data);
-    }
   });
 
   return (
@@ -65,9 +62,15 @@ const FeaturedProducts = () => {
         <>
           {topProducts && topProducts.length > 0 ? (
             <AnimationSlider>
-              {topProducts.map((item) => (
-                <div key={item.id}>
-                  <ProductCard item={item} />
+              {topProducts.map((product) => (
+                <div key={product._id}>
+                  <ProductCard
+                    image={product.banner_image}
+                    price={product.price}
+                    name={product.name}
+                    discountedPrice={product.discounted_price}
+                    smallDescription={product.small_description}
+                  />
                 </div>
               ))}
             </AnimationSlider>

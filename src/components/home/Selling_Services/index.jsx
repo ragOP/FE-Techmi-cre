@@ -14,13 +14,18 @@ const dummyData = [
 const SellingServices = () => {
 
   return (
-    <><div className="mt-20"><h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">Super Selling Services</h1> <AnimationSlider>
-      {dummyData.map((item) => (
-        <div key={item.id} className="">
-          <ProductCard item={item} />
-        </div>
-      ))}
-    </AnimationSlider></div></>
+    <>
+      <div className="mt-20">
+        <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">Super Selling Services</h1>
+        <AnimationSlider>
+          {dummyData.map((item) => (
+            <div key={item.id} className="">
+              <ProductCard item={item} />
+            </div>
+          ))}
+        </AnimationSlider>
+      </div>
+    </>
   );
 }
 

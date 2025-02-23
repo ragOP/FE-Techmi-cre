@@ -4,6 +4,8 @@ import { ArrowUpRight } from "lucide-react";
 import Frame1 from '../../../assets/cateoptions/Frame1.png';
 import Frame2 from '../../../assets/cateoptions/Frame2.png';
 import Frame3 from '../../../assets/cateoptions/Frame3.png';
+import { useQuery } from '@tanstack/react-query';
+import { fetchCategories } from "./helpers/fetchCategories";
 
 const categories = [
   { id: 1, imageSrc: Frame1, title: "House Cleaning" },
@@ -15,10 +17,8 @@ const CategoryCard = ({ imageSrc, title, onClick, isHighlighted }) => {
   return (
     <div
       onClick={onClick}
-      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer  transition-transform duration-300 ${
-        isHighlighted ? "border-[#00008B] scale-110" : "border-transparent"
-      }`}
-      style={{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer  transition-transform duration-300 ${isHighlighted ? "border-[#00008B] scale-110" : "border-transparent"}`}
+      style={{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundRepeat: "no-repeat", backgroundPosition: 'center' }}
     >
       <button className="absolute top-2 right-2 bg-[#0A008FBA] p-2 rounded-lg shadow">
         <ArrowUpRight className="w-5 h-5 text-white" />
@@ -37,17 +37,32 @@ const CategoryGrid = () => {
   const location = useLocation();
   const highlightedCard = location.state?.selectedCard || null;
 
+  const { data: fetchedCategories, isLoading, error } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    onSuccess: (data) => {
+      console.log("Data", data)
+    }
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading categories</div>;
+
+  const categories = fetchedCategories || [];
+
   return (
     <div className="flex flex-col md:flex-row gap-2  justify-center mb-20 items-center">
-      {categories.map((category) => (
+      {categories && categories?.length > 0 ? categories.map((category) => (
         <CategoryCard
-          key={category.id}
-          imageSrc={category.imageSrc}
-          title={category.title}
+          key={category._id}
+          imageSrc={category.images?.[0]}
+          title={category.name || ""}
           onClick={() => navigate("/service", { state: { selectedCard: category } })}
           isHighlighted={highlightedCard && highlightedCard.id === category.id}
         />
-      ))}
+      )) :
+        <div className="text-center text-gray-500">No category present.</div>
+      }
     </div>
   );
 };

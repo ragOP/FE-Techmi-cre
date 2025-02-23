@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../assets/navbar/Logo.svg";
 import cart from "../../assets/navbar/shopping-cart.svg";
 import user from "../../assets/navbar/circle-user-round.svg";
+import { getItem, removeItem } from "../../utils/local_storage";
+import { toast } from "react-toastify";
 
 const navContents = [
   { title: "Home", route: "/" },
@@ -15,10 +17,31 @@ const navContents = [
 const Navbar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
   const handleLogoClick = () => {
     navigate("/");
   };
+
+  const token = getItem("token");
+
+  const onLogoutUser = () => {
+    removeItem("token");
+    setIsUserLoggedIn(false)
+    toast.success("Logout successful!");
+  }
+
+  const onLoginUser = () => {
+    navigate("/login");
+  }
+
+  useEffect(() => {
+    if (token) {
+      setIsUserLoggedIn(true)
+    } else {
+      setIsUserLoggedIn(false)
+    }
+  }, [token])
 
   return (
     <div className="bg-[#FBF6F166] px-6 py-3 flex items-center justify-between relative">
@@ -53,10 +76,17 @@ const Navbar = () => {
           <span className="text-[#00008B] font-medium text-lg">Cart</span>
         </button>
 
-        <button className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full">
-          <img src={user} alt="User" className="h-[23px] w-[23px]" />
-          <span className="text-[#FFFFFF] text-lg">Login</span>
-        </button>
+        {!isUserLoggedIn ?
+          <button onClick={onLoginUser} className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full">
+            <img src={user} alt="User" className="h-[23px] w-[23px]" />
+            <span className="text-[#FFFFFF] text-lg">Login</span>
+          </button>
+          :
+          <button onClick={onLogoutUser} className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full">
+            <img src={user} alt="User" className="h-[23px] w-[23px]" />
+            <span className="text-[#FFFFFF] text-lg">Logout</span>
+          </button>
+        }
       </div>
 
       <div className="md:hidden flex items-center">
@@ -85,9 +115,15 @@ const Navbar = () => {
               <span className="text-[#00008B] font-medium text-lg">Cart</span>
             </button>
 
-            <button className="flex items-center   gap-1.5 px-4 py-2  rounded-full">
-              <span className=" text-[#00008B] font-medium text-lg">Login</span>
-            </button>
+            {isUserLoggedIn ? (
+              <button onClick={onLogoutUser} className="flex items-center gap-1.5 px-4 py-2 rounded-full">
+                <span className="text-[#00008B] font-medium text-lg">Logout</span>
+              </button>
+            ) : (
+              <button onClick={onLoginUser} className="flex items-center gap-1.5 px-4 py-2 rounded-full">
+                <span className="text-[#00008B] font-medium text-lg">Login</span>
+              </button>
+            )}
           </div>
         </div>
       )}

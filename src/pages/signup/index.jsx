@@ -7,7 +7,7 @@ import { signupUser } from "./helpers/signupUser";
 const Signup = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        fullName: "",
+        name: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -32,16 +32,15 @@ const Signup = () => {
         setLoading(true);
         try {
             const response = await signupUser({
-                fullName: formData.fullName,
+                name: formData.name,
                 email: formData.email,
                 password: formData.password,
             });
-
-            if (response.success) {
+            if (response.response.success) {
                 toast.success("Account created successfully!");
                 navigate("/login");
             } else {
-                toast.error(response.message || "Signup failed");
+                toast.error(response.response?.message || "Signup failed");
             }
         } catch (error) {
             toast.error(error.message || "Something went wrong");
@@ -63,9 +62,9 @@ const Signup = () => {
                         <label className="block text-sm font-medium text-gray-600">Full Name</label>
                         <input
                             type="text"
-                            name="fullName"
+                            name="name"
                             placeholder="John Doe"
-                            value={formData.fullName}
+                            value={formData.name}
                             onChange={handleChange}
                             className="mt-1 w-full rounded-lg border border-gray-300 p-3 text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                             required

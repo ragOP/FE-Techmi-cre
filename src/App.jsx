@@ -25,14 +25,13 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={token ? <Navigate to="/" replace /> : <Login />} />
         <Route path="/signup" element={token ? <Navigate to="/" replace /> : <Signup />} />
-        <Route path="/services" element={<Service />} />
+        <Route path="/service" element={<Service />} />
         <Route path="/search" element={<SearchResult />} />
 
         {/* Protected Routes (Only accessible if logged in) */}
-        <Route element={<ProtectedRoute />}>
-        </Route>
+        {/* <Route element={<ProtectedRoute />}>
+        </Route> */}
 
-        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

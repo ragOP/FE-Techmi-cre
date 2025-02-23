@@ -35,7 +35,7 @@ const CategoryCard = ({ imageSrc, title, onClick, isHighlighted }) => {
 const CategoryGrid = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const highlightedCard = location.state?.selectedCard || null;
+  const highlightedCardId = location.state?.selectedCardId || null;
 
   const { data: fetchedCategories, isLoading, error } = useQuery({
     queryKey: ['services'],
@@ -49,15 +49,19 @@ const CategoryGrid = () => {
 
   return (
     <div className="flex flex-col md:flex-row gap-2  justify-center mb-20 items-center">
-      {categories && categories?.length > 0 ? categories.map((category) => (
-        <CategoryCard
-          key={category._id}
-          imageSrc={category.images?.[0]}
-          title={category.name || ""}
-          onClick={() => navigate("/service", { state: { selectedCard: category } })}
-          isHighlighted={highlightedCard && highlightedCard.id === category.id}
-        />
-      )) :
+      {categories && categories?.length > 0 ?
+        categories.map((category) => {
+          const isSelected = highlightedCardId === category._id;
+          return (
+            <CategoryCard
+              key={category._id}
+              imageSrc={category.images?.[0]}
+              title={category.name || ""}
+              onClick={() => navigate("/service", { state: { selectedCardId: category._id, name: category.name } })}
+              isHighlighted={isSelected}
+            />
+          )
+        }) :
         <div className="text-center text-gray-500">No category present.</div>
       }
     </div>

@@ -8,18 +8,18 @@ import Tagtitle from "../../components/service/service_components/Pharmaceutical
 
 const Service = () => {
   const location = useLocation();
-  const selectedCard = location.state?.selectedCard || null;
-
+  const selectedCardTitle = location.state?.name || null;
+console.log(">>", selectedCardTitle)
   return (
     <div>
       <Tagtitle />
       <CategoryGrid />
 
-      {selectedCard && (
+      {selectedCardTitle && (
         <div className="mt-6">
-          {selectedCard.title === "House Cleaning" && <HouseCleaning />}
-          {selectedCard.title === "Pharmaceutical" && <Pharmaceutical />}
-          {selectedCard.title === "Laundry Service" && <LaundryService />}
+          {selectedCardTitle === "House Cleaning" && <HouseCleaning />}
+          {selectedCardTitle === "Pharmaceutical" && <Pharmaceutical />}
+          {selectedCardTitle === "Laundry Service" && <LaundryService />}
         </div>
       )}
     </div>

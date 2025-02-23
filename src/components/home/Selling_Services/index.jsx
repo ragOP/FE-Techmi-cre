@@ -3,7 +3,7 @@ import AnimationSlider from "../../common/animations";
 
 import ProductCard from "../../common/product_card";
 import { useQuery } from "@tanstack/react-query";
-import { fetchTopProducts } from "../featured_products/helper/fetchTopProducts";
+import { fetchProducts } from "../featured_products/helper/fetchProducts";
 
 const dummyData = [
   { id: 1, img: "https://images.unsplash.com/photo-1583088580009-2d947c3e90a6?q=80&w=2592", price: 8999, title: "House Cleaning", desc: "Sticky top navigation with a search bar, category" },
@@ -17,7 +17,7 @@ const SellingServices = () => {
 
   const { data: superSellingProducts, isLoading, error } = useQuery({
     queryKey: ['products'],
-    queryFn: fetchTopProducts,
+    queryFn: fetchProducts,
   });
 
   console.log(superSellingProducts);

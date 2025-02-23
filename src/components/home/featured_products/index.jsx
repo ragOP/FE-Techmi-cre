@@ -2,7 +2,7 @@ import React from "react"
 import AnimationSlider from "../../common/animations"
 import ProductCard from "../../common/product_card"
 import { useQuery } from "@tanstack/react-query"
-import { fetchTopProducts } from "./helper/fetchTopProducts"
+import { fetchProducts } from "./helper/fetchProducts"
 
 // const dummyData = [
 //   {
@@ -45,7 +45,7 @@ import { fetchTopProducts } from "./helper/fetchTopProducts"
 const FeaturedProducts = () => {
   const { data: topProducts, isLoading, error } = useQuery({
     queryKey: ['top_products'],
-    queryFn: fetchTopProducts,
+    queryFn: fetchProducts,
   });
 
   return (

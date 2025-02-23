@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import AnimationSlider from "../../common/animations";
 
 import ProductCard from "../../common/product_card";
-import { fetchTopProducts } from "../featured_products/helper/fetchTopProducts";
+import { fetchProducts } from "../featured_products/helper/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
 
 const OrderedMed = () => {
   const { data: topOrderedProducts, isLoading, error } = useQuery({
     queryKey: ['top_ordered_products'],
-    queryFn: fetchTopProducts,
+    queryFn: fetchProducts,
   });
 
   return (

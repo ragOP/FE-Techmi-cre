@@ -1,7 +1,7 @@
 import { apiService } from "../../../../utils/api/apiService";
 import { endpoints } from "../../../../utils/endpoints";
 
-export const fetchTopProducts = async () => {
+export const fetchProducts = async () => {
   try {
     const apiResponse = await apiService({
       endpoint: endpoints.product,

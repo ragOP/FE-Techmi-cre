@@ -22,34 +22,34 @@ const NextArrow = ({ onClick }) => (
   </button>
 );
 
-
-
 const AnimationSlider = ({ children }) => {
+  const totalSlides = React.Children.count(children);
+  const slidesToShow = Math.min(4.5, totalSlides);
 
   const settings = {
-    infinite: true,
+    infinite: totalSlides > 1, // Disable infinite loop for a single product
     speed: 500,
-    slidesToShow: 4.5,
+    slidesToShow,
     slidesToScroll: 1,
     swipeToSlide: true,
-    dots: false,
-    centerMode: true,
-    centerPadding: "0",
-    prevArrow: <PrevArrow />,
-    nextArrow: <NextArrow />,
+    dots: totalSlides > 1, // Hide dots if only one product
+    prevArrow: totalSlides > 1 ? <PrevArrow /> : null, // Hide arrows if only one product
+    nextArrow: totalSlides > 1 ? <NextArrow /> : null,
+    centerMode: totalSlides === 1, // Center the slide when there's only one product
+    centerPadding: totalSlides === 1 ? "30%" : "0", // Prevent full width for a single product
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: Math.min(4.5, React.Children.count(children)),
-          dots: false,
+          slidesToShow: slidesToShow,
+          dots: totalSlides > 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: Math.min(4.5, React.Children.count(children)),
-          dots: true,
+          slidesToShow: Math.min(2, totalSlides),
+          dots: totalSlides > 1,
           arrows: false,
         },
       },
@@ -57,8 +57,9 @@ const AnimationSlider = ({ children }) => {
         breakpoint: 640,
         settings: {
           slidesToShow: 1,
-          dots: true,
+          dots: totalSlides > 1,
           arrows: false,
+          centerMode: false,
         },
       },
     ],

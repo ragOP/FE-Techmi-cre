@@ -5,9 +5,15 @@ import { fetchProducts } from "../../../../home/featured_products/helper/fetchPr
 import { useQuery } from "@tanstack/react-query";
 
 const Newproduct = () => {
+  const params = {
+    is_best_seller: true,
+    page: 1,
+    per_page: 10,
+  }
+
   const { data: topPharmaProducts, isLoading, error } = useQuery({
     queryKey: ['top_pharma_products'],
-    queryFn: fetchProducts,
+    queryFn: () => fetchProducts({ params }),
   });
 
   return (

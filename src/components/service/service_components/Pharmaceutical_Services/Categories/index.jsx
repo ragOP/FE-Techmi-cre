@@ -2,14 +2,25 @@ import React from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "../../../../home/Categ_Options/helpers/fetchCategories";
+import { useLocation, useNavigate } from "react-router";
 
-const CategoriesPhaema = () => {
+const CategoriesPharma = () => {
+  const location = useLocation()
+  const navigate = useNavigate();
+  const selectedServiceId = location.state?.selectedCardId || null;
 
+  const params = {
+    service_id: selectedServiceId
+  }
 
   const { data: pharmaCategories, isLoading, error } = useQuery({
     queryKey: ['pharma_categories'],
-    queryFn: fetchCategories,
+    queryFn: () => fetchCategories({ params }),
   });
+
+  const onNavigateSearch = () => {
+    navigate('/search')
+  }
 
   return (
     <div className="mt-16 flex flex-col items-center">
@@ -22,14 +33,16 @@ const CategoriesPhaema = () => {
           <p className="text-gray-500">Loading categories...</p>
         </div>
         :
-        <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-4">
+        <div className="flex md:flex-row flex-col gap-14 mt-8 px-4 justify-center items-center">
           {pharmaCategories && pharmaCategories?.length > 0 && pharmaCategories.map((category) => (
-            <CategoriesPharmaCard
-              key={category?._id}
-              image={category?.images?.[0]}
-              name={category?.name}
-              discount={category?.discount}
-            />
+            <div onClick={onNavigateSearch}  className="w-full md:w-2/4" key={category?._id}>
+              <CategoriesPharmaCard
+                key={category?._id}
+                image={category?.images?.[0]}
+                name={category?.name}
+                discount={category?.discount}
+              />
+            </div>
           ))}
         </div>}
 
@@ -38,7 +51,7 @@ const CategoriesPhaema = () => {
   );
 };
 
-export default CategoriesPhaema;
+export default CategoriesPharma;
 
 export const CategoriesPharmaCard = ({ image, name, discount }) => {
   return (

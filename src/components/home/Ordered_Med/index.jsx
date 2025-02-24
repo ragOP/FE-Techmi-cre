@@ -6,9 +6,16 @@ import { fetchProducts } from "../featured_products/helper/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
 
 const OrderedMed = () => {
+
+  const params = {
+    is_best_seller: true,
+    page: 1,
+    per_page: 10,
+  }
+
   const { data: topOrderedProducts, isLoading, error } = useQuery({
     queryKey: ['top_ordered_products'],
-    queryFn: fetchProducts,
+    queryFn: () => fetchProducts({ params }),
   });
 
   return (

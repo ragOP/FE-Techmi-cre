@@ -7,13 +7,13 @@ import Frame3 from '../../../assets/cateoptions/Frame3.png';
 import { useQuery } from '@tanstack/react-query';
 import { fetchServices } from "./helpers/fetchServices";
 
-const categories = [
+const services = [
   { id: 1, imageSrc: Frame1, title: "House Cleaning" },
   { id: 2, imageSrc: Frame2, title: "Pharmaceutical" },
   { id: 3, imageSrc: Frame3, title: "Laundry Service" }
 ];
 
-const CategoryCard = ({ imageSrc, title, onClick, isHighlighted }) => {
+const ServiceCard = ({ imageSrc, title, onClick, isHighlighted }) => {
   return (
     <div
       onClick={onClick}
@@ -32,7 +32,7 @@ const CategoryCard = ({ imageSrc, title, onClick, isHighlighted }) => {
   );
 };
 
-const CategoryGrid = () => {
+const ServiceGrid = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const highlightedCardId = location.state?.selectedCardId || null;
@@ -45,27 +45,27 @@ const CategoryGrid = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading services</div>;
 
-  const categories = fetchedCategories || [];
+  const services = fetchedCategories || [];
 
   return (
     <div className="flex flex-col md:flex-row gap-2  justify-center mb-20 items-center">
-      {categories && categories?.length > 0 ?
-        categories.map((category) => {
-          const isSelected = highlightedCardId === category._id;
+      {services && services?.length > 0 ?
+        services.map((service) => {
+          const isSelected = highlightedCardId === service._id;
           return (
-            <CategoryCard
-              key={category._id}
-              imageSrc={category.images?.[0]}
-              title={category.name || ""}
-              onClick={() => navigate("/service", { state: { selectedCardId: category._id, name: category.name } })}
+            <ServiceCard
+              key={service._id}
+              imageSrc={service.images?.[0]}
+              title={service.name || ""}
+              onClick={() => navigate("/service", { state: { selectedCardId: service._id, name: service.name } })}
               isHighlighted={isSelected}
             />
           )
         }) :
-        <div className="text-center text-gray-500">No category present.</div>
+        <div className="text-center text-gray-500">No service present.</div>
       }
     </div>
   );
 };
 
-export default CategoryGrid;
+export default ServiceGrid;

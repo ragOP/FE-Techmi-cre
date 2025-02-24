@@ -14,10 +14,15 @@ const dummyData = [
 
 
 const SellingServices = () => {
+  const params = {
+    is_best_seller: true,
+    page: 1,
+    per_page: 10,
+  }
 
   const { data: superSellingProducts, isLoading, error } = useQuery({
     queryKey: ['products'],
-    queryFn: fetchProducts,
+    queryFn: () => fetchProducts({ params }),
   });
 
   console.log(superSellingProducts);

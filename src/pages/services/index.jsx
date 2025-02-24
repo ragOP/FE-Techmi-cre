@@ -9,7 +9,7 @@ import Tagtitle from "../../components/service/service_components/Pharmaceutical
 const Service = () => {
   const location = useLocation();
   const selectedCardTitle = location.state?.name || null;
-console.log(">>", selectedCardTitle)
+  
   return (
     <div>
       <Tagtitle />

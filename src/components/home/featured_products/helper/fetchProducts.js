@@ -1,14 +1,12 @@
 import { apiService } from "../../../../utils/api/apiService";
 import { endpoints } from "../../../../utils/endpoints";
 
-export const fetchProducts = async () => {
+export const fetchProducts = async ({ params }) => {
   try {
     const apiResponse = await apiService({
       endpoint: endpoints.product,
       method: "GET",
-      params: {
-        is_best_seller: true,
-      },
+      params: params,
     });
 
     if (apiResponse?.response?.success) {

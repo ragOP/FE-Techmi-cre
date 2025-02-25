@@ -15,6 +15,6 @@ export const fetchCategories = async ({ params }) => {
 
     return [];
   } catch (error) {
-    console.error("error");
+    console.error(error);
   }
 };

@@ -19,9 +19,10 @@ const Login = () => {
             if (response?.success) {
                 const data = response?.data
                 const tokenData = data?.token
+                const userId = data?.id;
                 if (tokenData) {
                     console.log(">>>>", data, tokenData)
-                    setItem({ token: tokenData });
+                    setItem({ token: tokenData, userId: userId });
                     navigate("/");
                     toast.success("Login successful!");
                 } else {

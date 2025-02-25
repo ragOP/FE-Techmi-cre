@@ -35,6 +35,15 @@ const Navbar = () => {
     navigate("/login");
   }
 
+  const handleCartClick = () => {
+    if (!isUserLoggedIn) {
+      toast.error("Please login to add items to cart");
+      navigate("/login");
+    } else {
+      navigate("/cart");
+    }
+  }
+
   useEffect(() => {
     if (token) {
       setIsUserLoggedIn(true)
@@ -71,7 +80,7 @@ const Navbar = () => {
       </div>
 
       <div className="hidden md:flex items-center gap-3">
-        <button className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full">
+        <button onClick={handleCartClick} className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full">
           <img src={cart} alt="Cart" className="h-[23px] w-[23px]" />
           <span className="text-[#00008B] font-medium text-lg">Cart</span>
         </button>

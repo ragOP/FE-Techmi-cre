@@ -4,4 +4,5 @@ export const endpoints = {
   product: "api/product",
   category: "api/category",
   service: "api/service",
+  cart: "api/cart",
 };

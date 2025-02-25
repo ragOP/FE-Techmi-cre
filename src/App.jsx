@@ -9,6 +9,7 @@ import SearchResult from "./components/search/Search_Result";
 import Signup from "./pages/signup";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import { getItem } from "./utils/local_storage";
+import Cart from "./pages/cart";
 
 const App = () => {
   const location = useLocation();
@@ -27,7 +28,7 @@ const App = () => {
         <Route path="/signup" element={token ? <Navigate to="/" replace /> : <Signup />} />
         <Route path="/service" element={<Service />} />
         <Route path="/search" element={<SearchResult />} />
-
+        <Route path="/cart" element={<Cart />} />
         {/* Protected Routes (Only accessible if logged in) */}
         {/* <Route element={<ProtectedRoute />}>
         </Route> */}

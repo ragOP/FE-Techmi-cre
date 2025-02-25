@@ -2,7 +2,7 @@ import React from "react";
 
 const filterOptions = {
   category: ["Mama Earth", "Cetaphile", "Himalaya", "Biotique", "Nivea"],
-  brand: ["Shampoo", "Face Cream", "Body Lotion"],
+  // brand: ["Shampoo", "Face Cream", "Body Lotion"],
   price: ["₹0 - ₹500", "₹500 - ₹1K", "ABOVE ₹1K"],
   discount: ["10% Off or more", "25% Off or more", "35% Off or more"],
 };

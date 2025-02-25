@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import ProductCard from "../../common/product_card";
 import SearchBar from "../../common/Search_Bar";
 import Filter from "../filter";
+import { useQuery } from "@tanstack/react-query"
+import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
 
 const SearchResult = () => {
   const location = useLocation();
@@ -12,11 +14,25 @@ const SearchResult = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [filters, setFilters] = useState({
+    page: 1,
+    per_page: 20,
     category: [],
-    brand: [],
+    // brand: [],
     price: [],
     discount: [],
   });
+
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery || "");
+
+  const params = {
+    search: debouncedQuery || "",
+    ...filters || {},
+  }
+  const { data: allProducts, isLoading, error } = useQuery({
+    queryKey: ['search_result_products'],
+    queryFn: () => fetchProducts({ params }),
+  });
+
 
   useEffect(() => {
     if (searchQuery) {
@@ -48,9 +64,9 @@ const SearchResult = () => {
       filtered = filtered.filter((product) => filters.category.includes(product.category));
     }
 
-    if (filters.brand.length > 0) {
-      filtered = filtered.filter((product) => filters.brand.includes(product.brand));
-    }
+    // if (filters.brand.length > 0) {
+    //   filtered = filtered.filter((product) => filters.brand.includes(product.brand));
+    // }
 
     if (filters.price.length > 0) {
       filtered = filtered?.filter((product) => {
@@ -82,18 +98,23 @@ const SearchResult = () => {
     <div className="flex mt-5">
       <Filter filters={filters} setFilters={setFilters} />
       <div className="flex-grow rounded-3xl bg-white px-4 mx-5 ">
-        <SearchBar />
+        <SearchBar debouncedQuery={debouncedQuery} setDebouncedQuery={setDebouncedQuery} />
         <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-x-4 ">
-          {filteredProducts?.map((product) => (
-            <ProductCard
-              key={product?.id}
-              image={product.banner_image}
-              price={product.price}
-              name={product.name}
-              discountedPrice={product.discounted_price}
-              smallDescription={product.small_description}
-            />
-          ))}
+          {isLoading ?
+            <div className="flex justify-center items-center h-40">
+              <p className="text-gray-500">Loading products...</p>
+            </div>
+            :
+            allProducts?.map((product) => (
+              <ProductCard
+                key={product?.id}
+                image={product.banner_image}
+                price={product.price}
+                name={product.name}
+                discountedPrice={product.discounted_price}
+                smallDescription={product.small_description}
+              />
+            ))}
         </div>
       </div>
     </div>

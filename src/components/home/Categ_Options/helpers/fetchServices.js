@@ -14,6 +14,6 @@ export const fetchServices = async () => {
 
     return [];
   } catch (error) {
-    console.error("error");
+    console.error(error);
   }
 };

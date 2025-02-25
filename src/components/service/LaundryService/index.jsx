@@ -1,11 +1,13 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Aboutus from "../service_components/House_Cleaning/About_us"
 import prescription from "../../../assets/solutions/prescription.svg"
 import OurServices from "../service_components/Laundry_Service/Our_Services"
 import Testimonials from "../../common/testimonial"
 import Searchbox from "../service_components/Laundry_Service/Searchbox"
+import HouseCleaningProducts from "../service_components/House_Cleaning/House_Cleaning_Products"
 
 const LaundryService = () => {
+  const productsRef = useRef(null);
   const [testimonialData, setTestimonialData] = useState([
     {
       name: "Alice Johnson",
@@ -26,19 +28,32 @@ const LaundryService = () => {
         "I've tried many expense trackers, but this one stands out. The experience is seamless, and I love the detailed reports. The ability to set goals and track my progress over time has been incredibly useful. Plus, the interface is beautifully designed, making it a pleasure to use every day. I wouldn't go back to any other tracker!",
     },
   ])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+
+  useEffect(() => {
+    if (selectedCategory && productsRef.current) {
+      productsRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedCategory]);
 
   return (
-    <div className="space-y-10">
-      <Searchbox />
+    <div className="space-y-5">
+      {/* <Searchbox /> */}
+      <OurServices selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
       <Aboutus
         title="About Us"
         desc="We are your one-stop solution for all your laundry needs. Discover why Caresync is the best laundry service provider in India and why customers trust us for their laundry requirements."
         desc2="Whether you are a student or a busy professional living away from home, our laundry services promise to free up your time and deliver a clean, spotless set of clothes. We treat your laundry with great care."
         src={prescription}
       />
-      <OurServices />
 
-      <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10">
+      {selectedCategory && (
+        <div ref={productsRef}>
+          <HouseCleaningProducts category={selectedCategory} />
+        </div>
+      )}
+
+      <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10 text-center">
         Our clients praise us <br /> for great service.
       </h2>
       <Testimonials testimonialData={testimonialData} />

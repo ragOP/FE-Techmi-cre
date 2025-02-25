@@ -16,7 +16,7 @@ export const getItem = (string) => {
   try {
     return encryptStorage.getItem(string);
   } catch (error) {
-    console.error("error");
+    console.error(error);
   }
 };
 

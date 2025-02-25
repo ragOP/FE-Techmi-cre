@@ -1,12 +1,15 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Pricing from "../service_components/House_Cleaning/Price_offer"
 import ServicesInfo from "../service_components/House_Cleaning/Service_info"
 import Aboutus from "../service_components/House_Cleaning/About_us"
 import Services from "../service_components/House_Cleaning/Our_service"
 import prescription from "../../../assets/solutions/prescription.svg"
 import Testimonials from "../../common/testimonial"
+import HouseCleaningProducts from "../service_components/House_Cleaning/House_Cleaning_Products"
 
 const HouseCleaning = () => {
+  const productsRef = useRef(null);
+
   const [testimonialData, setTestimonialData] = useState([
     {
       name: "Alice Johnson",
@@ -27,18 +30,30 @@ const HouseCleaning = () => {
         "I've tried many expense trackers, but this one stands out. The experience is seamless, and I love the detailed reports. The ability to set goals and track my progress over time has been incredibly useful. Plus, the interface is beautifully designed, making it a pleasure to use every day. I wouldn't go back to any other tracker!",
     },
   ])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+
+  useEffect(() => {
+    if (selectedCategory && productsRef.current) {
+      productsRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedCategory]);
 
   return (
-    <div className="space-y-10">
-      <Services />
+    <div className="space-y-5">
+      <Services setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
       <Aboutus
         title="About Us"
         desc="Care Sync is a leading professional cleaning company, known for delivering high-quality services in Delhi NCR and beyond. We offer comprehensive cleaning solutions for both residential and commercial spaces. From deep cleaning to pest control, we ensure your space is spotless, hygienic, and comfortable."
         src={prescription}
       />
-      <ServicesInfo />
-      <Pricing />
-      <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10">
+      {selectedCategory && (
+        <div ref={productsRef}>
+          <HouseCleaningProducts category={selectedCategory} />
+        </div>
+      )}
+      {/* <ServicesInfo /> */}
+      {/* <Pricing /> */}
+      <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10 text-center">
         Our clients praise us <br /> for great service.
       </h2>
       <Testimonials testimonialData={testimonialData} />

@@ -1,102 +1,81 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../../common/product_card";
 import SearchBar from "../../common/Search_Bar";
 import Filter from "../filter";
+import { useQuery } from "@tanstack/react-query"
+import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
+import { isArrayWithValues } from "../../../utils/array/isArrayWithValues";
+import { fetchCategories } from "../../home/Categ_Options/helpers/fetchCategories";
 
 const SearchResult = () => {
   const location = useLocation();
+  const selectedServiceId = location.state?.selectedCardId || null;
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("q") || "";
 
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [filters, setFilters] = useState({
+    page: 1,
+    per_page: 20,
     category: [],
-    brand: [],
+    // brand: [],
     price: [],
     discount: [],
   });
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery || "");
 
-  useEffect(() => {
-    if (searchQuery) {
-      handleSearch(searchQuery);
-    }
-  }, [searchQuery]);
+  const params = {
+    search: debouncedQuery || "",
+    ...filters || {},
+  }
 
-  const handleSearch = (query) => {
-    const dummyProducts = [
-      { id: 1, category: "Pain Relief", brand: "Mama Earth", price: 259, originalPrice: 599, discount: "10%", img: "https://images.unsplash.com/photo-1583088580009-2d947c3e90a6?q=80&w=2592", title: "Pain Relief Tablets", desc: "Effective pain relief." },
-      { id: 2, category: "Vitamins", brand: "Cetaphile", price: 499, originalPrice: 799, discount: "25%", img: "https://plus.unsplash.com/premium_photo-1738857914575-3d3b2fb7064e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", title: "Vitamin C Gummies", desc: "Boosts immunity and overall health." },
-      { id: 3, category: "Tea", brand: "Himalaya", price: 349, originalPrice: 699, discount: "35%", img: "https://plus.unsplash.com/premium_photo-1738857914575-3d3b2fb7064e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", title: "Herbal Green Tea", desc: "Rich in antioxidants for a healthy body." },
-      { id: 4, category: "Skincare", brand: "Biotique", price: 599, originalPrice: 999, discount: "40%", img: "https://plus.unsplash.com/premium_photo-1738857914575-3d3b2fb7064e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", title: "Aloe Vera Face Cream", desc: "Hydrates and nourishes your skin." },
-      { id: 5, category: "Haircare", brand: "Nivea", price: 299, originalPrice: 499, discount: "20%", img: "https://plus.unsplash.com/premium_photo-1738857914575-3d3b2fb7064e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", title: "Anti-Dandruff Shampoo", desc: "Removes dandruff and keeps scalp healthy." },
-    ];
+  const { data: allProducts, isLoading, error } = useQuery({
+    queryKey: ['search_result_products', params],
+    queryFn: () => fetchProducts({ params }),
+  });
 
-    setProducts(dummyProducts);
-    setFilteredProducts(dummyProducts);
-  };
+  console.log("selectedServiceId", selectedServiceId)
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters, products]);
+  const categoriesParams = {
+    service_id: selectedServiceId
+  }
+  const { data: categoriesList } = useQuery({
+    queryKey: ['pharma_categories', categoriesParams],
+    queryFn: () => fetchCategories({ params: categoriesParams }),
+  });
 
-  const applyFilters = () => {
-    let filtered = [...products];
-
-    if (filters.category.length > 0) {
-      filtered = filtered.filter((product) => filters.category.includes(product.category));
-    }
-
-    if (filters.brand.length > 0) {
-      filtered = filtered.filter((product) => filters.brand.includes(product.brand));
-    }
-
-    if (filters.price.length > 0) {
-      filtered = filtered?.filter((product) => {
-        return filters?.price?.some((range) => {
-          if (range === "₹0 - ₹500") return product.price >= 0 && product.price <= 500;
-          if (range === "₹500 - ₹1K") return product.price > 500 && product.price <= 1000;
-          if (range === "ABOVE ₹1K") return product.price > 1000;
-          return false;
-        });
-      });
-    }
-
-    if (filters.discount.length > 0) {
-      filtered = filtered?.filter((product) => {
-        return filters?.discount?.some((discount) => {
-          const discountValue = parseInt(product?.discount?.replace("%", ""));
-          if (discount === "10% Off or more") return discountValue >= 10;
-          if (discount === "25% Off or more") return discountValue >= 25;
-          if (discount === "35% Off or more") return discountValue >= 35;
-          return false;
-        });
-      });
-    }
-
-    setFilteredProducts(filtered.length > 0 ? filtered : products);
-  };
 
   return (
     <div className="flex mt-5">
-      <Filter filters={filters} setFilters={setFilters} />
+      <Filter filters={filters} setFilters={setFilters} categoriesList={categoriesList} />
       <div className="flex-grow rounded-3xl bg-white px-4 mx-5 ">
-        <SearchBar />
-        <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-x-4 ">
-          {filteredProducts?.map((product) => (
-            <ProductCard
-              key={product?.id}
-              image={product.banner_image}
-              price={product.price}
-              name={product.name}
-              discountedPrice={product.discounted_price}
-              smallDescription={product.small_description}
-            />
-          ))}
-        </div>
+        <SearchBar debouncedQuery={debouncedQuery} setDebouncedQuery={setDebouncedQuery} />
+        {isLoading ?
+          <div className="flex justify-center items-center h-40">
+            <p className="text-gray-500">Loading products...</p>
+          </div>
+          :
+          isArrayWithValues(allProducts) ?
+            <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-x-4 ">
+              {allProducts?.map((product) => (
+                <ProductCard
+                  key={product?.id}
+                  image={product.banner_image}
+                  price={product.price}
+                  name={product.name}
+                  discountedPrice={product.discounted_price}
+                  smallDescription={product.small_description}
+                />
+              ))}
+            </div>
+            :
+            !isLoading && !isArrayWithValues(allProducts) ?
+              <div className="flex align-center justify-center mt-10">
+                <p className="text-center text-gray-500">No products found.</p>
+              </div>
+              : null}
       </div>
-    </div>
+    </div >
   );
 };
 

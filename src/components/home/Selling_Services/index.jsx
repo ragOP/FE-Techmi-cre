@@ -36,6 +36,7 @@ const SellingServices = () => {
                       name={product.name}
                       discountedPrice={product.discounted_price}
                       smallDescription={product.small_description}
+                      id={product._id}
                     />
                   </div>
                 ))}

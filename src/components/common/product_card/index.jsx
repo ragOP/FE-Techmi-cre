@@ -1,16 +1,19 @@
 import React from "react"
 import Image from "../image"
 import arrow from "../../../assets/product_card/arrow-up-right.svg"
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
   image,
   price,
   discountedPrice,
   name,
-  smallDescription
+  smallDescription,
+  id
 }) => {
+  const navigate = useNavigate();
   return (
-    <div className="shadow-[#0000004D] shadow-lg mb-5 lg:h-[30rem] h-[30rem] xl:h-[40rem] rounded-2xl p-4 max-h-fit relative">
+    <div onClick={() => navigate(`/product/${id}`)} className="shadow-[#0000004D] shadow-lg mb-5 lg:h-[30rem] h-[30rem] xl:h-[40rem] rounded-2xl p-4 max-h-fit relative cursor-pointer">
       <img
         src={arrow}
         className="bg-[#82C8E5] rounded-full scale-75 p-2 absolute right-2 top-2"

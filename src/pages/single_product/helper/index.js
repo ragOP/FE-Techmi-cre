@@ -2,19 +2,16 @@ import { apiService } from "../../..//utils/api/apiService";
 import { endpoints } from "../../../utils/endpoints";
 import { getItem } from "../../../utils/local_storage";
 
-export const fetchCart = async ({ params, method = "GET", body = {} }) => {
+export const fetchSingleProduct = async ({ id, method = "GET"}) => {
   try {
     const apiResponse = await apiService({
-      endpoint: endpoints.cart,
+      endpoint: `${endpoints.product_by_id}/${id}`,
       method: method,
-      params,
       token: getItem("token"),
-      data: body,
     });
 
     if (apiResponse?.response?.success) {
-      console.log(">>>", apiResponse?.response?.data?.cart?.items)
-      return apiResponse?.response?.data?.cart?.items;
+      return apiResponse?.response?.data;
     }
 
     return [];

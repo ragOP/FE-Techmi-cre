@@ -10,6 +10,7 @@ import Signup from "./pages/signup";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import { getItem } from "./utils/local_storage";
 import Cart from "./pages/cart";
+import SingleProduct from "./pages/single_product";
 
 const App = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const App = () => {
         <Route path="/service" element={<Service />} />
         <Route path="/search" element={<SearchResult />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/product/:id" element={<SingleProduct />} />
         {/* Protected Routes (Only accessible if logged in) */}
         {/* <Route element={<ProtectedRoute />}>
         </Route> */}

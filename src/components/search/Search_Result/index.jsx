@@ -34,8 +34,6 @@ const SearchResult = () => {
     queryFn: () => fetchProducts({ params }),
   });
 
-  console.log("selectedServiceId", selectedServiceId)
-
   const categoriesParams = {
     service_id: selectedServiceId
   }
@@ -44,11 +42,10 @@ const SearchResult = () => {
     queryFn: () => fetchCategories({ params: categoriesParams }),
   });
 
-
   return (
     <div className="flex mt-5">
       <Filter filters={filters} setFilters={setFilters} categoriesList={categoriesList} />
-      <div className="flex-grow rounded-3xl bg-white px-4 mx-5 ">
+      <div className="flex-grow w-[80%] rounded-3xl bg-white px-4 mx-5 ">
         <SearchBar debouncedQuery={debouncedQuery} setDebouncedQuery={setDebouncedQuery} />
         {isLoading ?
           <div className="flex justify-center items-center h-40">

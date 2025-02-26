@@ -28,7 +28,7 @@ const Filter = ({ filters, setFilters, categoriesList }) => {
   };
 
   return (
-    <div className="w-64 p-4 bg-white shadow-md rounded-3xl border ml-5">
+    <div className="w-[20%] p-4 bg-white shadow-md rounded-3xl border ml-5">
       <h3 className="text-lg font-semibold mb-3">Filters</h3>
 
       {Object.entries(filterOptions).map(([key, values]) => (

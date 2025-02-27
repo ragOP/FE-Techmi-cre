@@ -2,12 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import AnimationSlider from "../../../../common/animations"
 import ProductCard from "../../../../common/product_card"
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
+import { useLocation } from "react-router";
 
 export const PharmaSearchProducts = ({ debouncedQuery }) => {
 
+    const location = useLocation()
+    const selectedServiceId = location.state?.selectedCardId || null;
+
+    const params = {
+        search: debouncedQuery,
+        service_id: selectedServiceId
+    }
+
     const { data: searchedProducts, isLoading, error } = useQuery({
-        queryKey: ["search_products", debouncedQuery],
-        queryFn: () => fetchProducts({ params: { search: debouncedQuery } }),
+        queryKey: ["search_products", params],
+        queryFn: () => fetchProducts({ params }),
         enabled: debouncedQuery?.trim() !== "",
     });
 

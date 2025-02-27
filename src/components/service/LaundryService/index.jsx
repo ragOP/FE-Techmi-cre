@@ -3,8 +3,10 @@ import Aboutus from "../service_components/House_Cleaning/About_us"
 import prescription from "../../../assets/solutions/prescription.svg"
 import OurServices from "../service_components/Laundry_Service/Our_Services"
 import Testimonials from "../../common/testimonial"
-import Searchbox from "../service_components/Laundry_Service/Searchbox"
-import HouseCleaningProducts from "../service_components/House_Cleaning/House_Cleaning_Products"
+import { fetchProducts } from "../../home/featured_products/helper/fetchProducts"
+import { useQuery } from "@tanstack/react-query"
+import Vectortick from "../../../assets/services/para/Vectortick.svg"
+import Vectorgrey from "../../../assets/services/para/vectorgrey.svg"
 
 const LaundryService = () => {
   const productsRef = useRef(null);
@@ -49,7 +51,7 @@ const LaundryService = () => {
 
       {selectedCategory && (
         <div ref={productsRef}>
-          <HouseCleaningProducts category={selectedCategory} />
+          <LaundaryCardList category={selectedCategory} />
         </div>
       )}
 
@@ -62,3 +64,98 @@ const LaundryService = () => {
 }
 
 export default LaundryService
+
+export const LaundaryCardList = ({ category }) => {
+
+  const [selectedCard, setSelectedCard] = useState(null);
+
+  const name = category?.name;
+  const id = category?._id;
+
+  const params = {
+    category_id: id,
+    page: 1,
+    per_page: 10,
+  }
+
+  const { data: laundaryProducts, isLoading, error } = useQuery({
+    queryKey: ['laundary_products', id],
+    queryFn: () => fetchProducts({ params }),
+  });
+
+
+  return (
+    <div className="md:px-12 space-y-2 pt-8">
+      <h1 className="text-3xl font-semibold text-center">{name}</h1>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <p className="text-gray-500">Loading products...</p>
+        </div>
+      ) : (
+        <>
+          {laundaryProducts && laundaryProducts.length > 0 ? (
+            <div className="flex flex-col md:flex-row p-4 gap-8 justify-center items-center">
+              {laundaryProducts.map((product) => {
+                const isSelected = selectedCard && selectedCard.toString() === product._id.toString();
+                return (
+                  <LaundaryCard
+                    key={product._id}
+                    id={product._id}
+                    name={product.name}
+                    price={product.price}
+                    discountedPrice={product.discounted_price}
+                    smallDescription={product.small_description}
+                    points={product.meta_data.points || []}
+                    onClick={() => setSelectedCard(product._id)}
+                    isSelected={isSelected}
+                  />
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">No products found.</div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescription, price, points }) => {
+  return (
+    <div className={`flex flex-col w-full md:w-1/4 h-[100%]  border-2 rounded-3xl p-6 transition-all duration-300 cursor-pointer ${isSelected === id
+      ? "bg-gradient-to-r from-[rgba(0,0,192,0.1)] to-[rgba(69,166,207,0.1)] border-blue-500"
+      : "border-gray-300 bg-white"
+      }`}>
+
+      <div className="flex-grow">
+        <h2 className="text-2xl font-normal">{name}</h2>
+        <p className="text-2xl font-bold">
+          ₹ {discountedPrice} / <span className="">{price}</span>
+        </p>
+        <p className="text-base font-medium text-[#3F3F3F]">{smallDescription}</p>
+        <ul className="mt-4 space-y-2">
+          <p className="text-base text-[#3F3F3F] font-medium">{name}</p>
+          {points.map((feature, index) => (
+            <li key={index} className="flex items-center space-x-2">
+              <img
+                src={isSelected === id ? Vectortick : Vectorgrey}
+                alt="icon"
+                className="w-4 h-4"
+              />
+
+              <span className="text-sm xl:text-base">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button
+        className={`mt-4 py-2 px-4 rounded-3xl w-full font-semibold ${isSelected === id ? "bg-[#141749] text-white" : "border border-[#00008B] text-blue-500"
+          }`} xlxl
+      >
+        Add to cart
+      </button>
+    </div>
+  )
+}

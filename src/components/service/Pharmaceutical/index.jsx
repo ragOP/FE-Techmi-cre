@@ -11,7 +11,6 @@ import { PharmaSearchProducts } from "../service_components/Pharmaceutical_Servi
 const Pharmaceutical = () => {
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
-
   return (
     <div className="w-full">
       <div className="flex flex-col align-center justify-center md:px-[15%] ">

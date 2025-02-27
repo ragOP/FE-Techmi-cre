@@ -48,19 +48,21 @@ export default function Cart() {
     }
   }, [cartProducts]);
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (product, change) => {
+    const productId = product?._id;
+
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.product === id
+        item.product._id === productId
           ? { ...item, quantity: Math.max(1, item.quantity + change) }
           : item
       )
     );
-    const updatedItem = cartProducts.find((item) => item.product === id);
+    const updatedItem = cartProducts.find((item) => item.product._id === productId);
     if (updatedItem) {
       updateCart({
         user_id: getItem("userId"),
-        product_id: updatedItem.product,
+        product_id: updatedItem.product._id,
         quantity: updatedItem.quantity + change,
       });
     }
@@ -90,68 +92,74 @@ export default function Cart() {
         <div className="flex-1 bg-white p-6 pr-1 rounded-tl-3xl rounded-bl-3xl">
           <h2 className="text-2xl ml-4 font-bold">{cart.length} items added</h2>
           {cart.length === 0 && (
-            <p className="text-lg ml-4 text-gray-500 mb-2">
+            <p className="text-lg ml-4 text-gray-500 mb-4">
               Your cart is empty
             </p>
           )}
-          {cart.length > 0 && (
+          {/* {cart.length > 0 && (
             <p className="text-sm ml-4 text-gray-500 mb-2">
               Items not requiring prescription
             </p>
-          )}
-          {cart.map((item) => (
-            <div
-              key={item._id}
-              className="flex items-center p-4 mb-4 border-b border-gray-200 bg-gray-50"
-            >
-              <img
-                src={item.product.images[0]}
-                alt={item.product.name}
-                className="w-28 h-28 object-cover rounded"
-              />
-              <div className="ml-4 mr-4 w-[65%]">
-                <h3 className="font-semibold text-lg">{item.product.name}</h3>
-                <p className="text-sm text-gray-500">
-                  {item.product.full_description || "No description"}
-                </p>
-                <span
-                  onClick={() => handleRemoveItemFromCart(item.product._id)}
-                  className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
-                >
-                  Remove
-                </span>
-              </div>
-              <div className="flex items-center flex-col -mt-8">
-                <p className="font-bold text-lg ">
-                  ₹{item.product.discounted_price ? item.product.discounted_price : item.product.price}{" "}
-                  {item.product.discounted_price && <span className="line-through text-gray-500 text-xs">
-                    ₹{item.product.price}
-                  </span>}{" "}
-                  {/* <span className="text-[#297C00] text-sm">
+          )} */}
+          <div className="mt-6">
+            {cart.map((item) => (
+              <div
+                key={item._id}
+                className="flex flex-row items-center justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
+              >
+                <div className="flex flex-row items-center">
+                  <img
+                    src={item.product.images[0]}
+                    alt={item.product.name}
+                    className="w-28 h-28 object-cover rounded"
+                  />
+                  <div className="ml-4 mr-4 w-[65%]">
+                    <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {item.product.full_description || "No description"}
+                    </p>
+                    <span
+                      onClick={() => handleRemoveItemFromCart(item.product._id)}
+                      className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
+                    >
+                      Remove
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center flex-col -mt-8">
+                  <p className="font-bold text-lg ">
+                    ₹{item.product.discounted_price ? item.product.discounted_price : item.product.price}{" "}
+                    {item.product.discounted_price &&
+                      <span className="line-through text-gray-500 text-xs">
+                        ₹{item.product.price}
+                      </span>}
+                    {/* <span className="text-[#297C00] text-sm">
                     {item.product.discount || 0}% off
                   </span> */}
-                </p>
-                <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
-                  <button
-                    onClick={() => updateQuantity(item.product, -1)}
-                    className="text-3xl"
-                  >
-                    -
-                  </button>
-                  <span className="mx-3 font-medium mt-1">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.product, 1)}
-                    className="text-2xl"
-                  >
-                    +
-                  </button>
+                  </p>
+                  <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
+                    <button
+                      onClick={() => updateQuantity(item.product, -1)}
+                      className="text-3xl pb-1"
+                    >
+                      -
+                    </button>
+                    <span className="mx-3 font-medium">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.product, 1)}
+                      className="text-2xl  pb-1"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
         </div>
         {cart.length > 0 && (
-          <div className="w-full md:w-1/3 bg-white p-6 rounded-tr-3xl rounded-br-3xl border-l border-gray-600">
+          <div className="w-full md:w-1/3 bg-white p-6 rounded-tr-3xl rounded-br-3xl border-l border-gray-200">
             <h3 className="text-xl font-bold mb-4">Offers & Discounts</h3>
             <div className="border-b border-gray-900 p-3 text-gray-800">
               <div className="flex items-center justify-between">

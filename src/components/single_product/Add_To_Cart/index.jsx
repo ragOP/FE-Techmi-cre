@@ -3,12 +3,13 @@ import securePayment from "../../../assets/single_product/second.png";
 import trustedPharmacy from "../../../assets/single_product/first.png";
 import genuineProducts from "../../../assets/single_product/third.png";
 import protinexBanner from "../../../assets/single_product/last.png";
+import { ChevronDown } from "lucide-react";
 
 const ProductAddToCart = ({ product, quantity, setQuantity, handleAddToCart }) => {
   return (
     <div className="w-[30%]">
       <div className="text-lg font-bold">
-        ₹{product?.price}*
+        ₹{product?.discounted_price || product?.price}*
         <span className="ml-3 text-gray-500 text-sm font-normal line-through">
           {" "}
           MRP ₹{product?.discounted_price}
@@ -30,22 +31,25 @@ const ProductAddToCart = ({ product, quantity, setQuantity, handleAddToCart }) =
         Delivering to: 122019, Jupiter
       </p>
 
-      <select
-        className="mt-3 border-2 border-gray-900 rounded-lg px-3 py-2 w-full bg-gray-100"
-        value={quantity}
-        onChange={(e) => setQuantity(e.target.value)}
-      >
-        {[1, 2, 3, 4, 5].map((num) => (
-          <option key={num} value={num}>
-            {num}
-          </option>
-        ))}
-      </select>
+      <div className="relative mt-3">
+        <select
+          className="border-2 border-gray-900 rounded-lg px-3 py-2 w-full bg-gray-100 appearance-none"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+        >
+          {[1, 2, 3, 4, 5].map((num) => (
+            <option key={num} value={num}>
+              {num}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
+      </div>
 
       <button onClick={handleAddToCart} className="w-full mt-4 border-2 border-blue-900 text-blue-900 rounded-3xl py-2">
         Add To Cart
       </button>
-      <button className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-2">
+      <button className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-3 ">
         Buy Now
       </button>
 

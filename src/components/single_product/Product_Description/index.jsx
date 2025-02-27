@@ -3,8 +3,13 @@ import morning from "../../../assets/single_product/morning.png";
 import afternoon from "../../../assets/single_product/afternoon.png";
 import night from "../../../assets/single_product/night.png";
 import { convertDate } from "../../../utils/date_time";
+import { calculateDiscountPercentage } from "../../../utils/percentage/calculateDiscountPercentage";
 
 const ProductDescription = ({ product }) => {
+  const price = product?.price;
+  const discountedPrice = product?.discounted_price || price;
+  const discountPercentage = calculateDiscountPercentage(product?.price, discountedPrice);
+
   return (
     <div className="w-[40%]">
       <div className="flex justify-between items-start">
@@ -22,8 +27,13 @@ const ProductDescription = ({ product }) => {
       </div>
 
       <div className="mt-4 flex items-center">
-        <span className="text-green-600 text-xl font-bold">{product?.price}</span>
-        <span className="text-gray-500 line-through ml-2">₹{product?.discounted_price}</span>
+        <span className="text-green-600 text-2xl font-bold">₹{product?.discounted_price || product?.price}</span>
+        {product?.discounted_price && <span className="text-gray-500 text-normal line-through ml-2">₹{product?.price}</span>}
+        {discountedPrice && (
+          <p className="text-xs text-orange-600 ml-4">
+            ({discountPercentage}% OFF)
+          </p>
+        )}
       </div>
 
       <div className="mt-2 flex gap-2 text-sm">
@@ -68,11 +78,10 @@ const ProductDescription = ({ product }) => {
         ].map((item, index) => (
           <div
             key={index}
-            className={`${
-              item.status === "Out of Stock"
-                ? "cursor-not-allowed"
-                : "cursor-pointer"
-            } border p-2 rounded-3xl shadow-sm text-center bg-gray-50`}
+            className={`${item.status === "Out of Stock"
+              ? "cursor-not-allowed"
+              : "cursor-pointer"
+              } border p-2 rounded-3xl shadow-sm text-center bg-gray-50`}
           >
             <p className="text-sm font-medium border-b pb-2">{item.weight}</p>
             <p className="text-lg font-semibold">{item.price}</p>

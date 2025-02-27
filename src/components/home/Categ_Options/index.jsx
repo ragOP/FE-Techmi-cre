@@ -6,6 +6,7 @@ import Frame2 from '../../../assets/cateoptions/Frame2.png';
 import Frame3 from '../../../assets/cateoptions/Frame3.png';
 import { useQuery } from '@tanstack/react-query';
 import { fetchServices } from "./helpers/fetchServices";
+import LoadingSpinner from "../../loader/LoadingSpinner";
 
 const services = [
   { id: 1, imageSrc: Frame1, title: "House Cleaning" },
@@ -42,7 +43,7 @@ const ServiceGrid = () => {
     queryFn: fetchServices,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingSpinner />;
   if (error) return <div>Error loading services</div>;
 
   const services = fetchedCategories || [];

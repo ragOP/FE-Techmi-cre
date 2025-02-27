@@ -3,6 +3,7 @@ import AnimationSlider from "../../common/animations"
 import ProductCard from "../../common/product_card"
 import { useQuery } from "@tanstack/react-query"
 import { fetchProducts } from "./helper/fetchProducts"
+import ProductLoader from "../../loader/ProductLoader"
 
 const FeaturedProducts = () => {
 
@@ -24,9 +25,7 @@ const FeaturedProducts = () => {
       </h1>
 
       {isLoading ? (
-        <div className="flex justify-center items-center h-40">
-          <p className="text-gray-500">Loading products...</p>
-        </div>
+        <ProductLoader />
       ) : (
         <>
           {topProducts && topProducts.length > 0 ? (

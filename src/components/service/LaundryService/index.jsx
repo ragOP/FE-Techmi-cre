@@ -4,9 +4,12 @@ import prescription from "../../../assets/solutions/prescription.svg"
 import OurServices from "../service_components/Laundry_Service/Our_Services"
 import Testimonials from "../../common/testimonial"
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import Vectortick from "../../../assets/services/para/Vectortick.svg"
 import Vectorgrey from "../../../assets/services/para/vectorgrey.svg"
+import { getItem } from "../../../utils/local_storage"
+import { fetchCart } from "../../../pages/cart/helper/fecthCart"
+import { useNavigate } from "react-router"
 
 const LaundryService = () => {
   const productsRef = useRef(null);
@@ -122,6 +125,28 @@ export const LaundaryCardList = ({ category }) => {
 }
 
 export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescription, price, points }) => {
+  const navigate = useNavigate()
+
+  const payload = {
+    user_id: getItem("userId"),
+    product_id: id,
+    quantity: 1,
+  }
+
+  const { mutate: addToCartMutation } = useMutation({
+    mutationFn: () => fetchCart({
+      method: "POST",
+      body: payload
+    }),
+    onSuccess: () => {
+      navigate("/cart");
+    },
+  });
+
+  const handleAddToCart = () => {
+    addToCartMutation();
+  };
+
   return (
     <div className={`flex flex-col w-full md:w-1/4 h-[100%]  border-2 rounded-3xl p-6 transition-all duration-300 cursor-pointer ${isSelected === id
       ? "bg-gradient-to-r from-[rgba(0,0,192,0.1)] to-[rgba(69,166,207,0.1)] border-blue-500"
@@ -151,8 +176,9 @@ export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescr
       </div>
 
       <button
+        onClick={handleAddToCart}
         className={`mt-4 py-2 px-4 rounded-3xl w-full font-semibold ${isSelected === id ? "bg-[#141749] text-white" : "border border-[#00008B] text-blue-500"
-          }`} xlxl
+          } hover:bg-blue-50`} 
       >
         Add to cart
       </button>

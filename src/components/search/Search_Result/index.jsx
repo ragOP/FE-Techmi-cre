@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../../common/product_card";
 import SearchBar from "../../common/Search_Bar";
 import Filter from "../filter";
@@ -9,6 +9,7 @@ import { isArrayWithValues } from "../../../utils/array/isArrayWithValues";
 import { fetchCategories } from "../../home/Categ_Options/helpers/fetchCategories";
 
 const SearchResult = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const selectedServiceId = location.state?.selectedCardId || null;
   const searchParams = new URLSearchParams(location.search);
@@ -43,6 +44,9 @@ const SearchResult = () => {
     queryFn: () => fetchCategories({ params: categoriesParams }),
   });
 
+  const onNavigateToProduct = (product) => {
+    navigate(`/product/${product._id}`);
+  }
 
   useEffect(() => {
     if (categoryId) {
@@ -72,12 +76,13 @@ const SearchResult = () => {
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4 gap-x-4 ">
               {allProducts?.map((product) => (
                 <ProductCard
-                  key={product?.id}
+                  key={product?._id}
                   image={product.banner_image}
                   price={product.price}
                   name={product.name}
                   discountedPrice={product.discounted_price}
                   smallDescription={product.small_description}
+                  onClick={() => onNavigateToProduct(product)}
                 />
               ))}
             </div>

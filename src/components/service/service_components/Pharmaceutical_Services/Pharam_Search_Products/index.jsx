@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import AnimationSlider from "../../../../common/animations"
 import ProductCard from "../../../../common/product_card"
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export const PharmaSearchProducts = ({ debouncedQuery }) => {
-
+    const navigate = useNavigate();
     const location = useLocation()
     const selectedServiceId = location.state?.selectedCardId || null;
 
@@ -19,6 +19,10 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
         queryFn: () => fetchProducts({ params }),
         enabled: debouncedQuery?.trim() !== "",
     });
+
+    const onNavigateToProduct = (product) => {
+        navigate(`/product/${product._id}`);
+    }
 
     return (
         <>
@@ -41,6 +45,7 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
                                                     name={product.name}
                                                     discountedPrice={product.discounted_price}
                                                     smallDescription={product.small_description}
+                                                    onClick={() => onNavigateToProduct(product)}
                                                 />
                                             </div>
                                         ))}

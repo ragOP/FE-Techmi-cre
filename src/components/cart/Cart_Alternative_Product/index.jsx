@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import AnimationSlider from "../../common/animations";
 
 import ProductCard from "../../common/product_card";
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 const CartAlternativeProduct = () => {
+  const navigate = useNavigate();
 
   const params = {
     is_best_seller: true,
@@ -17,6 +19,10 @@ const CartAlternativeProduct = () => {
     queryKey: ['top_ordered_products'],
     queryFn: () => fetchProducts({ params }),
   });
+
+  const onNavigateToProduct = (product) => {
+    navigate(`/product/${product._id}`);
+  }
 
   return (
     <>
@@ -40,6 +46,7 @@ const CartAlternativeProduct = () => {
                       discountedPrice={product.discounted_price}
                       smallDescription={product.small_description}
                       id={product._id}
+                      onClick={() => onNavigateToProduct(product)}
                     />
                   </div>
                 ))}

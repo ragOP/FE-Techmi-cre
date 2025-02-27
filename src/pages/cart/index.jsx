@@ -80,6 +80,10 @@ export default function Cart() {
   const platformFee = 0;
   const finalPrice = totalPrice - discount + platformFee;
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   return (
     <div className="m-6 min-h-screen rounded-3xl shadow bg-white">
       <div className="flex flex-col md:flex-row">
@@ -97,7 +101,7 @@ export default function Cart() {
           )}
           {cart.map((item) => (
             <div
-              key={item.id}
+              key={item._id}
               className="flex items-center p-4 mb-4 border-b border-gray-200 bg-gray-50"
             >
               <img

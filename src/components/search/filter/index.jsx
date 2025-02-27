@@ -9,7 +9,7 @@ const Filter = ({ filters, setFilters, categoriesList }) => {
     price: [
       { value: "0_500", label: "₹0 - ₹500" },
       { value: "500_1000", label: "₹500 - ₹1K" },
-      { value: "above_1000", label: "ABOVE ₹1K" },
+      { value: "1000", label: "ABOVE ₹1K" },
     ],
     // discount: [
     //   { value: "10", label: "10% Off or more" },

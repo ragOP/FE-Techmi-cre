@@ -1,9 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
-import AnimationSlider from "../../../../common/animations";
 import ProductCard from "../../../../common/product_card";
+import { useNavigate } from "react-router";
+import { getItem } from "../../../../../utils/local_storage";
+import { fetchCart } from "../../../../../pages/cart/helper/fecthCart";
 
 const HouseCleaningProducts = ({ category }) => {
+    const navigate = useNavigate()
 
     const name = category?.name;
     const id = category?._id;
@@ -18,6 +21,30 @@ const HouseCleaningProducts = ({ category }) => {
         queryKey: ['top_products', id],
         queryFn: () => fetchProducts({ params }),
     });
+
+
+
+
+    const { mutate: addToCartMutation } = useMutation({
+        mutationFn: ({ payload }) => fetchCart({
+            method: "POST",
+            body: payload
+        }),
+        onSuccess: () => {
+            navigate("/cart");
+        },
+    });
+
+    const handleAddToCart = (product) => {
+        const payload = {
+            user_id: getItem("userId"),
+            product_id: product?._id,
+            quantity: 1,
+        }
+        console.log(">>>>", payload)
+
+        addToCartMutation({ payload });
+    };
 
     return (
         <div className="md:px-12 space-y-2 pt-8">
@@ -38,6 +65,8 @@ const HouseCleaningProducts = ({ category }) => {
                                         name={product.name}
                                         discountedPrice={product.discounted_price}
                                         smallDescription={product.small_description}
+                                        onAddToCart={() => handleAddToCart(product)}
+                                        showAddToCart={true}
                                     />
                                 </div>
                             ))}

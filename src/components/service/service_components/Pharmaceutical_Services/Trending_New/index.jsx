@@ -3,8 +3,10 @@ import AnimationSlider from "../../../../common/animations";
 import ProductCard from "../../../../common/product_card";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
+import { useNavigate } from "react-router";
 
 const Trendingnew = () => {
+    const navigate = useNavigate();
 
     const params = {
         is_best_seller: true,
@@ -16,6 +18,10 @@ const Trendingnew = () => {
         queryKey: ['top_pharma_products'],
         queryFn: () => fetchProducts({ params }),
     });
+
+    const onNavigateToProduct = (product) => {
+        navigate(`/product/${product._id}`);
+    }
 
     return (
         <div className="mt-20 ">
@@ -39,6 +45,7 @@ const Trendingnew = () => {
                                         name={product.name}
                                         discountedPrice={product.discounted_price}
                                         smallDescription={product.small_description}
+                                        onClick={() => onNavigateToProduct(product)}
                                     />
                                 </div>
                             ))}

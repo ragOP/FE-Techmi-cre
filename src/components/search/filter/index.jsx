@@ -2,7 +2,7 @@ import React from "react";
 
 const Filter = ({ filters, setFilters, categoriesList }) => {
   const filterOptions = {
-    category: categoriesList?.map((it) => ({
+    category_id: categoriesList?.map((it) => ({
       value: it._id,
       label: it.name,
     })),
@@ -11,11 +11,11 @@ const Filter = ({ filters, setFilters, categoriesList }) => {
       { value: "500_1000", label: "₹500 - ₹1K" },
       { value: "above_1000", label: "ABOVE ₹1K" },
     ],
-    discount: [
-      { value: "10", label: "10% Off or more" },
-      { value: "25", label: "25% Off or more" },
-      { value: "35", label: "35% Off or more" },
-    ],
+    // discount: [
+    //   { value: "10", label: "10% Off or more" },
+    //   { value: "25", label: "25% Off or more" },
+    //   { value: "35", label: "35% Off or more" },
+    // ],
   };
 
   const handleCheckboxChange = (category, value) => {

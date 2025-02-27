@@ -19,7 +19,7 @@ const CategoriesPharma = () => {
   });
 
   const onNavigateSearch = ({ category }) => {
-    navigate(`/search?q=${category?.name}`, { state: { selectedCardId: selectedServiceId } })
+    navigate(`/search?q=${category?.name}`, { state: { selectedCardId: selectedServiceId, categoryId: category?._id } })
   }
 
   return (

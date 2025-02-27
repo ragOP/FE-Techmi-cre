@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../../common/product_card";
 import SearchBar from "../../common/Search_Bar";
@@ -13,16 +13,17 @@ const SearchResult = () => {
   const selectedServiceId = location.state?.selectedCardId || null;
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("q") || "";
+  const categoryId = location.state.categoryId || null;
 
   const [filters, setFilters] = useState({
     page: 1,
     per_page: 20,
-    category: [],
+    category_id: [],
     // brand: [],
     price: [],
     discount: [],
   });
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery || "");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
 
   const params = {
     search: debouncedQuery || "",
@@ -41,6 +42,21 @@ const SearchResult = () => {
     queryKey: ['pharma_categories', categoriesParams],
     queryFn: () => fetchCategories({ params: categoriesParams }),
   });
+
+
+  useEffect(() => {
+    if (categoryId) {
+      const currentCategory = categoriesList?.find((category) => category._id === categoryId);
+      setFilters({
+        ...filters,
+        category_id: [currentCategory?._id],
+      });
+    }
+  }, [categoryId])
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="flex mt-5">

@@ -35,8 +35,10 @@ export default function Cart() {
   });
 
   const getDiscount = (products) => {
-    const discount = products.reduce((sum, item) => sum + item.discount, 0);
-    setDiscount(discount);
+    const discount = products.reduce((sum, item) => sum + item.product.discounted_price, 0);
+    const original_price = products.reduce((sum, item) => sum + item.product.price, 0);
+    const total_discount = original_price - discount;
+    setDiscount(total_discount);
   };
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function Cart() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const platformFee = 4;
+  const platformFee = 0;
   const finalPrice = totalPrice - discount + platformFee;
 
   return (
@@ -99,17 +101,17 @@ export default function Cart() {
               className="flex items-center p-4 mb-4 border-b border-gray-200 bg-gray-50"
             >
               <img
-                src={item.images[0]}
-                alt={item.name}
+                src={item.product.images[0]}
+                alt={item.product.name}
                 className="w-28 h-28 object-cover rounded"
               />
               <div className="ml-4 mr-4 w-[65%]">
-                <h3 className="font-semibold text-lg">{item.name}</h3>
+                <h3 className="font-semibold text-lg">{item.product.name}</h3>
                 <p className="text-sm text-gray-500">
-                  {item.description || "No description"}
+                  {item.product.full_description || "No description"}
                 </p>
                 <span
-                  onClick={() => handleRemoveItemFromCart(item.product)}
+                  onClick={() => handleRemoveItemFromCart(item.product._id)}
                   className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
                 >
                   Remove
@@ -117,13 +119,13 @@ export default function Cart() {
               </div>
               <div className="flex items-center flex-col -mt-8">
                 <p className="font-bold text-lg ">
-                  ₹{item.price}{" "}
-                  <span className="line-through text-gray-500 text-xs">
-                    ₹{item.price + item.discount}
-                  </span>{" "}
-                  <span className="text-[#297C00] text-sm">
-                    {item.discount}% off
-                  </span>
+                  ₹{item.product.discounted_price ? item.product.discounted_price : item.product.price}{" "}
+                  {item.product.discounted_price && <span className="line-through text-gray-500 text-xs">
+                    ₹{item.product.price}
+                  </span>}{" "}
+                  {/* <span className="text-[#297C00] text-sm">
+                    {item.product.discount || 0}% off
+                  </span> */}
                 </p>
                 <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
                   <button
@@ -162,13 +164,13 @@ export default function Cart() {
 
             <h3 className="text-xl font-bold mt-6 mb-4">Bill Summary</h3>
             <p className="flex justify-between mb-4 text-gray-600">
-              Item Total (MRP) <span>₹{totalPrice}</span>
+              Item Total (MRP) <span>₹{Number(totalPrice).toFixed(2)}</span>
             </p>
             <p className="flex justify-between mb-4 text-gray-600">
               Platform Fee <span>₹{platformFee}</span>
             </p>
             <p className="flex justify-between mb-4 text-[#297C00] font-medium">
-              Total Discount <span>-₹{discount}</span>
+              Total Discount <span>-₹{Number(discount).toFixed(2)}</span>
             </p>
             <p className="flex justify-between mb-4 text-[#297C00] font-medium">
               Shipping Fees{" "}
@@ -178,7 +180,7 @@ export default function Cart() {
             </p>
             <hr className="border-dashed border-gray-900" />
             <p className="flex justify-between font-bold text-lg mt-2">
-              To be paid <span>₹{finalPrice}</span>
+              To be paid <span>₹{Number(finalPrice).toFixed(2)}</span>
             </p>
             <div className="mt-2 border-t border-gray-900">
               <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>

@@ -26,16 +26,6 @@ const SearchResult = () => {
   });
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
-  const params = {
-    search: debouncedQuery || "",
-    ...filters || {},
-  }
-
-  const { data: allProducts, isLoading, error } = useQuery({
-    queryKey: ['search_result_products', params],
-    queryFn: () => fetchProducts({ params }),
-  });
-
   const categoriesParams = {
     service_id: selectedServiceId
   }
@@ -47,6 +37,17 @@ const SearchResult = () => {
   const onNavigateToProduct = (product) => {
     navigate(`/product/${product._id}`);
   }
+
+  const params = {
+    search: debouncedQuery || "",
+    category_id: !isArrayWithValues(filters.category_id) ? categoriesList?.map((it) => it?.id) : filters.category_id,
+    ...filters || {},
+  }
+
+  const { data: allProducts, isLoading, error } = useQuery({
+    queryKey: ['search_result_products', params],
+    queryFn: () => fetchProducts({ params }),
+  });
 
   useEffect(() => {
     if (categoryId) {

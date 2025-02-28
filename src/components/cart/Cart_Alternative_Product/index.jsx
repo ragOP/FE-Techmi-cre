@@ -15,14 +15,13 @@ const CartAlternativeProduct = () => {
     per_page: 10,
   }
 
+
+
   const { data: topOrderedProducts, isLoading, error } = useQuery({
     queryKey: ['top_ordered_products'],
     queryFn: () => fetchProducts({ params }),
   });
 
-  const onNavigateToProduct = (product) => {
-    navigate(`/product/${product._id}`);
-  }
 
   return (
     <>
@@ -46,7 +45,7 @@ const CartAlternativeProduct = () => {
                       discountedPrice={product.discounted_price}
                       smallDescription={product.small_description}
                       id={product._id}
-                      onClick={() => onNavigateToProduct(product)}
+                      onClick={() => navigate(`/product/${product._id}`)}
                     />
                   </div>
                 ))}

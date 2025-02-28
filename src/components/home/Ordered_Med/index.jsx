@@ -4,8 +4,10 @@ import AnimationSlider from "../../common/animations";
 import ProductCard from "../../common/product_card";
 import { fetchProducts } from "../featured_products/helper/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const OrderedMed = () => {
+  const navigate = useNavigate();
 
   const params = {
     is_best_seller: true,
@@ -39,6 +41,8 @@ const OrderedMed = () => {
                       name={product.name}
                       discountedPrice={product.discounted_price}
                       smallDescription={product.small_description}
+                      id={product._id}
+                      onClick={() => navigate(`/product/${product._id}`)}
                     />
                   </div>
                 ))}

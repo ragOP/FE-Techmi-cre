@@ -3,13 +3,14 @@ import AnimationSlider from "../../common/animations";
 import ProductCard from "../../common/product_card";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../featured_products/helper/fetchProducts";
-
+import { useNavigate } from "react-router-dom";
 const SellingServices = () => {
   const params = {
     is_best_seller: true,
     page: 1,
     per_page: 10,
   }
+  const navigate = useNavigate();
 
   const { data: superSellingProducts, isLoading, error } = useQuery({
     queryKey: ['products'],
@@ -37,6 +38,7 @@ const SellingServices = () => {
                       discountedPrice={product.discounted_price}
                       smallDescription={product.small_description}
                       id={product._id}
+                      onClick={() => navigate(`/product/${product._id}`)}
                     />
                   </div>
                 ))}

@@ -4,7 +4,7 @@ import ProductCard from "../../common/product_card"
 import { useQuery } from "@tanstack/react-query"
 import { fetchProducts } from "./helper/fetchProducts"
 import ProductLoader from "../../loader/ProductLoader"
-
+import { useNavigate } from "react-router-dom";
 const FeaturedProducts = () => {
 
   const params = {
@@ -17,6 +17,8 @@ const FeaturedProducts = () => {
     queryKey: ['top_products'],
     queryFn: () => fetchProducts({ params }),
   });
+
+  const navigate = useNavigate();
 
   return (
     <div className="mt-20">
@@ -39,6 +41,7 @@ const FeaturedProducts = () => {
                     discountedPrice={product.discounted_price}
                     smallDescription={product.small_description}
                     id={product._id}
+                    onClick={() => navigate(`/product/${product._id}`)}
                   />
                 </div>
               ))}

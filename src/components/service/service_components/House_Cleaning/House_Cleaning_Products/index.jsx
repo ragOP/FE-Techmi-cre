@@ -4,6 +4,7 @@ import ProductCard from "../../../../common/product_card";
 import { useNavigate } from "react-router";
 import { getItem } from "../../../../../utils/local_storage";
 import { fetchCart } from "../../../../../pages/cart/helper/fecthCart";
+import LoadingSpinner from "../../../../loader/LoadingSpinner";
 
 const HouseCleaningProducts = ({ category }) => {
     const navigate = useNavigate()
@@ -50,9 +51,7 @@ const HouseCleaningProducts = ({ category }) => {
         <div className="md:px-12 space-y-2 pt-8">
             <h1 className="text-3xl font-semibold text-center">{name}</h1>
             {isLoading ? (
-                <div className="flex justify-center items-center h-40">
-                    <p className="text-gray-500">Loading products...</p>
-                </div>
+                <LoadingSpinner />
             ) : (
                 <>
                     {houseCleaningProducts && houseCleaningProducts.length > 0 ? (

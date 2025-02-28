@@ -3,6 +3,7 @@ import AnimationSlider from "../../../../common/animations"
 import ProductCard from "../../../../common/product_card"
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
 import { useLocation, useNavigate } from "react-router";
+import LoadingSpinner from "../../../../loader/LoadingSpinner";
 
 export const PharmaSearchProducts = ({ debouncedQuery }) => {
     const navigate = useNavigate();
@@ -30,9 +31,7 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
                 debouncedQuery?.trim() !== "" && (
                     <>
                         {isLoading ? (
-                            <div className="flex justify-center items-center h-40">
-                                <p className="text-gray-500">Loading products...</p>
-                            </div>
+                            <LoadingSpinner />
                         ) : (
                             <>
                                 {searchedProducts && searchedProducts.length > 0 ? (

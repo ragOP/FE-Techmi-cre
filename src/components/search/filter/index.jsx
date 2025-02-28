@@ -6,7 +6,7 @@ const Filter = ({ filters, setFilters, categoriesList }) => {
       value: it._id,
       label: it.name,
     })),
-    price: [
+    price_range: [
       { value: "0_500", label: "₹0 - ₹500" },
       { value: "500_1000", label: "₹500 - ₹1K" },
       { value: "1000", label: "ABOVE ₹1K" },

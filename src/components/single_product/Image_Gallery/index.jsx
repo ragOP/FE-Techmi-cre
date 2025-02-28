@@ -40,7 +40,7 @@ const ImageGallery = ({ product }) => {
               largeImage: {
                 src: selectedImage,
                 width: 1200,
-                height: 1800,
+                height: 2500,
               },
               enlargedImageContainerDimensions: {
                 width: "150%",

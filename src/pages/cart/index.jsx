@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { fetchCart } from "./helper/fecthCart";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItem } from "../../utils/local_storage";
+import LoadingSpinner from "../../components/loader/LoadingSpinner";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -16,7 +17,7 @@ export default function Cart() {
   };
 
   const {
-    data: cartProducts,
+    data: cartProducts, isLoading, error
   } = useQuery({
     queryKey: ["cart_products"],
     queryFn: () => fetchCart({ params }),
@@ -96,6 +97,7 @@ export default function Cart() {
               Your cart is empty
             </p>
           )}
+          {isLoading && <LoadingSpinner />}
           {/* {cart.length > 0 && (
             <p className="text-sm ml-4 text-gray-500 mb-2">
               Items not requiring prescription

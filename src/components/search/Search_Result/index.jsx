@@ -22,7 +22,7 @@ const SearchResult = () => {
     per_page: 20,
     category_id: [],
     // brand: [],
-    price: [],
+    price_range: [],
     discount: [],
   });
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -40,10 +40,12 @@ const SearchResult = () => {
   }
 
   const params = {
-    search: debouncedQuery || "",
-    category_id: !isArrayWithValues(filters.category_id) ? categoriesList?.map((it) => it?.id) : filters.category_id,
     ...filters || {},
+    search: debouncedQuery || "",
+    category_id: !isArrayWithValues(filters.category_id) ? categoriesList?.map((it) => it?._id) : filters.category_id,
   }
+
+  // console.log(params, "-----------------params", categoriesList)
 
   const { data: allProducts, isLoading, error } = useQuery({
     queryKey: ['search_result_products', params],

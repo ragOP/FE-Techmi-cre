@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import ReactImageMagnify from "react-image-magnify";
+// import ReactImageMagnify from "react-image-magnify";
 
 const ImageGallery = ({ product }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -29,7 +29,8 @@ const ImageGallery = ({ product }) => {
         <ChevronDown className="w-8 h-8 ml-4 text-gray-500 cursor-pointer" />
       </div>
       <div className="w-[82%] h-96 rounded-lg">
-        {selectedImage && (
+        <img src={selectedImage} alt="Product" className="w-full h-full rounded-lg" />
+        {/* {selectedImage && (
           <ReactImageMagnify
             {...{
               smallImage: {
@@ -57,7 +58,7 @@ const ImageGallery = ({ product }) => {
               },
             }}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

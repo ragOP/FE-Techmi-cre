@@ -27,7 +27,7 @@ const AnimationSlider = ({ children }) => {
   const slidesToShow = Math.min(4.5, totalSlides);
 
   const settings = {
-    infinite: totalSlides > 1, // Disable infinite loop for a single product
+    infinite: totalSlides > 4, // Disable infinite loop for a single product
     speed: 500,
     slidesToShow,
     slidesToScroll: 1,
@@ -35,8 +35,8 @@ const AnimationSlider = ({ children }) => {
     dots: totalSlides > 1, // Hide dots if only one product
     prevArrow: totalSlides > 1 ? <PrevArrow /> : null, // Hide arrows if only one product
     nextArrow: totalSlides > 1 ? <NextArrow /> : null,
-    centerMode: totalSlides === 1, // Center the slide when there's only one product
-    centerPadding: totalSlides === 1 ? "30%" : "0", // Prevent full width for a single product
+    centerMode: totalSlides < 4, // Center the slide when there's only one product
+    centerPadding: totalSlides < 4 ? "20%" : "0", // Prevent full width for a single product
     responsive: [
       {
         breakpoint: 1024,

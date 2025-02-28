@@ -5,6 +5,7 @@ import ProductCard from "../../common/product_card";
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import LoadingSpinner from "../../loader/LoadingSpinner";
 
 const CartAlternativeProduct = () => {
   const navigate = useNavigate();
@@ -29,9 +30,7 @@ const CartAlternativeProduct = () => {
         <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">Alternative Products</h1>
 
         {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <p className="text-gray-500">Loading products...</p>
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             {topOrderedProducts && topOrderedProducts.length > 0 ? (

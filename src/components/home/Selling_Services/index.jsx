@@ -4,6 +4,7 @@ import ProductCard from "../../common/product_card";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProducts } from "../featured_products/helper/fetchProducts";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../../loader/LoadingSpinner";
 const SellingServices = () => {
   const params = {
     is_best_seller: true,
@@ -22,9 +23,7 @@ const SellingServices = () => {
       <div className="mt-20">
         <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">Super Selling Services</h1>
         {isLoading ? (
-          <div className="flex justify-center items-center h-40">
-            <p className="text-gray-500">Loading products...</p>
-          </div>
+          <LoadingSpinner />
         ) : (
           <>
             {superSellingProducts && superSellingProducts.length > 0 ? (

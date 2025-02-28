@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query"
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
 import { isArrayWithValues } from "../../../utils/array/isArrayWithValues";
 import { fetchCategories } from "../../home/Categ_Options/helpers/fetchCategories";
+import LoadingSpinner from "../../loader/LoadingSpinner";
 
 const SearchResult = () => {
   const navigate = useNavigate();
@@ -69,9 +70,7 @@ const SearchResult = () => {
       <div className="flex-grow w-[80%] rounded-3xl bg-white px-4 mx-5 ">
         <SearchBar debouncedQuery={debouncedQuery} setDebouncedQuery={setDebouncedQuery} />
         {isLoading ?
-          <div className="flex justify-center items-center h-40">
-            <p className="text-gray-500">Loading products...</p>
-          </div>
+          <LoadingSpinner />
           :
           isArrayWithValues(allProducts) ?
             <div className="grid grid-cols-1 space-y-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-x-4 ">

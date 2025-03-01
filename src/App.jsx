@@ -7,7 +7,6 @@ import Footer from "./components/footer";
 import Login from "./pages/login";
 import SearchResult from "./components/search/Search_Result";
 import Signup from "./pages/signup";
-import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import { getItem } from "./utils/local_storage";
 import Cart from "./pages/cart";
 import SingleProduct from "./pages/single_product";

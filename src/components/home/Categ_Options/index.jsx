@@ -43,7 +43,7 @@ const ServiceGrid = () => {
     queryFn: fetchServices,
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (!isLoading) return <LoadingSpinner />;
   if (error) return <div>Error loading services</div>;
 
   const services = fetchedCategories || [];

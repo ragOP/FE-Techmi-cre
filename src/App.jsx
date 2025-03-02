@@ -10,6 +10,9 @@ import Signup from "./pages/signup";
 import { getItem } from "./utils/local_storage";
 import Cart from "./pages/cart";
 import SingleProduct from "./pages/single_product";
+import ProtectedRoute from "./utils/auth/ProtectedRoute";
+import { FloatingWhatsApp } from 'react-floating-whatsapp'
+import userLogo from "./assets/navbar/user-image.png";
 
 const App = () => {
   const location = useLocation();
@@ -22,22 +25,28 @@ const App = () => {
       {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
 
       <Routes>
-        {/* Redirect logged-in users away from login/signup */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={token ? <Navigate to="/" replace /> : <Login />} />
-        <Route path="/signup" element={token ? <Navigate to="/" replace /> : <Signup />} />
+        <Route
+          path="/login"
+          element={token ? <Navigate to="/" replace /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={token ? <Navigate to="/" replace /> : <Signup />}
+        />
         <Route path="/service" element={<Service />} />
         <Route path="/search" element={<SearchResult />} />
-        <Route path="/cart" element={<Cart />} />
         <Route path="/product/:id" element={<SingleProduct />} />
-        {/* Protected Routes (Only accessible if logged in) */}
-        {/* <Route element={<ProtectedRoute />}>
-        </Route> */}
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<Cart />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
+      <FloatingWhatsApp phoneNumber="9409718733" accountName="Abhishek Mishra" avatar={userLogo}/>
     </div>
   );
 };

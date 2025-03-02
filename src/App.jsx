@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -8,6 +8,7 @@ import userLogo from "./assets/navbar/user-image.png";
 import useToast from "./hooks";
 import ToastContainer from "./components/toast/ToastContainer";
 import LazyLoader from "./components/loader/LazyLoader";
+import WebsiteLoader from "./components/loader/WebsiteLoader";
 
 const Home = lazy(() => import("./pages/home"));
 const Service = lazy(() => import("./pages/services"));
@@ -24,10 +25,23 @@ const App = () => {
   const hideLayoutRoutes = ["/login", "/signup"];
   const { toasts, removeToast } = useToast();
 
+  const [initalWebsiteLoader, setInitialWebsiteLoader] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTimeout(() => {
+        setInitialWebsiteLoader(false);
+      }, 2000);
+    });
+  }, []);
+
+  if (initalWebsiteLoader) {
+    return <WebsiteLoader />;
+  }
+
   return (
     <div className="bg-[#82c8e51a]">
-      {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
-
+      {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}\
       <Suspense fallback={<LazyLoader />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -50,11 +64,8 @@ const App = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-
       {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
-
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-
       <FloatingWhatsApp
         phoneNumber="9409718733"
         accountName="Abhishek Mishra"

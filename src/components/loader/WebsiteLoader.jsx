@@ -11,7 +11,7 @@ const WebsiteLoader = () => {
       </div>
 
       {/* Loading Text */}
-      <p className="mt-4 text-lg font-medium text-white animate-pulse text-color-gray-500">
+      <p className="mt-4 text-xl font-medium text-gray-950 animate-pulse">
         Loading, please wait...
       </p>
     </div>

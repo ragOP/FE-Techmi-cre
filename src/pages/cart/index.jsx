@@ -177,7 +177,7 @@ export default function Cart() {
                     {isPending &&
                     !removeCart &&
                     item.product._id === selectedId ? (
-                      <div className="mx-3">
+                      <div className="mx-2">
                         <CartLoader />
                       </div>
                     ) : (

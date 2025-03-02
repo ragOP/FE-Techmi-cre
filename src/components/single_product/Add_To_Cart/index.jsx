@@ -4,8 +4,15 @@ import trustedPharmacy from "../../../assets/single_product/first.png";
 import genuineProducts from "../../../assets/single_product/third.png";
 import protinexBanner from "../../../assets/single_product/last.png";
 import { ChevronDown } from "lucide-react";
+import CartLoader from "../../loader/CartLoader";
 
-const ProductAddToCart = ({ product, quantity, setQuantity, handleAddToCart }) => {
+const ProductAddToCart = ({
+  product,
+  quantity,
+  setQuantity,
+  handleAddToCart,
+  isAddingToCart,
+}) => {
   return (
     <div className="w-full lg:w-[30%]">
       <div className="text-lg font-bold">
@@ -46,8 +53,12 @@ const ProductAddToCart = ({ product, quantity, setQuantity, handleAddToCart }) =
         <ChevronDown className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
       </div>
 
-      <button onClick={handleAddToCart} className="w-full mt-4 border-2 border-blue-900 text-blue-900 rounded-3xl py-2">
-        Add To Cart
+      <button
+        disabled={isAddingToCart}
+        onClick={handleAddToCart}
+        className="w-full mt-4 border-2 border-blue-900 text-blue-900 rounded-3xl py-2"
+      >
+        {isAddingToCart ? <div className="my-1"><CartLoader /></div>  : "Add To Cart"}
       </button>
       <button className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-3 ">
         Buy Now

@@ -9,6 +9,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchSingleProduct } from "./helper";
 import { fetchCart } from "../cart/helper/fecthCart";
 import { getItem } from "../../utils/local_storage";
+import { toast } from "react-toastify";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -26,7 +27,7 @@ export default function ProductPage() {
     queryFn: () => fetchCart(),
   });
 
-  const { mutate: addToCartMutation } = useMutation({
+  const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: () => fetchCart({
       method: "POST",
       body: {
@@ -36,6 +37,7 @@ export default function ProductPage() {
       },
     }),
     onSuccess: () => {
+      toast.success("Product added to cart!");
       navigate("/cart");
     },
   });
@@ -69,6 +71,7 @@ export default function ProductPage() {
             quantity={quantity}
             setQuantity={setQuantity}
             handleAddToCart={handleAddToCart}
+            isAddingToCart={isPending}
           />
         </div>
       </div>

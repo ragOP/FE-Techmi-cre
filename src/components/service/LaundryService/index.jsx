@@ -12,6 +12,8 @@ import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { useNavigate } from "react-router";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import useToast from "../../../hooks";
+import { toast } from "react-toastify";
+import CartLoader from "../../loader/CartLoader";
 
 const LaundryService = () => {
   const productsRef = useRef(null);
@@ -149,19 +151,14 @@ export const LaundaryCard = ({
     quantity: 1,
   };
 
-  const { mutate: addToCartMutation, isLoading } = useMutation({
+  const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: () =>
       fetchCart({
         method: "POST",
         body: payload,
       }),
     onSuccess: () => {
-      addToast({
-        title: "Success",
-        message: "Service added to cart!",
-        variant: "default",
-        duration: 3000,
-      });
+      toast.success("Product added to cart!");
       navigate("/cart");
     },
   });
@@ -203,14 +200,14 @@ export const LaundaryCard = ({
       </div>
 
       <button
-        onClick={!isLoading && handleAddToCart}
+        onClick={!isPending && handleAddToCart}
         className={`mt-4 py-2 px-4 rounded-3xl w-full font-semibold ${
           isSelected === id
             ? "bg-[#141749] text-white"
             : "border border-[#00008B] text-blue-500"
         } hover:bg-blue-50`}
       >
-        {isLoading ? "Adding..." : "Add to cart"}
+        {isPending ? <div className="my-1"><CartLoader /></div> : "Add to cart"}
       </button>
     </div>
   );

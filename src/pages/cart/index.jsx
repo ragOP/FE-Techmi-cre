@@ -7,24 +7,28 @@ import { fetchCart } from "./helper/fecthCart";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItem } from "../../utils/local_storage";
 import LoadingSpinner from "../../components/loader/LoadingSpinner";
+import CartLoader from "../../components/loader/CartLoader";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
   const [shippingFee, setShippingFee] = useState(null);
+  const [removeCart, setRemoveCart] = useState(false);
   const [discount, setDiscount] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
   const params = {
     user_id: getItem("userId"),
   };
 
   const {
-    data: cartProducts, isLoading, error
+    data: cartProducts,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: ["cart_products"],
     queryFn: () => fetchCart({ params }),
   });
-
   const queryClient = useQueryClient();
-  const { mutate: updateCart } = useMutation({
+  const { mutate: updateCart, isPending } = useMutation({
     mutationFn: (updatedCart) =>
       fetchCart({
         method: "POST",
@@ -32,11 +36,17 @@ export default function Cart() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries(["cart_products"]);
+      setRemoveCart(false);
     },
   });
 
   const getDiscount = (products) => {
-    const discount = products.reduce((sum, item) => sum + ((item.product.price - item.product.discounted_price) * item.quantity), 0);
+    const discount = products.reduce(
+      (sum, item) =>
+        sum +
+        (item.product.price - item.product.discounted_price) * item.quantity,
+      0
+    );
     setDiscount(discount);
   };
 
@@ -48,6 +58,7 @@ export default function Cart() {
   }, [cartProducts]);
 
   const updateQuantity = (product, change) => {
+    setSelectedId(product._id);
     const productId = product?._id;
 
     setCart((prevCart) =>
@@ -57,7 +68,9 @@ export default function Cart() {
           : item
       )
     );
-    const updatedItem = cartProducts.find((item) => item.product._id === productId);
+    const updatedItem = cartProducts.find(
+      (item) => item.product._id === productId
+    );
     if (updatedItem) {
       updateCart({
         user_id: getItem("userId"),
@@ -67,6 +80,8 @@ export default function Cart() {
     }
   };
   const handleRemoveItemFromCart = (productId) => {
+    setSelectedId(productId);
+    setRemoveCart(true);
     updateCart({
       user_id: getItem("userId"),
       product_id: productId,
@@ -83,7 +98,7 @@ export default function Cart() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [])
+  }, []);
 
   return (
     <div className="m-6 min-h-screen rounded-3xl shadow bg-white">
@@ -114,40 +129,64 @@ export default function Cart() {
                     className="w-36 h-36 lg:w-28 lg:h-28 object-cover rounded"
                   />
                   <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[180%] lg:w-[65%]">
-                    <h3 className="font-semibold text-lg">{item.product.name}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {item.product.name}
+                    </h3>
                     <p className="text-sm text-gray-500">
                       {item.product.full_description || "No description"}
                     </p>
-                    <span
-                      onClick={() => handleRemoveItemFromCart(item.product._id)}
-                      className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
-                    >
-                      Remove
-                    </span>
+                    {removeCart && item.product._id === selectedId ? (
+                      <div className="w-fit mt-2">
+                        <CartLoader />
+                      </div>
+                    ) : (
+                      <span
+                        onClick={() =>
+                          handleRemoveItemFromCart(item.product._id)
+                        }
+                        className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
+                      >
+                        Remove
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center flex-col -mt-8 sm:w-[30%] w-auto">
                   <p className="font-bold text-lg ">
-                    ₹{item.product.discounted_price ? item.product.discounted_price : item.product.price}{" "}
-                    {item.product.discounted_price &&
+                    ₹
+                    {item.product.discounted_price
+                      ? item.product.discounted_price
+                      : item.product.price}{" "}
+                    {item.product.discounted_price && (
                       <span className="line-through text-gray-500 text-xs">
                         ₹{item.product.price}
-                      </span>}
+                      </span>
+                    )}
                     {/* <span className="text-[#297C00] text-sm">
                     {item.product.discount || 0}% off
                   </span> */}
                   </p>
                   <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
                     <button
+                      disabled={isPending}
                       onClick={() => updateQuantity(item.product, -1)}
                       className="text-3xl pb-1"
                     >
                       -
                     </button>
-                    <span className="mx-3 font-medium">{item.quantity}</span>
+                    {isPending &&
+                    !removeCart &&
+                    item.product._id === selectedId ? (
+                      <div className="mx-3">
+                        <CartLoader />
+                      </div>
+                    ) : (
+                      <span className="mx-3 font-medium">{item.quantity}</span>
+                    )}
                     <button
+                      disabled={isPending}
                       onClick={() => updateQuantity(item.product, 1)}
-                      className="text-2xl  pb-1"
+                      className="text-2xl pb-1"
                     >
                       +
                     </button>
@@ -156,7 +195,6 @@ export default function Cart() {
               </div>
             ))}
           </div>
-
         </div>
         {cart.length > 0 && (
           <div className="w-full md:w-1/3 bg-white p-6 rounded-tr-3xl rounded-br-3xl border-l border-gray-200">

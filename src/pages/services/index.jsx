@@ -7,6 +7,7 @@ import LaundryService from "../../components/service/LaundryService";
 import Tagtitle from "../../components/service/service_components/Pharmaceutical_Services/tagtitle";
 import ServiceDescription from "../../components/service_description";
 import { description } from "../../constant";
+import { toast } from "react-toastify";
 
 const Service = () => {
   const location = useLocation();

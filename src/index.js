@@ -5,7 +5,6 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ToastContainer } from "react-toastify";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -17,7 +16,6 @@ root.render(
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <App />
-          <ToastContainer />
         </QueryClientProvider>
       </Provider>
     </BrowserRouter>

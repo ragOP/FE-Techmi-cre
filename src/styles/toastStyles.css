@@ -1,0 +1,31 @@
+.custom-toast-container .Toastify__toast {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.custom-toast-container .Toastify__toast--success {
+  background: linear-gradient(135deg, #00c853, #b2ff59);
+  color: #fff;
+}
+
+.custom-toast-container .Toastify__toast--error {
+  background: linear-gradient(135deg, #d32f2f, #ff5252);
+  color: #fff;
+}
+
+.custom-toast-container .Toastify__toast--warning {
+  background: linear-gradient(135deg, #ff9800, #ffc107);
+  color: #fff;
+}
+
+.custom-toast-container .Toastify__toast--info {
+  background: linear-gradient(135deg, #2196f3, #64b5f6);
+  color: #fff;
+}
+
+.custom-toast-container .Toastify__progress-bar {
+  background: rgba(255, 255, 255, 0.6);
+}

@@ -5,10 +5,10 @@ import Footer from "./components/footer";
 import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
 import userLogo from "./assets/navbar/user-image.png";
-import useToast from "./hooks";
 import ToastContainer from "./components/toast/ToastContainer";
 import LazyLoader from "./components/loader/LazyLoader";
 import WebsiteLoader from "./components/loader/WebsiteLoader";
+import "./styles/toastStyles.css"
 
 const Home = lazy(() => import("./pages/home"));
 const Service = lazy(() => import("./pages/services"));
@@ -23,7 +23,6 @@ const App = () => {
   const token = localStorage.getItem("token");
 
   const hideLayoutRoutes = ["/login", "/signup"];
-  const { toasts, removeToast } = useToast();
 
   const [initalWebsiteLoader, setInitialWebsiteLoader] = useState(true);
 
@@ -34,6 +33,7 @@ const App = () => {
       }, 2000);
     });
   }, []);
+
 
   if (initalWebsiteLoader) {
     return <WebsiteLoader />;
@@ -65,7 +65,20 @@ const App = () => {
         </Routes>
       </Suspense>
       {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        className="custom-toast-container"
+      />
       <FloatingWhatsApp
         phoneNumber="9409718733"
         accountName="Abhishek Mishra"

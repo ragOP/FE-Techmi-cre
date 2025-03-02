@@ -65,20 +65,6 @@ const App = () => {
         </Routes>
       </Suspense>
       {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        className="custom-toast-container"
-      />
       <FloatingWhatsApp
         phoneNumber="9409718733"
         accountName="Abhishek Mishra"

@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from "react"
-import Aboutus from "../service_components/House_Cleaning/About_us"
-import prescription from "../../../assets/solutions/prescription.svg"
-import OurServices from "../service_components/Laundry_Service/Our_Services"
-import Testimonials from "../../common/testimonial"
-import { fetchProducts } from "../../home/featured_products/helper/fetchProducts"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import Vectortick from "../../../assets/services/para/Vectortick.svg"
-import Vectorgrey from "../../../assets/services/para/vectorgrey.svg"
-import { getItem } from "../../../utils/local_storage"
-import { fetchCart } from "../../../pages/cart/helper/fecthCart"
-import { useNavigate } from "react-router"
-import LoadingSpinner from "../../loader/LoadingSpinner"
+import React, { useEffect, useRef, useState } from "react";
+import Aboutus from "../service_components/House_Cleaning/About_us";
+import prescription from "../../../assets/solutions/prescription.svg";
+import OurServices from "../service_components/Laundry_Service/Our_Services";
+import Testimonials from "../../common/testimonial";
+import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Vectortick from "../../../assets/services/para/Vectortick.svg";
+import Vectorgrey from "../../../assets/services/para/vectorgrey.svg";
+import { getItem } from "../../../utils/local_storage";
+import { fetchCart } from "../../../pages/cart/helper/fecthCart";
+import { useNavigate } from "react-router";
+import LoadingSpinner from "../../loader/LoadingSpinner";
+import useToast from "../../../hooks";
 
 const LaundryService = () => {
   const productsRef = useRef(null);
@@ -33,8 +34,8 @@ const LaundryService = () => {
       review:
         "I've tried many expense trackers, but this one stands out. The experience is seamless, and I love the detailed reports. The ability to set goals and track my progress over time has been incredibly useful. Plus, the interface is beautifully designed, making it a pleasure to use every day. I wouldn't go back to any other tracker!",
     },
-  ])
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     if (selectedCategory && productsRef.current) {
@@ -45,7 +46,10 @@ const LaundryService = () => {
   return (
     <div className="space-y-5">
       {/* <Searchbox /> */}
-      <OurServices selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <OurServices
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
       <Aboutus
         title="About Us"
         desc="We are your one-stop solution for all your laundry needs. Discover why Caresync is the best laundry service provider in India and why customers trust us for their laundry requirements."
@@ -64,13 +68,12 @@ const LaundryService = () => {
       </h2>
       <Testimonials testimonialData={testimonialData} />
     </div>
-  )
-}
+  );
+};
 
-export default LaundryService
+export default LaundryService;
 
 export const LaundaryCardList = ({ category }) => {
-
   const [selectedCard, setSelectedCard] = useState(null);
 
   const name = category?.name;
@@ -80,13 +83,16 @@ export const LaundaryCardList = ({ category }) => {
     category_id: id,
     page: 1,
     per_page: 10,
-  }
+  };
 
-  const { data: laundaryProducts, isLoading, error } = useQuery({
-    queryKey: ['laundary_products', id],
+  const {
+    data: laundaryProducts,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["laundary_products", id],
     queryFn: () => fetchProducts({ params }),
   });
-
 
   return (
     <div className="md:px-12 space-y-2 pt-8">
@@ -98,7 +104,9 @@ export const LaundaryCardList = ({ category }) => {
           {laundaryProducts && laundaryProducts.length > 0 ? (
             <div className="flex flex-col md:flex-row p-4 gap-8 justify-center items-center">
               {laundaryProducts.map((product) => {
-                const isSelected = selectedCard && selectedCard.toString() === product._id.toString();
+                const isSelected =
+                  selectedCard &&
+                  selectedCard.toString() === product._id.toString();
                 return (
                   <LaundaryCard
                     key={product._id}
@@ -111,7 +119,7 @@ export const LaundaryCardList = ({ category }) => {
                     onClick={() => setSelectedCard(product._id)}
                     isSelected={isSelected}
                   />
-                )
+                );
               })}
             </div>
           ) : (
@@ -120,24 +128,40 @@ export const LaundaryCardList = ({ category }) => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescription, price, points }) => {
-  const navigate = useNavigate()
+export const LaundaryCard = ({
+  id,
+  name,
+  isSelected,
+  discountedPrice,
+  smallDescription,
+  price,
+  points,
+}) => {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const payload = {
     user_id: getItem("userId"),
     product_id: id,
     quantity: 1,
-  }
+  };
 
-  const { mutate: addToCartMutation } = useMutation({
-    mutationFn: () => fetchCart({
-      method: "POST",
-      body: payload
-    }),
+  const { mutate: addToCartMutation, isLoading } = useMutation({
+    mutationFn: () =>
+      fetchCart({
+        method: "POST",
+        body: payload,
+      }),
     onSuccess: () => {
+      addToast({
+        title: "Success",
+        message: "Service added to cart!",
+        variant: "default",
+        duration: 3000,
+      });
       navigate("/cart");
     },
   });
@@ -147,17 +171,21 @@ export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescr
   };
 
   return (
-    <div className={`flex flex-col w-full md:w-1/4 h-[100%]  border-2 rounded-3xl p-6 transition-all duration-300 cursor-pointer ${isSelected === id
-      ? "bg-gradient-to-r from-[rgba(0,0,192,0.1)] to-[rgba(69,166,207,0.1)] border-blue-500"
-      : "border-gray-300 bg-white"
-      }`}>
-
+    <div
+      className={`flex flex-col w-full md:w-1/4 h-[100%]  border-2 rounded-3xl p-6 transition-all duration-300 cursor-pointer ${
+        isSelected === id
+          ? "bg-gradient-to-r from-[rgba(0,0,192,0.1)] to-[rgba(69,166,207,0.1)] border-blue-500"
+          : "border-gray-300 bg-white"
+      }`}
+    >
       <div className="flex-grow">
         <h2 className="text-2xl font-normal">{name}</h2>
         <p className="text-2xl font-bold">
           ₹ {discountedPrice} / <span className="">{price}</span>
         </p>
-        <p className="text-base font-medium text-[#3F3F3F]">{smallDescription}</p>
+        <p className="text-base font-medium text-[#3F3F3F]">
+          {smallDescription}
+        </p>
         <ul className="mt-4 space-y-2">
           <p className="text-base text-[#3F3F3F] font-medium">{name}</p>
           {points.map((feature, index) => (
@@ -175,12 +203,15 @@ export const LaundaryCard = ({ id, name, isSelected, discountedPrice, smallDescr
       </div>
 
       <button
-        onClick={handleAddToCart}
-        className={`mt-4 py-2 px-4 rounded-3xl w-full font-semibold ${isSelected === id ? "bg-[#141749] text-white" : "border border-[#00008B] text-blue-500"
-          } hover:bg-blue-50`} 
+        onClick={!isLoading && handleAddToCart}
+        className={`mt-4 py-2 px-4 rounded-3xl w-full font-semibold ${
+          isSelected === id
+            ? "bg-[#141749] text-white"
+            : "border border-[#00008B] text-blue-500"
+        } hover:bg-blue-50`}
       >
-        Add to cart
+        {isLoading ? "Adding..." : "Add to cart"}
       </button>
     </div>
-  )
-}
+  );
+};

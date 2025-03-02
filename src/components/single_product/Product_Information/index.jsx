@@ -1,26 +1,47 @@
+import { useRef } from "react";
+
 export default function ProductInfo() {
+  const descriptionRef = useRef(null);
+  const directionRef = useRef(null);
+  const faqRef = useRef(null);
+  const additionalRef = useRef(null);
+
+  const scrollToSection = (ref) => {
+    // console.log(ref, "<<<< ref");
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div className="w-full mx-auto p-6 font-sans text-gray-800">
       <nav className="border-b pb-3 text-sm text-gray-600 flex space-x-6">
-        <p
-          href="#"
+      <p
+          onClick={() => scrollToSection(descriptionRef)}
           className="text-blue-900 font-medium pb-1 cursor-pointer"
         >
           Product Information
         </p>
-        <p href="#" className="hover:text-blue-900 cursor-pointer">
+        <p
+          onClick={() => scrollToSection(directionRef)}
+          className="hover:text-blue-900 cursor-pointer"
+        >
           Directions for Use
         </p>
-        <p href="#" className="hover:text-blue-900 cursor-pointer">
+        <p
+          onClick={() => scrollToSection(faqRef)}
+          className="hover:text-blue-900 cursor-pointer"
+        >
           FAQs
         </p>
-        <p href="#" className="hover:text-blue-900 cursor-pointer">
-          Customers Also Bought
+        <p
+          onClick={() => scrollToSection(additionalRef)}
+          className="hover:text-blue-900 cursor-pointer"
+        >
+          Additional Information
         </p>
       </nav>
 
       <section className="mt-4">
-        <h2 className="text-2xl font-semibold">Description</h2>
+        <h2 ref={descriptionRef} className="text-2xl font-semibold">Description</h2>
         <p className="text-gray-700 mt-3 leading-relaxed">
           The CeraVe Ceramides Moisturising Cream for Dry Skin is a specially
           formulated skincare product designed to replenish dry to very dry
@@ -58,7 +79,7 @@ export default function ProductInfo() {
       </section>
 
       <section className="mt-4">
-        <h2 className="text-2xl font-semibold">Directions for Use</h2>
+        <h2 ref={directionRef} className="text-2xl font-semibold">Directions for Use</h2>
         <ul className="list-disc list-inside text-gray-700 mt-3 space-y-2">
           <li>Cleanse your skin thoroughly.</li>
           <li>
@@ -81,7 +102,7 @@ export default function ProductInfo() {
       </section>
 
       <section className="mt-4">
-        <h2 className="text-2xl font-semibold">FAQs</h2>
+        <h2 ref={faqRef} className="text-2xl font-semibold">FAQs</h2>
         <div className="mt-2">
           <h3 className="font-semibold">
             Is CeraVe Moisturising Cream suitable for all skin types?
@@ -118,7 +139,7 @@ export default function ProductInfo() {
       </section>
 
       <section className="mt-8 border border-gray-400 p-6 rounded-xl bg-gray-100">
-        <h2 className="text-2xl font-semibold">Additional Information</h2>
+        <h2 ref={additionalRef} className="text-2xl font-semibold">Additional Information</h2>
         <p className="text-gray-700 mt-2">
           <span className="font-semibold">Country of origin:</span>
         </p>

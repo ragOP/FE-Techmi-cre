@@ -7,7 +7,7 @@ import { ChevronDown } from "lucide-react";
 
 const ProductAddToCart = ({ product, quantity, setQuantity, handleAddToCart }) => {
   return (
-    <div className="w-[30%]">
+    <div className="w-full lg:w-[30%]">
       <div className="text-lg font-bold">
         ₹{product?.discounted_price || product?.price}*
         <span className="ml-3 text-gray-500 text-sm font-normal line-through">

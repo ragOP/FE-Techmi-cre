@@ -61,7 +61,7 @@ export default function ProductPage() {
   return (
     <div className="bg-gray-100 min-h-screen w-[98.5vw] m-4">
       <div className="bg-gray-100 p-4 rounded-lg">
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex lg:flex-row gap-6">
           <ImageGallery product={product} />
           <ProductDescription product={product} />
           <ProductAddToCart

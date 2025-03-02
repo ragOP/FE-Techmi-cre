@@ -11,7 +11,7 @@ const ProductDescription = ({ product }) => {
   const discountPercentage = calculateDiscountPercentage(product?.price, discountedPrice);
 
   return (
-    <div className="w-[40%]">
+    <div className="w-full lg:w-[40%]">
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-xl font-semibold text-gray-900">

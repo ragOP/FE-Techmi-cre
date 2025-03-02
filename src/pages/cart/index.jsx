@@ -36,10 +36,8 @@ export default function Cart() {
   });
 
   const getDiscount = (products) => {
-    const discount = products.reduce((sum, item) => sum + item.product.discounted_price, 0);
-    const original_price = products.reduce((sum, item) => sum + item.product.price, 0);
-    const total_discount = original_price - discount;
-    setDiscount(total_discount);
+    const discount = products.reduce((sum, item) => sum + ((item.product.price - item.product.discounted_price) * item.quantity), 0);
+    setDiscount(discount);
   };
 
   useEffect(() => {
@@ -77,7 +75,7 @@ export default function Cart() {
   };
 
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   );
   const platformFee = 0;
@@ -107,15 +105,15 @@ export default function Cart() {
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="flex flex-row items-center justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
+                className="flex lg:flex-row items-center justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
               >
-                <div className="flex flex-row items-center">
+                <div className="flex flex-col lg:flex-row lg:items-center sm:w-[70%] w-auto">
                   <img
                     src={item.product.images[0]}
                     alt={item.product.name}
-                    className="w-28 h-28 object-cover rounded"
+                    className="w-36 h-36 lg:w-28 lg:h-28 object-cover rounded"
                   />
-                  <div className="ml-4 mr-4 w-[65%]">
+                  <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[180%] lg:w-[65%]">
                     <h3 className="font-semibold text-lg">{item.product.name}</h3>
                     <p className="text-sm text-gray-500">
                       {item.product.full_description || "No description"}
@@ -128,7 +126,7 @@ export default function Cart() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center flex-col -mt-8">
+                <div className="flex items-center flex-col -mt-8 sm:w-[30%] w-auto">
                   <p className="font-bold text-lg ">
                     ₹{item.product.discounted_price ? item.product.discounted_price : item.product.price}{" "}
                     {item.product.discounted_price &&

@@ -1,4 +1,9 @@
-import { ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 // import ReactImageMagnify from "react-image-magnify";
 
@@ -12,9 +17,10 @@ const ImageGallery = ({ product }) => {
   }, [product]);
 
   return (
-    <div className="flex gap-8 w-[40%] relative">
-      <div className="flex flex-col gap-2 mt-2">
-        <ChevronUp className="w-8 h-8 ml-4 text-gray-500 cursor-pointer" />
+    <div className="flex flex-col-reverse lg:flex-row gap-8 w-full lg:w-[40%] relative">
+      <div className="flex flex-row items-center justify-center lg:flex-col lg:items-start gap-2 mt-2 lg:justify-start">
+        <ChevronUp className="w-8 h-8 ml-4 text-gray-500 cursor-pointer lg:block hidden" />
+        <ChevronLeft className="w-8 h-8 ml-4 text-gray-500 cursor-pointer lg:hidden block" />
         {product?.images?.map((img, index) => (
           <img
             key={index}
@@ -26,10 +32,15 @@ const ImageGallery = ({ product }) => {
             onClick={() => setSelectedImage(img)}
           />
         ))}
-        <ChevronDown className="w-8 h-8 ml-4 text-gray-500 cursor-pointer" />
+        <ChevronRight className="w-8 h-8 ml-0 lg:ml-4 text-gray-500 cursor-pointer lg:hidden block" />
+        <ChevronDown className="w-8 h-8 ml-0 lg:ml-4 text-gray-500 cursor-pointer hidden lg:block" />
       </div>
-      <div className="w-[82%] h-96 rounded-lg">
-        <img src={selectedImage} alt="Product" className="w-full h-full rounded-lg" />
+      <div className="w-full lg:w-[82%] h-96 rounded-lg">
+        <img
+          src={selectedImage}
+          alt="Product"
+          className="w-full h-full rounded-lg"
+        />
         {/* {selectedImage && (
           <ReactImageMagnify
             {...{

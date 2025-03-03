@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItem } from "../../utils/local_storage";
 import LoadingSpinner from "../../components/loader/LoadingSpinner";
 import CartLoader from "../../components/loader/CartLoader";
+import Lottie from "lottie-react";
+import emptyCartAnimation from "../../assets/EmptyCartAnimation.json";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -110,16 +112,27 @@ export default function Cart() {
 
   return (
     <div className="m-6 min-h-screen rounded-3xl shadow bg-white">
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row min-h-[45vh] border-b-2">
         <div className="flex-1 bg-white p-6 pr-1 rounded-tl-3xl rounded-bl-3xl">
-          <h2 className="text-2xl ml-4 font-bold">{cart.length} items added</h2>
-          {cart.length === 0 && (
-            <p className="text-lg ml-4 text-gray-500 mb-4">
-              Your cart is empty
-            </p>
+          <h2 className="text-2xl ml-4 font-bold">
+            {isLoading ? (
+              <div className="h-4 w-[12em] bg-gray-200 rounded animate-pulse"></div>
+            ) : !isLoading && cart.length > 0 ? (
+              `${cart.length} items added`
+            ) : null}
+          </h2>{" "}
+          {!isLoading && cart.length === 0 && (
+            <div className="flex flex-col mt-[6rem] mb-[8rem] w-full h-64 items-center justify-center">
+              <Lottie animationData={emptyCartAnimation} loop={true} />
+              <p className="text-2xl font-semibold ml-4 text-black-500">
+                Your cart is empty
+              </p>
+              <button className="mt-4 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium px-8 hover:bg-[#0000CC] hover:scale-105 transition-all duration-300 ease-in-out">
+                <Link to="/service">Shop now</Link>
+              </button>
+            </div>
           )}
           {isLoading && <LoadingSpinner />}
-
           <div className="mt-6">
             {cart.map((item) => (
               <div

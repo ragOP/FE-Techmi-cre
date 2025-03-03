@@ -175,18 +175,18 @@ const Navbar = () => {
             {isUserLoggedIn ? (
               <button
                 onClick={onLogoutUser}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full hover:bg-[#00008B] hover:text-white transition-all duration-300 ease-in-out border-2 border-[#00008B] hover:scale-105"
               >
-                <span className="text-[#00008B] font-medium text-lg">
+                <span className="text-[#00008B] font-medium text-lg hover:text-white">
                   Logout
                 </span>
               </button>
             ) : (
               <button
                 onClick={onLoginUser}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full hover:bg-[#00008B] hover:text-white transition-all duration-300 ease-in-out border-2 border-[#00008B] hover:scale-105"
               >
-                <span className="text-[#00008B] font-medium text-lg">
+                <span className="text-[#00008B] font-medium text-lg hover:text-white">
                   Login
                 </span>
               </button>

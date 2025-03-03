@@ -120,7 +120,7 @@ export default function Cart() {
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="flex lg:flex-row items-center justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
+                className="flex lg:flex-row items-start justify-start lg:items-center lg:justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center sm:w-[70%] w-auto">
                   <img
@@ -128,7 +128,7 @@ export default function Cart() {
                     alt={item.product.name}
                     className="w-36 h-36 lg:w-28 lg:h-28 object-cover rounded"
                   />
-                  <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[180%] lg:w-[65%]">
+                  <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[170%] lg:w-[65%]">
                     <h3 className="font-semibold text-lg">
                       {item.product.name}
                     </h3>
@@ -151,7 +151,7 @@ export default function Cart() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center flex-col -mt-8 sm:w-[30%] w-auto">
+                <div className="flex items-center flex-col mt-8 lg:-mt-8 sm:w-[30%] w-auto">
                   <p className="font-bold text-lg ">
                     ₹
                     {item.product.discounted_price

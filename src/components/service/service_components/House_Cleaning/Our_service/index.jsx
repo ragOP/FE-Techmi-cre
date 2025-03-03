@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react"
+import React, { use, useEffect, useState } from "react"
 import { useLocation } from "react-router";
 import { fetchCategories } from "../../../../home/Categ_Options/helpers/fetchCategories";
 
-const Services = ({ setSelectedCategory, selectedCategory }) => {
+const Services = ({ setFilterCategories, setSelectedCategory, selectedCategory }) => {
   const location = useLocation()
   const selectedServiceId = location.state?.selectedCardId || null;
 
@@ -21,6 +21,10 @@ const Services = ({ setSelectedCategory, selectedCategory }) => {
   const onClickCategory = (category) => {
     setSelectedCategory(category)
   }
+
+  useEffect(() => {
+    setFilterCategories(houseCategories)
+  }, [houseCategories])
 
   return (
     <div className=" py-10">

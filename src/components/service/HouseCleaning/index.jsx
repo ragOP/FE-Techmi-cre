@@ -6,9 +6,11 @@ import Services from "../service_components/House_Cleaning/Our_service"
 import prescription from "../../../assets/solutions/prescription.svg"
 import Testimonials from "../../common/testimonial"
 import HouseCleaningProducts from "../service_components/House_Cleaning/House_Cleaning_Products"
+import ServiceFilter from "../../service_filter"
 
 const HouseCleaning = () => {
   const productsRef = useRef(null);
+  const [filterCategories, setFilterCategories] = useState([])
 
   const [testimonialData, setTestimonialData] = useState([
     {
@@ -37,10 +39,10 @@ const HouseCleaning = () => {
       productsRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedCategory]);
-
   return (
     <div className="space-y-5">
-      <Services setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
+      <ServiceFilter filterCategories={filterCategories} />
+      <Services setFilterCategories={setFilterCategories} setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
       <Aboutus
         title="About Us"
         desc="Care Sync is a leading professional cleaning company, known for delivering high-quality services in Delhi NCR and beyond. We offer comprehensive cleaning solutions for both residential and commercial spaces. From deep cleaning to pest control, we ensure your space is spotless, hygienic, and comfortable."

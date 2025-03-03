@@ -14,9 +14,11 @@ import LoadingSpinner from "../../loader/LoadingSpinner";
 import useToast from "../../../hooks";
 import { toast } from "react-toastify";
 import CartLoader from "../../loader/CartLoader";
+import ServiceFilter from "../../service_filter";
 
 const LaundryService = () => {
   const productsRef = useRef(null);
+  const [filterCategories, setFilterCategories] = useState([]);
   const [testimonialData, setTestimonialData] = useState([
     {
       name: "Alice Johnson",
@@ -48,7 +50,9 @@ const LaundryService = () => {
   return (
     <div className="space-y-5">
       {/* <Searchbox /> */}
+      <ServiceFilter filterCategories={filterCategories} />
       <OurServices
+        setFilterCategories={setFilterCategories}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />

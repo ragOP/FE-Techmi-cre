@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 import img1 from "../../../../../assets/services/laundry/1.svg"
 import img2 from "../../../../../assets/services/laundry/2.svg"
@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query"
 import { fetchCategories } from "../../../../home/Categ_Options/helpers/fetchCategories"
 import { HomeCleaningCard } from "../../House_Cleaning/Our_service"
 
-const OurServices = ({ selectedCategory, setSelectedCategory }) => {
+const OurServices = ({ setFilterCategories, selectedCategory, setSelectedCategory }) => {
 
   const location = useLocation()
   const selectedServiceId = location.state?.selectedCardId || null;
@@ -28,8 +28,12 @@ const OurServices = ({ selectedCategory, setSelectedCategory }) => {
     setSelectedCategory(category)
   }
 
+  useEffect(() => {
+    setFilterCategories(laundryCategories);
+  }, [laundryCategories])
+
   return (
-    <div className="px-10">
+    <div className="container mx-auto">
       <div className="flex flex-col lg:flex-row justify-between items-center md:px-14">
         <h2 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-2 text-center">
           Types of Laundry Service We offer

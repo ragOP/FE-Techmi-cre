@@ -74,7 +74,7 @@ const CartAlternativeProduct = () => {
 
   return (
     <>
-      <div className="mt-12">
+      <div className="mt-12 min-h-[30vh]">
         <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">
           Alternative Products
         </h1>

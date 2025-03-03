@@ -68,8 +68,8 @@ const LastMinuteBuy = () => {
 
   return (
     <>
-      <div className="mt-12">
-        <h1 className="text-center text-3xl font-semibold mb-5 text-[#00008B]">
+      <div className="mt-8 min-h-[30vh]">
+        <h1 className="text-center text-3xl font-semibold mb-8 text-[#00008B]">
           Last Minute Buy
         </h1>
 

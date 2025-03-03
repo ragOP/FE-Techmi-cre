@@ -7,6 +7,7 @@ import { useLocation } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { fetchCategories } from "../../../../home/Categ_Options/helpers/fetchCategories"
 import { HomeCleaningCard } from "../../House_Cleaning/Our_service"
+import LoadingSpinner from "../../../../loader/LoadingSpinner"
 
 const OurServices = ({ selectedCategory, setSelectedCategory }) => {
 
@@ -46,7 +47,7 @@ const OurServices = ({ selectedCategory, setSelectedCategory }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 px-4 xl:w-[75%] w-[90%] mx-auto">
           {isLoading ?
             <div className="flex justify-center items-center h-40">
-              <p className="text-gray-500">Loading categories...</p>
+              <LoadingSpinner />
             </div>
             : laundryCategories.map((category) => (
               <HomeCleaningCard

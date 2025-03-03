@@ -1,26 +1,31 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react"
+import React, { useState } from "react";
 import { useLocation } from "react-router";
 import { fetchCategories } from "../../../../home/Categ_Options/helpers/fetchCategories";
+import LoadingSpinner from "../../../../loader/LoadingSpinner";
 
 const Services = ({ setSelectedCategory, selectedCategory }) => {
-  const location = useLocation()
+  const location = useLocation();
   const selectedServiceId = location.state?.selectedCardId || null;
 
-  const selectedCategoryId = selectedCategory?._id
+  const selectedCategoryId = selectedCategory?._id;
 
   const params = {
-    service_id: selectedServiceId
-  }
+    service_id: selectedServiceId,
+  };
 
-  const { data: houseCategories, isLoading, error } = useQuery({
-    queryKey: ['house_cleaning'],
+  const {
+    data: houseCategories,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["house_cleaning"],
     queryFn: () => fetchCategories({ params }),
   });
 
   const onClickCategory = (category) => {
-    setSelectedCategory(category)
-  }
+    setSelectedCategory(category);
+  };
 
   return (
     <div className=" py-10">
@@ -30,7 +35,8 @@ const Services = ({ setSelectedCategory, selectedCategory }) => {
             Our Services, We Clean It All - Big or Small!
           </h2>
           <p className="xl:text-xl text-lg ">
-            Explore our wide range of cleaning services designed for your lifestyle
+            Explore our wide range of cleaning services designed for your
+            lifestyle
           </p>
         </div>
 
@@ -42,31 +48,36 @@ const Services = ({ setSelectedCategory, selectedCategory }) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 px-4 xl:w-[75%] w-[90%] mx-auto">
-        {isLoading ?
+        {isLoading ? (
           <div className="flex justify-center items-center h-40">
-            <p className="text-gray-500">Loading categories...</p>
+            <LoadingSpinner />
           </div>
-          : houseCategories.map((category) => (
+        ) : (
+          houseCategories.map((category) => (
             <HomeCleaningCard
               onClick={() => onClickCategory(category)}
               key={category?._id}
               category={category}
               isSelected={selectedCategoryId === category?._id}
             />
-          ))}
+          ))
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Services
-
+export default Services;
 
 export const HomeCleaningCard = ({ category, onClick, isSelected }) => {
   return (
     <div
       onClick={onClick}
-      className={`relative bg-white rounded-3xl shadow-md overflow-hidden border-4 transition-all ${isSelected ? "border-[#00008b] shadow-lg scale-105" : "border-transparent"}`}
+      className={`relative bg-white rounded-3xl shadow-md overflow-hidden border-4 transition-all ${
+        isSelected
+          ? "border-[#00008b] shadow-lg scale-105"
+          : "border-transparent"
+      }`}
     >
       <img
         src={category?.images?.[0]}
@@ -81,5 +92,5 @@ export const HomeCleaningCard = ({ category, onClick, isSelected }) => {
         <p className="text-sm mb-5">{category.description}</p>
       </div>
     </div>
-  )
-}
+  );
+};

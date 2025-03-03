@@ -34,7 +34,15 @@ export default function Cart() {
         method: "POST",
         body: updatedCart,
       }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      if (variables.quantity === 0) {
+        setCart((prevCart) =>
+          prevCart.filter(
+            (item) =>
+              item.product?._id.toString() !== variables.product_id?.toString()
+          )
+        );
+      }
       queryClient.invalidateQueries(["cart_products"]);
       setRemoveCart(false);
     },
@@ -111,11 +119,7 @@ export default function Cart() {
             </p>
           )}
           {isLoading && <LoadingSpinner />}
-          {/* {cart.length > 0 && (
-            <p className="text-sm ml-4 text-gray-500 mb-2">
-              Items not requiring prescription
-            </p>
-          )} */}
+
           <div className="mt-6">
             {cart.map((item) => (
               <div

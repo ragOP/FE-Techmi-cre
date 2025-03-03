@@ -1,24 +1,66 @@
-import React from "react"
-import AnimationSlider from "../../common/animations"
-import ProductCard from "../../common/product_card"
-import { useQuery } from "@tanstack/react-query"
-import { fetchProducts } from "./helper/fetchProducts"
-import ProductLoader from "../../loader/ProductLoader"
+import React, { useState } from "react";
+import AnimationSlider from "../../common/animations";
+import ProductCard from "../../common/product_card";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchProducts } from "./helper/fetchProducts";
+import ProductLoader from "../../loader/ProductLoader";
 import { useNavigate } from "react-router-dom";
+import { fetchCart } from "../../../pages/cart/helper/fecthCart";
+import { toast } from "react-toastify";
+import { getItem } from "../../../utils/local_storage";
+
 const FeaturedProducts = () => {
+  const navigate = useNavigate();
+
+  const [selectedId, setSelectedId] = useState(null);
 
   const params = {
     is_best_seller: true,
     page: 1,
     per_page: 10,
-  }
+  };
 
-  const { data: topProducts, isLoading, error } = useQuery({
-    queryKey: ['top_products'],
+  const {
+    data: topProducts,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["top_products"],
     queryFn: () => fetchProducts({ params }),
   });
 
-  const navigate = useNavigate();
+  const { mutate: addToCartMutation, isPending } = useMutation({
+    mutationFn: ({ payload }) =>
+      fetchCart({
+        method: "POST",
+        body: payload,
+      }),
+    onSuccess: () => {
+      toast.success("Product added to cart!");
+      navigate("/cart");
+    },
+  });
+
+  const handleAddToCart = (product) => {
+    const token = getItem("token");
+
+    if (!token) {
+      return navigate("/login");
+    }
+
+    if (isPending) return;
+
+    const userId = getItem("userId");
+
+    setSelectedId(product._id);
+    const payload = {
+      user_id: userId,
+      product_id: product?._id,
+      quantity: 1,
+    };
+
+    addToCartMutation({ payload });
+  };
 
   return (
     <div className="mt-20">
@@ -42,6 +84,9 @@ const FeaturedProducts = () => {
                     smallDescription={product.small_description}
                     id={product._id}
                     onClick={() => navigate(`/product/${product._id}`)}
+                    selectedId={selectedId}
+                    onAddToCart={() => handleAddToCart(product)}
+                    isProductAdd={isPending}
                   />
                 </div>
               ))}

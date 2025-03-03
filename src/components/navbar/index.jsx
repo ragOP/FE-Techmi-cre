@@ -6,6 +6,30 @@ import cart from "../../assets/navbar/shopping-cart.svg";
 import user from "../../assets/navbar/circle-user-round.svg";
 import { getItem, removeItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+
+const buttonVariants = {
+  hover: {
+    scale: 1.05, // Slightly scale up on hover
+    backgroundColor: "#dce2f7", // Change background color on hover
+    color: "#FFFFFF", // Change text color on hover
+    transition: { duration: 0.2 },
+  },
+  tap: {
+    scale: 0.95, // Slightly scale down on tap
+  },
+};
+
+const navLinkVariants = {
+  hover: {
+    scale: 1.1, // Slightly scale up on hover
+    color: "#00008B", // Change text color on hover
+    transition: { duration: 0.2 },
+  },
+  tap: {
+    scale: 0.95, // Slightly scale down on tap
+  },
+};
 
 const navContents = [
   { title: "Home", route: "/" },
@@ -67,28 +91,39 @@ const Navbar = () => {
 
       <div className="hidden md:flex justify-evenly rounded-3xl bg-[#F6F3F3] items-center">
         {navContents.map((n) => (
-          <NavLink
+          <motion.div
             key={n.route}
-            to={n.route}
-            className={({ isActive }) =>
-              `text-lg font-semibold px-3 py-2 ${
-                isActive ? "text-[#00008B] underline" : ""
-              }`
-            }
+            variants={navLinkVariants}
+            whileHover="hover"
+            whileTap="tap"
           >
-            {n.title}
-          </NavLink>
+            <NavLink
+              to={n.route}
+              className={({ isActive }) =>
+                `text-lg font-semibold px-3 py-2 ${
+                  isActive ? "text-[#00008B] underline" : ""
+                }`
+              }
+            >
+              {n.title}
+            </NavLink>
+          </motion.div>
         ))}
       </div>
 
       <div className="hidden md:flex items-center gap-3">
-        <button
+        <motion.button
           onClick={handleCartClick}
           className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
         >
           <img src={cart} alt="Cart" className="h-[23px] w-[23px]" />
-          <span className="text-[#00008B] font-medium text-lg">Cart</span>
-        </button>
+          <motion.span className="text-[#00008B] font-medium text-lg">
+            Cart
+          </motion.span>
+        </motion.button>
 
         {!isUserLoggedIn ? (
           <button

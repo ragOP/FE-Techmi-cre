@@ -97,7 +97,7 @@ const ProductCard = ({
   onBuyNow,
   showAddToCart = true,
   showBuyNow = true,
-  showWishlist = true,
+  showWishlist = false,
   isProductAdd = false,
   selectedId = null,
 }) => {

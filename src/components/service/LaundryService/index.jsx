@@ -211,7 +211,13 @@ export const LaundaryCard = ({
             : "border border-[#00008B] text-blue-500"
         } hover:bg-blue-50`}
       >
-        {isPending ? <div className="my-1"><CartLoader /></div> : "Add to cart"}
+        {isPending ? (
+          <div className="my-1">
+            <CartLoader />
+          </div>
+        ) : (
+          "Add to cart"
+        )}
       </button>
     </div>
   );

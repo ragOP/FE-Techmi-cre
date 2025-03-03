@@ -29,6 +29,7 @@ const Services = ({ setFilterCategories, setSelectedCategory, selectedCategory }
 
   useEffect(() => {
     setFilterCategories(houseCategories)
+    console.log(houseCategories, ">>>>>> housing")
   }, [houseCategories])
 
   return (

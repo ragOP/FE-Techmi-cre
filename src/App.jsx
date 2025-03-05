@@ -2,13 +2,13 @@ import React, { Suspense, lazy, useEffect, useState } from "react";
 import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
-import ProtectedRoute from "./utils/auth/ProtectedRoute";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
 import userLogo from "./assets/navbar/user-image.png";
-import ToastContainer from "./components/toast/ToastContainer";
 import LazyLoader from "./components/loader/LazyLoader";
 import WebsiteLoader from "./components/loader/WebsiteLoader";
-import "./styles/toastStyles.css"
+import "./styles/toastStyles.css";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { autoLogout } from "./utils/auth";
 
 const Home = lazy(() => import("./pages/home"));
 const Service = lazy(() => import("./pages/services"));
@@ -34,43 +34,52 @@ const App = () => {
     });
   }, []);
 
+  useEffect(() => {
+    if (token) {
+      autoLogout(() => {
+        alert("Session expired! Logging out...");
+      });
+    }
+  }, [token]);
 
   if (initalWebsiteLoader) {
     return <WebsiteLoader />;
   }
 
   return (
-    <div className="bg-[#82c8e51a]">
-      {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}\
-      <Suspense fallback={<LazyLoader />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/login"
-            element={token ? <Navigate to="/" replace /> : <Login />}
-          />
-          <Route
-            path="/signup"
-            element={token ? <Navigate to="/" replace /> : <Signup />}
-          />
-          <Route path="/service" element={<Service />} />
-          <Route path="/search" element={<SearchResult />} />
-          <Route path="/product/:id" element={<SingleProduct />} />
+    <>
+      <div className="bg-[#82c8e51a]">
+        {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
+        <Suspense fallback={<LazyLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/login"
+              element={token ? <Navigate to="/" replace /> : <Login />}
+            />
+            <Route
+              path="/signup"
+              element={token ? <Navigate to="/" replace /> : <Signup />}
+            />
+            <Route path="/service" element={<Service />} />
+            <Route path="/search" element={<SearchResult />} />
+            <Route path="/product/:id" element={<SingleProduct />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/cart" element={<Cart />} />
-          </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/cart" element={<Cart />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-      {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
-      <FloatingWhatsApp
-        phoneNumber="9409718733"
-        accountName="Abhishek Mishra"
-        avatar={userLogo}
-      />
-    </div>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+        {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
+        <FloatingWhatsApp
+          phoneNumber="9409718733"
+          accountName="Abhishek"
+          avatar={userLogo}
+        />
+      </div>
+    </>
   );
 };
 

@@ -19,14 +19,12 @@ const Login = () => {
       if (response?.success) {
         const data = response?.data;
         const tokenData = data?.token;
-        const refreshToken = data?.refreshToken;
         const userId = data?.id;
 
         if (tokenData) {
           const localStoragePayload = {
             token: tokenData,
             userId: userId,
-            refreshToken,
           };
           setItem(localStoragePayload);
           

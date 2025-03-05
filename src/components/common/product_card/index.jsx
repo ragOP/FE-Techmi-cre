@@ -102,7 +102,6 @@ const ProductCard = ({
   selectedId = null,
 }) => {
   const navigate = useNavigate();
-  console.log(">>>>", id);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(variants[0]);
   const discount = price

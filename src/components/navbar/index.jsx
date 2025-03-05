@@ -168,25 +168,25 @@ const Navbar = () => {
           ))}
 
           <div className="flex flex-col items-center gap-3 py-4">
-            <button className="flex items-center text-[#00008B] gap-1.5 px-4 py-2 rounded-full">
+            <button onClick={handleCartClick} className="flex items-center text-[#00008B] gap-1.5 px-4 py-2 rounded-full">
               <span className="text-[#00008B] font-medium text-lg">Cart</span>
             </button>
 
             {isUserLoggedIn ? (
               <button
                 onClick={onLogoutUser}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full hover:bg-[#00008B] hover:text-white transition-all duration-300 ease-in-out border-2 border-[#00008B] hover:scale-105"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full"
               >
-                <span className="text-[#00008B] font-medium text-lg hover:text-white">
+                <span className="text-[#00008B] font-medium text-lg">
                   Logout
                 </span>
               </button>
             ) : (
               <button
                 onClick={onLoginUser}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full hover:bg-[#00008B] hover:text-white transition-all duration-300 ease-in-out border-2 border-[#00008B] hover:scale-105"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full"
               >
-                <span className="text-[#00008B] font-medium text-lg hover:text-white">
+                <span className="text-[#00008B] font-medium text-lg">
                   Login
                 </span>
               </button>

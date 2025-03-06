@@ -1,80 +1,94 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItem } from "../../../utils/local_storage";
+import { toast } from "react-toastify";
+import { addAddress } from "../helper/addAddress";
+import { getAddresses } from "../helper/getAddresses";
+import { deleteAddress } from "../helper/deleteAddress";
+import { updateAddress } from "../helper/updateAddress";
+import { Edit, Trash2 } from "lucide-react";
+
+const addressInitialState = {
+  name: "",
+  mobile: "",
+  pincode: "",
+  locality: "",
+  address: "",
+  city: "",
+  state: "",
+  landmark: "",
+  alternatePhone: "",
+  addressType: "home",
+};
 
 const AddressDialog = ({ onClose }) => {
+  const userId = getItem("userId");
+
   const queryClient = useQueryClient();
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    mobile: "",
-    pincode: "",
-    locality: "",
-    address: "",
-    city: "",
-    state: "",
-    landmark: "",
-    alternatePhone: "",
-    addressType: "home",
-  });
+  const [editingAddress, setEditingAddress] = useState(null);
 
   const { data: addresses, isLoading } = useQuery({
     queryKey: ["user_addresses"],
-    queryFn: async () => {
-      const res = await fetch("/api/addresses", {
-        headers: { Authorization: `Bearer ${getItem("token")}` },
-      });
-      return res.json();
-    },
+    queryFn: () => getAddresses({ id: userId }),
   });
 
   const { mutate: createAddress } = useMutation({
     mutationFn: async (newAddress) => {
-      const res = await fetch("/api/addresses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getItem("token")}`,
-        },
-        body: JSON.stringify({ ...newAddress, user: getItem("userId") }),
-      });
-      return res.json();
+      if (!userId) return;
+      const payload = {
+        ...newAddress,
+        user: userId,
+      };
+      const apiResponse = await addAddress({ payload });
+      return apiResponse?.response;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(["user_addresses"]);
-      setIsAddingNew(false);
-      setFormData({
-        name: "",
-        mobile: "",
-        pincode: "",
-        locality: "",
-        address: "",
-        city: "",
-        state: "",
-        landmark: "",
-        alternatePhone: "",
-        addressType: "home",
-      });
+    onSuccess: (res) => {
+      if (res?.success) {
+        queryClient.invalidateQueries(["user_addresses"]);
+        setEditingAddress(null);
+        toast.success("Address added successfully");
+      } else {
+        toast.error(res?.message || "Failed to add address");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to add address");
     },
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const { mutate: modifyAddress } = useMutation({
+    mutationFn: ({ id, payload }) => updateAddress({ id, payload }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["user_addresses"]);
+      setEditingAddress(null);
+      toast.success("Address updated successfully");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to update address");
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    createAddress(formData);
-  };
+  const { mutate: removeAddress } = useMutation({
+    mutationFn: (id) => deleteAddress({ id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["user_addresses"]);
+      toast.success("Address deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to delete address");
+    },
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-start justify-center p-4 overflow-auto">
       <div className="bg-white rounded-lg w-full max-w-2xl shadow-xl mt-20 mb-8">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">
-            {isAddingNew ? "Add New Address" : "Saved Addresses"}
+            {editingAddress
+              ? editingAddress._id
+                ? "Edit Address"
+                : "Add New Address"
+              : "Saved Addresses"}
           </h2>
           <button
             onClick={onClose}
@@ -84,242 +98,309 @@ const AddressDialog = ({ onClose }) => {
           </button>
         </div>
 
-        {!isAddingNew ? (
-          <div className="p-4">
-            {/* Address List */}
-            <div className="space-y-4">
-              {isLoading ? (
-                [...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse p-4 border rounded-md">
-                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))
-              ) : addresses?.length > 0 ? (
-                addresses.map((address) => (
-                  <div
-                    key={address._id}
-                    className="border rounded-md p-4 hover:border-primary cursor-pointer group"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="font-medium">{address.name}</span>
-                          <span className="text-xs text-gray-500">
-                            ({address.addressType})
-                          </span>
-                          {address.isPrimary && (
-                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                              Primary
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          {address.address}, {address.locality}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {address.city}, {address.state} - {address.pincode}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-2">
-                          Phone: {address.mobile}
-                        </p>
-                      </div>
-                      <button className="text-gray-400 hover:text-primary invisible group-hover:visible">
-                        Edit
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  No saved addresses found
-                </div>
-              )}
-            </div>
-
-            {/* Add New Button */}
-            <button
-              onClick={() => setIsAddingNew(true)}
-              className="w-full mt-6 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-primary hover:text-primary transition-colors"
-            >
-              + Add New Address
-            </button>
-          </div>
+        {editingAddress ? (
+          <AddressForm
+            initialData={editingAddress}
+            onSubmit={(data) => {
+              if (editingAddress._id) {
+                modifyAddress({ id: editingAddress._id, payload: data });
+              } else {
+                createAddress(data);
+              }
+            }}
+            onCancel={() => setEditingAddress(null)}
+          />
         ) : (
-          <form onSubmit={handleSubmit} className="p-4">
-            <div className="space-y-4">
-              {/* Contact Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Mobile Number
-                  </label>
-                  <input
-                    type="tel"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Address Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Pincode
-                  </label>
-                  <input
-                    type="text"
-                    name="pincode"
-                    value={formData.pincode}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Locality
-                  </label>
-                  <input
-                    type="text"
-                    name="locality"
-                    value={formData.locality}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Full Address
-                </label>
-                <textarea
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary h-24"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Additional Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Landmark (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="landmark"
-                    value={formData.landmark}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Alternate Phone (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    name="alternatePhone"
-                    value={formData.alternatePhone}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
-                  />
-                </div>
-              </div>
-
-              {/* Address Type */}
-              <div className="border-t pt-4">
-                <label className="block text-sm font-medium mb-2">
-                  Address Type
-                </label>
-                <div className="flex gap-4">
-                  {["home", "work", "other"].map((type) => (
-                    <label
-                      key={type}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        name="addressType"
-                        value={type}
-                        checked={formData.addressType === type}
-                        onChange={handleInputChange}
-                        className="text-primary focus:ring-primary"
-                      />
-                      <span className="capitalize">{type}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end gap-4 mt-6 border-t pt-4">
-              <button
-                type="button"
-                onClick={() => setIsAddingNew(false)}
-                className="px-6 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark"
-              >
-                Save Address
-              </button>
-            </div>
-          </form>
+          <AddressList
+            addresses={addresses}
+            isLoading={isLoading}
+            onAddNew={() => {
+              if (addresses?.length >= 3) {
+                toast.error("You can only save 3 addresses");
+                return;
+              }
+              setEditingAddress(addressInitialState);
+            }}
+            onEdit={setEditingAddress}
+            onDelete={removeAddress}
+          />
         )}
       </div>
+    </div>
+  );
+};
+
+const AddressForm = ({ initialData, onSubmit, onCancel }) => {
+  const [formData, setFormData] = useState(initialData);
+
+  useEffect(() => {
+    setFormData({ ...addressInitialState, ...initialData });
+  }, [initialData]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-4">
+      <div className="space-y-4">
+        {/* Contact Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Mobile Number
+            </label>
+            <input
+              type="tel"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Address Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Pincode</label>
+            <input
+              type="text"
+              name="pincode"
+              value={formData.pincode}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Locality</label>
+            <input
+              type="text"
+              name="locality"
+              value={formData.locality}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Full Address</label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary h-24"
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">City</label>
+            <input
+              type="text"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">State</label>
+            <input
+              type="text"
+              name="state"
+              value={formData.state}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Landmark (Optional)
+            </label>
+            <input
+              type="text"
+              name="landmark"
+              value={formData.landmark}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Alternate Phone (Optional)
+            </label>
+            <input
+              type="tel"
+              name="alternatePhone"
+              value={formData.alternatePhone}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        {/* Address Type */}
+        <div className="border-t pt-4">
+          <label className="block text-sm font-medium mb-2">Address Type</label>
+          <div className="flex gap-4">
+            {["home", "work", "other"].map((type) => (
+              <label
+                key={type}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="addressType"
+                  value={type}
+                  checked={formData.addressType === type}
+                  onChange={handleInputChange}
+                  className="text-primary focus:ring-primary"
+                />
+                <span className="capitalize">{type}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Form Actions */}
+        <div className="flex justify-end gap-4 mt-6 border-t pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-6 py-2 border border-[#00008B] text-[#00008B] hover:bg-[#00008B] hover:text-white rounded-md transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-2 bg-[#00008B] text-white rounded-md hover:bg-[#000070] transition"
+          >
+            {initialData._id ? "Update" : "Save"} Address
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+const AddressItem = ({ address, onEdit, onDelete }) => {
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this address?")) {
+      onDelete(address._id);
+    }
+  };
+
+  return (
+    <div className="border rounded-md p-4 hover:border-primary cursor-pointer group">
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-medium">{address.name}</span>
+            <span className="text-xs text-gray-500">
+              ({address.addressType})
+            </span>
+            {address.isPrimary && (
+              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                Primary
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-600">
+            {address.address}, {address.locality}
+          </p>
+          <p className="text-sm text-gray-600">
+            {address.city}, {address.state} - {address.pincode}
+          </p>
+          <p className="text-sm text-gray-600 mt-2">Phone: {address.mobile}</p>
+        </div>
+        <div className="flex gap-2">
+          {/* Edit Button */}
+          <button
+            onClick={() => onEdit(address)}
+            className="flex items-center gap-1 text-gray-400 hover:text-primary invisible group-hover:visible transition-all duration-200 hover:underline"
+          >
+            {/* <Edit className="w-4 h-4" /> */}
+            <span>Edit</span>
+          </button>
+
+          {/* Delete Button */}
+          <button
+            onClick={handleDelete}
+            className="flex items-center gap-1 text-gray-400 hover:text-red-500 invisible group-hover:visible transition-all duration-200 hover:underline"
+          >
+            {/* <Trash2 className="w-4 h-4" /> */}
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AddressList = ({ addresses, isLoading, onAddNew, onEdit, onDelete }) => {
+  return (
+    <div className="p-4">
+      <div className="space-y-4">
+        {isLoading ? (
+          [...Array(3)].map((_, i) => (
+            <div key={i} className="animate-pulse p-4 border rounded-md">
+              <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))
+        ) : addresses?.length > 0 ? (
+          addresses.map((address) => (
+            <AddressItem
+              key={address._id}
+              address={address}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No saved addresses found
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={onAddNew}
+        className="w-full mt-6 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-primary hover:text-primary transition-colors"
+      >
+        + Add New Address
+      </button>
     </div>
   );
 };

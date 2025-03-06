@@ -6,4 +6,5 @@ export const endpoints = {
   service: "api/service",
   cart: "api/cart",
   product_by_id: "api/product",
+  address: "api/address",
 };

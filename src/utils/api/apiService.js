@@ -14,8 +14,7 @@ export const apiService = async ({
   signal
 }) => {
   try {
-    const user = getItem("user");
-    const token = user?.token;
+    const token = getItem("token");
 
     const requestObj = {
       url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,

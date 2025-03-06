@@ -74,7 +74,9 @@ const LastMinuteBuy = () => {
         </h1>
 
         {isLoading ? (
-          <LoadingSpinner />
+          <div className="flex justify-center">
+            <LoadingSpinner />
+          </div>
         ) : (
           <>
             {topOrderedProducts && topOrderedProducts.length > 0 ? (

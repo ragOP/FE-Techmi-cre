@@ -13,6 +13,9 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import { getItem, removeItem } from "./utils/local_storage";
 
+const WHATSAPP_USER_NAME = "Abhishek";
+const WHATSAPP_PHONE_NUMBER = "9409718733";
+
 const Home = lazy(() => import("./pages/home"));
 const Service = lazy(() => import("./pages/services"));
 const Login = lazy(() => import("./pages/login"));
@@ -102,8 +105,8 @@ const App = () => {
         </Suspense>
         {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
         <FloatingWhatsApp
-          phoneNumber="9409718733"
-          accountName="Abhishek"
+          phoneNumber={WHATSAPP_PHONE_NUMBER}
+          accountName={WHATSAPP_USER_NAME}
           avatar={userLogo}
         />
       </div>

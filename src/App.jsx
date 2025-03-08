@@ -12,6 +12,10 @@ import { autoLogout } from "./utils/auth";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import { getItem, removeItem } from "./utils/local_storage";
+import ContactUs from "./pages/contact";
+import BlogUI from "./pages/blog";
+import SingleBlog from "./pages/single_blog";
+import Blog from "./pages/blog";
 
 const WHATSAPP_USER_NAME = "Abhishek";
 const WHATSAPP_PHONE_NUMBER = "9409718733";
@@ -95,11 +99,12 @@ const App = () => {
             <Route path="/service" element={<Service />} />
             <Route path="/search" element={<SearchResult />} />
             <Route path="/product/:id" element={<SingleProduct />} />
-
+            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/blogs" element={<Blog />} />
+            <Route path="/blogs/:id" element={<SingleBlog />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/cart" element={<Cart />} />
             </Route>
-
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>

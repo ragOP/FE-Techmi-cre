@@ -15,7 +15,7 @@
     "framer-motion": "^12.4.7",
     "is-odd": "^3.0.1",
     "jwt-decode": "^4.0.0",
-    "leaflet": "^1.7.1",
+    "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.474.0",
     "mapbox-gl": "^3.10.0",

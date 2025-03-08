@@ -34,7 +34,7 @@ const navLinkVariants = {
 const navContents = [
   { title: "Home", route: "/" },
   { title: "Services", route: "/service" },
-  { title: "Blog", route: "/blog" },
+  { title: "Blog", route: "/blogs" },
   { title: "Contact Us", route: "/contact" },
 ];
 

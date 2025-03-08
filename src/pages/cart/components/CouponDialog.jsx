@@ -66,6 +66,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                         {coupon.code}
                       </span>
                       <span className="text-green-600 text-sm">
+                        {coupon.discountType === "fixed" ? "₹" : ""}
                         {coupon.discountValue}
                         {coupon.discountType === "percentage" ? "%" : ""}{" "}
                         {"Off"}
@@ -123,6 +124,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                             </span>
                           </div>
                           <span className="text-green-600 font-medium">
+                            {coupon.discountType === "fixed" ? "₹" : ""} {" "}
                             {coupon.discountValue}
                             {coupon.discountType === "percentage"
                               ? "%"

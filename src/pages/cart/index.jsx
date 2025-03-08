@@ -160,19 +160,22 @@ export default function Cart() {
     0
   );
   useEffect(() => {
-    let couponDiscountedPrice = 0;
-
     if (discountCoupon.length > 0) {
-      const { discountValue, maxDiscount } = discountCoupon[0];
-      couponDiscountedPrice = totalPrice * (discountValue / 100);
-      if (maxDiscount) {
-        couponDiscountedPrice = Math.min(couponDiscountedPrice, maxDiscount);
-      }
+      const { discountValue, maxDiscount, discountType } = discountCoupon[0];
+      let couponDiscountedPrice = discountType === "fixed" 
+        ? discountValue 
+        : totalPrice * (discountValue / 100);
+
+      couponDiscountedPrice = Math.min(couponDiscountedPrice, maxDiscount || couponDiscountedPrice);
+      couponDiscountedPrice = Math.min(couponDiscountedPrice, totalPrice - discount);
+
+      setDiscountedPrice(couponDiscountedPrice);
+      setFinalPrice(totalPrice - discount - couponDiscountedPrice + platformFee);
+    } else {
+      setDiscountedPrice(0);
+      setFinalPrice(totalPrice - discount + platformFee);
     }
-    couponDiscountedPrice = Math.min(couponDiscountedPrice, totalPrice - discount);
-    setDiscountedPrice(couponDiscountedPrice);
-    setFinalPrice(totalPrice - discount - couponDiscountedPrice + platformFee);
-  }, [discountCoupon, cart, discount, platformFee, totalPrice]);
+  }, [discountCoupon, totalPrice, discount, platformFee]);
 
   const scrollToTop = () => {
     window.scrollTo({

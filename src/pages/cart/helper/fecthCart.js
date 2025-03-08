@@ -13,8 +13,7 @@ export const fetchCart = async ({ params, method = "GET", body = {} }) => {
     });
 
     if (apiResponse?.response?.success) {
-      console.log(">>>", apiResponse?.response?.data?.cart?.items)
-      return apiResponse?.response?.data?.cart?.items;
+      return apiResponse?.response?.data?.cart;
     }
 
     return [];

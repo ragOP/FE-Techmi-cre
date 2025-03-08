@@ -19,6 +19,8 @@ import emptyCartAnimation from "../../assets/EmptyCartAnimation.json";
 import AddressDialog from "./components/AddressDialog";
 import { getItem } from "../../utils/local_storage";
 import CouponDialog from "./components/CouponDialog";
+import { toast } from "react-toastify";
+import { placeOrder } from "./helper/order";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -42,14 +44,38 @@ export default function Cart() {
   const onOpenCouponDialog = () => setOpenCoupon(true);
   const onCloseCouponDialog = () => setOpenCoupon(false);
 
-  const {
-    data: cartProducts,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: cartProducts, isLoading } = useQuery({
     queryKey: ["cart_products"],
     queryFn: () => fetchCart({ params }),
   });
+
+  const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation({
+    mutationFn: (payload) => placeOrder({payload}),
+    onSuccess: (data) => {
+      toast.success("Order placed successfully!");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
+      setDiscountCoupon([]);
+      scrollToTop();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Order failed, please try again later");
+    }
+  });
+  
+  const handlePlaceOrder = async () => {
+    const payload = {
+      cartId: cartProducts?._id,
+      addressId: address?._id,
+      couponId: discountCoupon?.[0]?._id || null
+    };
+  
+    if (!payload.cartId || !payload.addressId) {
+      toast.error("Please select an address");
+      return;
+    }  
+    placeOrderMutation(payload);
+  };  
+
   const queryClient = useQueryClient();
   const { mutate: updateCart, isPending } = useMutation({
     mutationFn: (updatedCart) =>
@@ -82,11 +108,11 @@ export default function Cart() {
   };
 
   useEffect(() => {
-    if (cartProducts) {
-      setCart(cartProducts);
-      getDiscount(cartProducts);
+    if (cartProducts?.items) {
+      setCart(cartProducts?.items);
+      getDiscount(cartProducts?.items);
     }
-  }, [cartProducts]);
+  }, [cartProducts?.items]);
 
   const updateQuantity = (product, change) => {
     setSelectedId(product._id);
@@ -99,7 +125,7 @@ export default function Cart() {
           : item
       )
     );
-    const updatedItem = cartProducts.find(
+    const updatedItem = cartProducts?.items?.find(
       (item) => item.product._id === productId
     );
     if (updatedItem) {
@@ -141,12 +167,15 @@ export default function Cart() {
     setFinalPrice(totalPrice - discount - couponDiscountedPrice + platformFee);
   }, [discountCoupon, cart]);
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+  
   useEffect(() => {
-    console.log(address, "<<<<<<<<");
-  }, [address]);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollToTop()
   }, []);
 
   return (
@@ -344,8 +373,13 @@ export default function Cart() {
                 </div>
               </div>
 
-              <button className="w-full mt-6 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium">
-                Proceed to Checkout
+              <button
+                onClick={handlePlaceOrder}
+                className={`${
+                  isPlacingOrder ? "pointer-events-none" : ""
+                } w-full mt-6 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
+              >
+                {isPlacingOrder ? <div className="my-1"><CartLoader /></div> : "Proceed to Checkout"}
               </button>
             </div>
           )}

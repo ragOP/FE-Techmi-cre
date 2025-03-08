@@ -1,61 +1,43 @@
-import { useState } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { getAllCoupons } from "../helper/coupon";
+import { useQuery } from "@tanstack/react-query";
 
-const CouponDialog = ({ onClose }) => {
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupons, setAppliedCoupons] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  // Demo coupon data
-  const availableCoupons = [
-    {
-      code: 'FLAT50',
-      discount: '50% OFF',
-      description: 'Get 50% off on orders above ₹999',
-      validity: 'Valid till 30 Sept 2024',
-      terms: 'Applicable on selected products'
-    },
-    {
-      code: 'FREESHIP',
-      discount: 'Free Shipping',
-      description: 'Free delivery on orders above ₹499',
-      validity: 'Valid till 31 Dec 2024',
-      terms: 'Applicable for standard shipping'
-    },
-    {
-      code: 'WELCOME20',
-      discount: '20% OFF',
-      description: '20% off for new customers',
-      validity: 'Valid till 31 Oct 2024',
-      terms: 'Max discount ₹200'
-    }
-  ];
+const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
+  const [couponCode, setCouponCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { data: availableCoupons, isLoading } = useQuery({
+    queryKey: ["available_coupons"],
+    queryFn: () => getAllCoupons(),
+    select: (data) => data?.response,
+  });
 
   const handleApplyCoupon = (code) => {
     if (!code) {
-      setErrorMessage('Please enter a coupon code');
+      setErrorMessage("Please enter a coupon code");
       return;
     }
-    
-    const coupon = availableCoupons.find(c => c.code === code);
+    const coupon = availableCoupons.find((c) => c.code === code);
     if (coupon) {
-      setAppliedCoupons([...appliedCoupons, coupon]);
-      setErrorMessage('');
-      setCouponCode('');
+      setAppliedCoupons([coupon]);
+      setErrorMessage("");
+      setCouponCode("");
     } else {
-      setErrorMessage('Invalid coupon code');
+      setErrorMessage("Invalid coupon code");
     }
   };
 
   const handleRemoveCoupon = (code) => {
-    setAppliedCoupons(appliedCoupons.filter(c => c.code !== code));
+    const updatedCoupons = appliedCoupons.filter((c) => c.code !== code);
+    setAppliedCoupons(updatedCoupons.length ? updatedCoupons : []);
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-start justify-center p-4 overflow-auto">
-      <div className="bg-white rounded-lg w-full max-w-md shadow-xl mt-20 mb-8 animate-slide-up">
+      <div className="bg-white rounded-lg w-full max-w-lg shadow-xl mt-20 mb-8 animate-slide-up overflow-y-auto h-[80%]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="sticky top-0 bg-white z-10 flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">Apply Coupons</h2>
           <button
             onClick={onClose}
@@ -83,11 +65,12 @@ const CouponDialog = ({ onClose }) => {
                         {coupon.code}
                       </span>
                       <span className="text-green-600 text-sm">
-                        {coupon.discount}
+                        {coupon.discount || "10%"}
                       </span>
                     </div>
                     <p className="text-xs text-green-600 mt-1">
-                      {coupon.description}
+                      {coupon.description ||
+                        "GET 10% off on all pharma products"}
                     </p>
                   </div>
                   <button
@@ -103,46 +86,65 @@ const CouponDialog = ({ onClose }) => {
 
           {/* Available Coupons */}
           <div className="space-y-4">
-            {availableCoupons.map((coupon) => (
-              <div
-                key={coupon.code}
-                className="border rounded-md p-4 hover:border-primary transition-colors"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="bg-blue-100 px-2 py-1 rounded">
-                        <span className="font-medium text-blue-600">
-                          {coupon.code}
-                        </span>
-                      </div>
-                      <span className="text-green-600 font-medium">
-                        {coupon.discount}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">{coupon.description}</p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {coupon.validity}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {coupon.terms}
-                    </p>
+            {isLoading
+              ? [...Array(3)].map((_, i) => (
+                  <div key={i} className="animate-pulse p-4 border rounded-md">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </div>
-                  <button
-                    onClick={() => handleApplyCoupon(coupon.code)}
-                    className="ml-4 px-3 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-md text-sm"
+                ))
+              : availableCoupons.map((coupon) => (
+                  <div
+                    key={coupon.code}
+                    className={`border rounded-md p-4 hover:border-primary transition-colors ${
+                      appliedCoupons.length > 0
+                        ? "pointer-events-none opacity-50 filter grayscale"
+                        : ""
+                    }`}
                   >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="bg-blue-100 px-2 py-1 rounded">
+                            <span className="font-medium text-blue-600">
+                              {coupon.code}
+                            </span>
+                          </div>
+                          <span className="text-green-600 font-medium">
+                            {coupon.discountValue}{"%"}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {coupon.description ||
+                            "GET 10% off on all pharma products"}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {coupon.validity || "MAY 2025"} {"|"}{" "}
+                          <span>{coupon.terms || "Min Purchase of 2500"}</span>
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleApplyCoupon(coupon.code)}
+                        className="ml-4 px-3 py-1.5 bg-primary hover:bg-primary-dark text-gray rounded-md text-sm transition-transform transform border border-blue-500 hover:scale-105"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                ))}
           </div>
 
           {/* Coupon Input */}
           <div className="mt-6 pt-4 border-t">
             <h3 className="text-sm font-medium mb-3">Have another coupon?</h3>
-            <div className="flex gap-2">
+            <div
+              className={`${
+                appliedCoupons.length > 0
+                  ? "pointer-events-none opacity-50 filter grayscale"
+                  : ""
+              } flex gap-2`}
+            >
               <input
                 type="text"
                 value={couponCode}
@@ -152,7 +154,7 @@ const CouponDialog = ({ onClose }) => {
               />
               <button
                 onClick={() => handleApplyCoupon(couponCode)}
-                className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md"
+                className="ml-4 px-3 py-1.5 bg-primary hover:bg-primary-dark text-gray rounded-md text-sm transition-transform transform border border-blue-500 hover:scale-105"
               >
                 Apply
               </button>

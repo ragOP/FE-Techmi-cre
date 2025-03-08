@@ -7,4 +7,5 @@ export const endpoints = {
   cart: "api/cart",
   product_by_id: "api/product",
   address: "api/address",
+  coupon: "api/coupon",
 };

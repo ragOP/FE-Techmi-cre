@@ -21,7 +21,7 @@ const addressInitialState = {
   addressType: "home",
 };
 
-const AddressDialog = ({ onClose }) => {
+const AddressDialog = ({ onClose, setAddress }) => {
   const userId = getItem("userId");
 
   const queryClient = useQueryClient();
@@ -123,6 +123,8 @@ const AddressDialog = ({ onClose }) => {
             }}
             onEdit={setEditingAddress}
             onDelete={removeAddress}
+            setAddress={setAddress}
+            onClose={onClose}
           />
         )}
       </div>
@@ -312,7 +314,7 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
   );
 };
 
-const AddressItem = ({ address, onEdit, onDelete }) => {
+const AddressItem = ({ address, onEdit, onDelete, setAddress, onClose }) => {
   const handleDelete = (e) => {
     e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this address?")) {
@@ -320,8 +322,16 @@ const AddressItem = ({ address, onEdit, onDelete }) => {
     }
   };
 
+  const handleSelectAdress = () => {
+    setAddress(address);
+    onClose();
+  };
+
   return (
-    <div className="border rounded-md p-4 hover:border-primary cursor-pointer group">
+    <div
+      onClick={handleSelectAdress}
+      className="border rounded-md p-4 hover:border-primary cursor-pointer group"
+    >
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -367,7 +377,15 @@ const AddressItem = ({ address, onEdit, onDelete }) => {
   );
 };
 
-const AddressList = ({ addresses, isLoading, onAddNew, onEdit, onDelete }) => {
+const AddressList = ({
+  addresses,
+  isLoading,
+  onAddNew,
+  onEdit,
+  onDelete,
+  setAddress,
+  onClose,
+}) => {
   return (
     <div className="p-4">
       <div className="space-y-4">
@@ -386,6 +404,8 @@ const AddressList = ({ addresses, isLoading, onAddNew, onEdit, onDelete }) => {
               address={address}
               onEdit={onEdit}
               onDelete={onDelete}
+              setAddress={setAddress}
+              onClose={onClose}
             />
           ))
         ) : (

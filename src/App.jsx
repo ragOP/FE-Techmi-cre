@@ -9,6 +9,9 @@ import WebsiteLoader from "./components/loader/WebsiteLoader";
 import "./styles/toastStyles.css";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { autoLogout } from "./utils/auth";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
+import { getItem, removeItem } from "./utils/local_storage";
 
 const Home = lazy(() => import("./pages/home"));
 const Service = lazy(() => import("./pages/services"));
@@ -41,6 +44,31 @@ const App = () => {
       });
     }
   }, [token]);
+
+  const checkTokenExpiration = () => {
+    const storedToken = getItem("token");
+    if (!storedToken) return;
+
+    try {
+      const decodedToken = jwtDecode(storedToken);
+      const currentTime = Date.now() / 1000;
+
+      if (decodedToken.exp < currentTime) {
+        removeItem("token");
+        toast.error("Your session has expired. Please login again.", {
+          autoClose: 3000,
+          theme: "colored",
+        });
+      }
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      removeItem("token");
+    }
+  };
+
+  useEffect(() => {
+    checkTokenExpiration();
+  }, []);
 
   if (initalWebsiteLoader) {
     return <WebsiteLoader />;

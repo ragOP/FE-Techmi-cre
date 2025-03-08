@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { getAllCoupons } from "../helper/coupon";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 
 const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
   const [couponCode, setCouponCode] = useState("");
@@ -143,9 +143,8 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                             } on all products`}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
-                          {format(
-                            new Date(coupon.endDate),
-                            "dd/MM/yyyy hh:mm a"
+                          {dayjs(coupon.endDate).format(
+                            "DD/MM/YYYY hh:mm A"
                           )}{" "}
                           {/* {"|"}{" "} */}
                           {/* <span>{coupon.terms || "Min Purchase of 2500"}</span> */}

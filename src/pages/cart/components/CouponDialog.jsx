@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { getAllCoupons } from "../helper/coupon";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
   const [couponCode, setCouponCode] = useState("");
@@ -52,7 +53,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
           {appliedCoupons.length > 0 && (
             <div className="mb-6">
               <h3 className="text-sm font-medium text-green-600 mb-2">
-                Applied Coupons ({appliedCoupons.length})
+                Applied Coupons ({appliedCoupons.length || ""})
               </h3>
               {appliedCoupons.map((coupon) => (
                 <div
@@ -65,12 +66,22 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                         {coupon.code}
                       </span>
                       <span className="text-green-600 text-sm">
-                        {coupon.discount || "10%"}
+                        {coupon.discountValue}
+                        {coupon.discountType === "percentage" ? "%" : ""}{" "}
+                        {"Off"}
                       </span>
                     </div>
                     <p className="text-xs text-green-600 mt-1">
                       {coupon.description ||
-                        "GET 10% off on all pharma products"}
+                        `Get ${
+                          coupon.discountType === "percentage"
+                            ? `${coupon.discountValue}% off${
+                                coupon.maxDiscount
+                                  ? `, up to ₹${coupon.maxDiscount}`
+                                  : ""
+                              }`
+                            : `₹${coupon.discountValue} off`
+                        } on all products`}
                     </p>
                   </div>
                   <button
@@ -112,16 +123,32 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                             </span>
                           </div>
                           <span className="text-green-600 font-medium">
-                            {coupon.discountValue}{"%"}
+                            {coupon.discountValue}
+                            {coupon.discountType === "percentage"
+                              ? "%"
+                              : ""}{" "}
+                            {"Off"}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600">
                           {coupon.description ||
-                            "GET 10% off on all pharma products"}
+                            `Get ${
+                              coupon.discountType === "percentage"
+                                ? `${coupon.discountValue}% off${
+                                    coupon.maxDiscount
+                                      ? `, up to ₹${coupon.maxDiscount}`
+                                      : ""
+                                  }`
+                                : `₹${coupon.discountValue} off`
+                            } on all products`}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
-                          {coupon.validity || "MAY 2025"} {"|"}{" "}
-                          <span>{coupon.terms || "Min Purchase of 2500"}</span>
+                          {format(
+                            new Date(coupon.endDate),
+                            "dd/MM/yyyy hh:mm a"
+                          )}{" "}
+                          {/* {"|"}{" "} */}
+                          {/* <span>{coupon.terms || "Min Purchase of 2500"}</span> */}
                         </p>
                       </div>
                       <button

@@ -10,6 +10,8 @@
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "cra-template": "1.2.0",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "encrypt-storage": "^2.14.6",
     "framer-motion": "^12.4.7",
     "is-odd": "^3.0.1",

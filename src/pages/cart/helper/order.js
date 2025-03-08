@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import { apiService } from "../../..//utils/api/apiService";
 import { endpoints } from "../../../utils/endpoints";
 

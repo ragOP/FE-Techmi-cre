@@ -52,9 +52,14 @@ export default function Cart() {
   const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation({
     mutationFn: (payload) => placeOrder({payload}),
     onSuccess: (data) => {
-      toast.success("Order placed successfully!");
-      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
-      setDiscountCoupon([]);
+      if(data?.response?.status >= 400){
+        toast.error(data?.response?.data?.message || "Something went wrong");
+        return;
+      }else{
+        toast.success("Order placed successfully!");
+        queryClient.invalidateQueries({ queryKey: ["cart_products"] });
+        setDiscountCoupon([]);
+      }
       scrollToTop();
     },
     onError: (error) => {

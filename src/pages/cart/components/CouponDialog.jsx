@@ -106,7 +106,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                     <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </div>
                 ))
-              : availableCoupons.map((coupon) => (
+              : availableCoupons && availableCoupons.length > 0 && availableCoupons.map((coupon) => (
                   <div
                     key={coupon.code}
                     className={`border rounded-md p-4 hover:border-primary transition-colors ${

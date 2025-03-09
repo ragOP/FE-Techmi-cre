@@ -3,6 +3,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import logo from "../../assets/navbar/crm.webp";
 import cart from "../../assets/navbar/shopping-cart.svg";
+import order from "../../assets/navbar/shopping-cart.svg";
 import user from "../../assets/navbar/circle-user-round.svg";
 import { getItem, removeItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
@@ -67,6 +68,14 @@ const Navbar = () => {
       navigate("/cart");
     }
   };
+  const handleOrderClick = () => {
+    if (!isUserLoggedIn) {
+      toast.error("Please login to add items to cart");
+      navigate("/login");
+    } else {
+      navigate("/order");
+    }
+  };
 
   useEffect(() => {
     if (token) {
@@ -111,7 +120,21 @@ const Navbar = () => {
         ))}
       </div>
 
+
       <div className="hidden md:flex items-center gap-3">
+      <motion.button
+          onClick={handleOrderClick}
+          className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
+        >
+          <img src={order} alt="Cart" className="h-[23px] w-[23px]" />
+          <motion.span className="text-[#00008B] font-medium text-lg">
+            My Orders
+          </motion.span>
+        </motion.button>
+
         <motion.button
           onClick={handleCartClick}
           className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"

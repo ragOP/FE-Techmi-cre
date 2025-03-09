@@ -11,5 +11,6 @@ export const endpoints = {
   order: "api/order",
   contact: "api/contact",
   blogs: "api/blog",
-  reviews: "api/review"
+  reviews: "api/review",
+  ordermy:'api/order/history',
 };

@@ -24,19 +24,19 @@ const NextArrow = ({ onClick }) => (
 
 const AnimationSlider = ({ children }) => {
   const totalSlides = React.Children.count(children);
-  const slidesToShow = Math.min(4.5, totalSlides);
+  const slidesToShow = Math.min(4, totalSlides);
 
   const settings = {
-    infinite: totalSlides > 4, // Disable infinite loop for a single product
+    infinite: totalSlides > 4,
     speed: 500,
     slidesToShow,
     slidesToScroll: 1,
     swipeToSlide: true,
-    dots: totalSlides > 1, // Hide dots if only one product
-    prevArrow: totalSlides > 1 ? <PrevArrow /> : null, // Hide arrows if only one product
+    dots: totalSlides > 1,
+    prevArrow: totalSlides > 1 ? <PrevArrow /> : null,
     nextArrow: totalSlides > 1 ? <NextArrow /> : null,
-    centerMode: totalSlides < 4, // Center the slide when there's only one product
-    centerPadding: totalSlides < 4 ? "20%" : "0", // Prevent full width for a single product
+    centerMode: totalSlides < 4,
+    centerPadding: totalSlides < 4 ? "20%" : "0",
     responsive: [
       {
         breakpoint: 1024,

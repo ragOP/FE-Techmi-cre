@@ -16,9 +16,6 @@ export default function Blog() {
     featured: true,
   };
 
-  const featParams = {
-    featured: false,
-  };
 
   const { data: blogData, isLoading } = useQuery({
     queryKey: ["blog_data_featured"],
@@ -28,7 +25,7 @@ export default function Blog() {
 
   const { data: latestBlog, isPending } = useQuery({
     queryKey: ["blog_data"],
-    queryFn: () => getBlogData({ featParams }),
+    queryFn: () => getBlogData({ }),
     select: (data) => data?.response?.data,
   });
 
@@ -75,7 +72,7 @@ export default function Blog() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.8, duration: 1 }}
         >
-          {isLoading
+          {isLoading && posts.length === 0
             ? Array.from({ length: 4 }).map((_, index) => (
                 <div
                   key={index}
@@ -89,7 +86,7 @@ export default function Blog() {
                   </div>
                 </div>
               ))
-            : posts.map((post, index) => (
+            :  posts.map((post, index) => (
                 <motion.div
                   key={post.id}
                   onClick={() => navigate(`/blogs/${post._id}`)}
@@ -144,7 +141,7 @@ export default function Blog() {
 
           <h2 className="mt-6 text-lg md:text-xl font-bold">Latest Posts</h2>
           <motion.div className="mt-4 space-y-4">
-            {isLoading
+            {isPending && latestPosts.length === 0
               ? Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={index}
@@ -157,7 +154,7 @@ export default function Blog() {
                     </div>
                   </div>
                 ))
-              : latestPosts.map((post, index) => (
+              :  latestPosts.map((post, index) => (
                   <motion.div
                     key={post._id}
                     onClick={() => navigate(`/blogs/${post._id}`)}

@@ -18,7 +18,7 @@ const ServiceCard = ({ imageSrc, title, onClick, isHighlighted }) => {
   return (
     <div
       onClick={onClick}
-      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer  transition-transform duration-300 ${isHighlighted ? "border-[#00008B] scale-110" : "border-transparent"}`}
+      className={`xl:w-96 xl:h-96 lg:w-72 lg:h-72 h-64 w-[80%] mx-3 rounded-2xl shadow-lg overflow-hidden relative flex items-center justify-center cursor-pointer  transition-transform duration-300 ${isHighlighted ? "border-[#00008B] scale-110" : "border-transparent"} hover:scale-105`}
       style={{ backgroundImage: `url(${imageSrc})`, backgroundSize: 'cover', backgroundRepeat: "no-repeat", backgroundPosition: 'center' }}
     >
       <button className="absolute top-2 right-2 bg-[#0A008FBA] p-2 rounded-lg shadow">

@@ -9,5 +9,6 @@ export const endpoints = {
   address: "api/address",
   coupon: "api/coupon",
   order: "api/order",
-  contact: "api/contact"
+  contact: "api/contact",
+  blogs: "api/blog"
 };

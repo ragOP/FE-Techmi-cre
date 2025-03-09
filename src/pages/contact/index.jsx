@@ -4,6 +4,10 @@ import { motion } from "framer-motion";
 import contact from "../../assets/contact/conatct.png";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { submitQueryForm } from "./helper";
+import { QueryClient, useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import CartLoader from "../../components/loader/CartLoader";
 
 const position = [28.5691, 77.2786];
 
@@ -11,6 +15,32 @@ const Contact = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+
+  const { mutate: submitQuery, isPending } = useMutation({
+    mutationFn: async (formData) => {
+      return await submitQueryForm(formData);
+    },
+    onSuccess: () => {
+      toast.success("Form submitted successfully");
+      setName("");
+      setEmail("");
+      setSubject("");
+    },
+  });
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    if(!name || !email || !subject) {
+      toast.error("Please fill all the fields");
+      return;
+    }
+    const formData = { name, email, subject };
+    submitQuery(formData);
+  };
 
   useEffect(() => {
     if (!mapInstance.current) {
@@ -157,6 +187,8 @@ const Contact = () => {
             <motion.input
               type="text"
               placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,6 +197,8 @@ const Contact = () => {
             <motion.input
               type="email"
               placeholder="Your Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm md:text-base"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -172,6 +206,8 @@ const Contact = () => {
             />
             <motion.textarea
               placeholder="Your Message"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-28 text-sm md:text-base"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -179,9 +215,10 @@ const Contact = () => {
             />
             <motion.button
               whileHover={{ scale: 1.05 }}
-              className="w-full bg-blue-900 text-white p-3 rounded-3xl font-semibold text-sm md:text-lg hover:bg-blue-700 transition-all"
+              onClick={handleSubmitForm}
+              className={`${isPending? 'pointer-events-none': ''} w-full bg-blue-900 text-white p-3 rounded-3xl font-semibold text-sm md:text-lg hover:bg-blue-700 transition-all`}
             >
-              Submit Message
+             {isPending? <div className="my-2"><CartLoader /></div>  : "Submit Message"}
             </motion.button>
           </form>
         </motion.div>

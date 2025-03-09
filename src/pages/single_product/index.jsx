@@ -10,12 +10,16 @@ import { fetchSingleProduct } from "./helper";
 import { fetchCart } from "../cart/helper/fecthCart";
 import { getItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
+import ReviewSlider from "../../components/review";
+import { fetchReviews } from "../../components/review/helper";
+import ReviewModal from "../../components/review_modal";
 
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { data: productData } = useQuery({
     queryKey: ["productData", id],
@@ -28,14 +32,15 @@ export default function ProductPage() {
   });
 
   const { mutate: addToCartMutation, isPending } = useMutation({
-    mutationFn: () => fetchCart({
-      method: "POST",
-      body: {
-        user_id: getItem("userId"),
-        product_id: id,
-        quantity: quantity,
-      },
-    }),
+    mutationFn: () =>
+      fetchCart({
+        method: "POST",
+        body: {
+          user_id: getItem("userId"),
+          product_id: id,
+          quantity: quantity,
+        },
+      }),
     onSuccess: () => {
       toast.success("Product added to cart!");
       navigate("/cart");
@@ -44,6 +49,10 @@ export default function ProductPage() {
 
   const handleAddToCart = () => {
     addToCartMutation();
+  };
+
+  const handleOpenReview = () => {
+    setIsOpen(true);
   };
 
   const scrollToTop = () => {
@@ -78,6 +87,8 @@ export default function ProductPage() {
       <CartAlternativeProduct />
       <ProductInfo />
       <CartAlternativeProduct />
+      <ReviewSlider id={id} handleOpenReview={handleOpenReview} />
+      <ReviewModal isOpen={isOpen} setIsOpen={setIsOpen} id={id} />
     </div>
   );
 }

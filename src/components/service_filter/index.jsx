@@ -1,8 +1,13 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchProducts } from "../home/featured_products/helper/fetchProducts";
 import { toast } from "react-toastify";
-import { getItem } from "../../utils/local_storage";
+import { getItem, setItem } from "../../utils/local_storage";
 import { fetchCart } from "../../pages/cart/helper/fecthCart";
 import { useNavigate } from "react-router-dom";
 import CartLoader from "../loader/CartLoader";
@@ -40,6 +45,8 @@ export default function ServiceFilter({ filterCategories }) {
     setServicePackage(res);
   };
 
+  const queryClient = useQueryClient();
+
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: ({ payload }) =>
       fetchCart({
@@ -48,7 +55,7 @@ export default function ServiceFilter({ filterCategories }) {
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
@@ -62,9 +69,18 @@ export default function ServiceFilter({ filterCategories }) {
       return;
     }
     const token = getItem("token");
+
     if (!token) {
+      const productObj = {
+        _id: servicePackageId,
+      };
+      const payload = {
+        pendingProduct: JSON.stringify(productObj),
+      };
+      setItem(payload);
       return navigate("/login");
     }
+
     if (isPending) return;
     const userId = getItem("userId");
     const payload = {

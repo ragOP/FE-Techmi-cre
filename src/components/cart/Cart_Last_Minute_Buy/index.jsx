@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
-import { getItem } from "../../../utils/local_storage";
+import { getItem, setItem } from "../../../utils/local_storage";
 
 const LastMinuteBuy = () => {
   const navigate = useNavigate();
@@ -34,6 +34,8 @@ const LastMinuteBuy = () => {
     navigate(`/product/${product._id}`);
   };
 
+  const queryClient = useQueryClient();
+
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: ({ payload }) =>
       fetchCart({
@@ -42,31 +44,34 @@ const LastMinuteBuy = () => {
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      QueryClient.invalidateQueries({ queryKey: ["cart_products"] });
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
   const handleAddToCart = (product) => {
-    const token = getItem("token");
-
-    if (!token) {
-      return navigate("/login");
-    }
-
-    if (isPending) return;
-
-    const userId = getItem("userId");
-
-    setSelectedId(product._id);
-    const payload = {
-      user_id: userId,
-      product_id: product?._id,
-      quantity: 1,
+      const token = getItem("token");
+    
+      if (!token) {
+        const payload = {
+          pendingProduct : JSON.stringify(product)
+        }
+        setItem(payload);
+        return navigate("/login");
+      }
+    
+      if (isPending) return;
+    
+      const userId = getItem("userId");
+    
+      setSelectedId(product._id);
+      const payload = {
+        user_id: userId,
+        product_id: product?._id,
+        quantity: 1,
+      };
+    
+      addToCartMutation({ payload });
     };
-
-    addToCartMutation({ payload });
-  };
 
   return (
     <>

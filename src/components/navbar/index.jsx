@@ -8,6 +8,8 @@ import user from "../../assets/navbar/circle-user-round.svg";
 import { getItem, removeItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { fetchCart } from "../../pages/cart/helper/fecthCart";
+import { useQuery } from "@tanstack/react-query";
 
 const buttonVariants = {
   hover: {
@@ -43,6 +45,26 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [totalCartItems, setTotalCartItems] = useState(0);
+
+  const params = {
+    user_id: getItem("userId"),
+  };
+
+  const { data: cartProducts } = useQuery({
+    queryKey: ["cart_products"],
+    queryFn: () => fetchCart({ params }),
+  });
+
+  useEffect(() => {
+    const user = getItem("token");
+    console.log(user, ">>> USER")
+    if (cartProducts && user) {
+      setTotalCartItems(cartProducts?.items?.length);
+    } else {
+      setTotalCartItems(0);
+    }
+  }, [cartProducts]);
 
   const handleLogoClick = () => {
     navigate("/");
@@ -53,6 +75,7 @@ const Navbar = () => {
   const onLogoutUser = () => {
     removeItem("token");
     setIsUserLoggedIn(false);
+    setTotalCartItems(0);
     toast.success("Logout successful!");
   };
 
@@ -120,9 +143,8 @@ const Navbar = () => {
         ))}
       </div>
 
-
       <div className="hidden md:flex items-center gap-3">
-      <motion.button
+        <motion.button
           onClick={handleOrderClick}
           className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
           variants={buttonVariants}
@@ -137,12 +159,17 @@ const Navbar = () => {
 
         <motion.button
           onClick={handleCartClick}
-          className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
+          className="relative flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
           variants={buttonVariants}
           whileHover="hover"
           whileTap="tap"
         >
           <img src={cart} alt="Cart" className="h-[23px] w-[23px]" />
+          <div className="w-6 h-6 rounded-full absolute bg-blue-900 -top-2 -right-1">
+            <span className="text-gray-50 text-xs absolute top-1 left-2.5">
+              {totalCartItems}
+            </span>
+          </div>
           <motion.span className="text-[#00008B] font-medium text-lg">
             Cart
           </motion.span>
@@ -191,7 +218,10 @@ const Navbar = () => {
           ))}
 
           <div className="flex flex-col items-center gap-3 py-4">
-            <button onClick={handleCartClick} className="flex items-center text-[#00008B] gap-1.5 px-4 py-2 rounded-full">
+            <button
+              onClick={handleCartClick}
+              className="flex items-center text-[#00008B] gap-1.5 px-4 py-2 rounded-full"
+            >
               <span className="text-[#00008B] font-medium text-lg">Cart</span>
             </button>
 

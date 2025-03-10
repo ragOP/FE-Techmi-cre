@@ -5,10 +5,10 @@ import ProductDescription from "../../components/single_product/Product_Descript
 import ProductAddToCart from "../../components/single_product/Add_To_Cart";
 import ProductInfo from "../../components/single_product/Product_Information";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, QueryClient, useQueryClient } from "@tanstack/react-query";
 import { fetchSingleProduct } from "./helper";
 import { fetchCart } from "../cart/helper/fecthCart";
-import { getItem } from "../../utils/local_storage";
+import { getItem, setItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
 import ReviewSlider from "../../components/review";
 import { fetchReviews } from "../../components/review/helper";
@@ -31,6 +31,8 @@ export default function ProductPage() {
     queryFn: () => fetchCart(),
   });
 
+
+  const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: () =>
       fetchCart({
@@ -43,11 +45,22 @@ export default function ProductPage() {
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
-  const handleAddToCart = () => {
+const handleAddToCart = (product) => {
+    const token = getItem("token");
+  
+    if (!token) {
+      const payload = {
+        pendingProduct : JSON.stringify(product)
+      }
+      setItem(payload);
+      return navigate("/login");
+    }
+  
+    if (isPending) return;  
     addToCartMutation();
   };
 

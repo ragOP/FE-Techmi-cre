@@ -1,16 +1,29 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { loginUser } from "./helpers/loginUser";
 import { toast } from "react-toastify";
-import { setItem } from "../../utils/local_storage";
+import { getItem, removeItem, setItem } from "../../utils/local_storage";
+import { fetchCart } from "../cart/helper/fecthCart";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const queryClient = useQueryClient();
+  const { mutate: addToCartMutation } = useMutation({
+    mutationFn: ({ payload }) =>
+      fetchCart({
+        method: "POST",
+        body: payload,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
+    },
+  });
 
   const { mutate, isLoading, error } = useMutation({
     mutationFn: loginUser,
@@ -27,9 +40,24 @@ const Login = () => {
             userId: userId,
           };
           setItem(localStoragePayload);
-          
-          navigate("/");
+
           toast.success("Login successful!");
+
+          const pendingProduct = getItem("pendingProduct");
+          console.log(pendingProduct, ">>>>>> Pending Product")
+          if (pendingProduct) {
+            const payload = {
+              user_id: userId,
+              product_id: pendingProduct?._id,
+              quantity: 1,
+            };
+
+            addToCartMutation({ payload });
+
+            removeItem("pendingProduct");
+          }
+
+          navigate("/");
         } else {
           toast.error("Token not found");
         }

@@ -51,6 +51,7 @@ const Navbar = () => {
 
   const localStorageName = getItem("name");
   const localStorageRole = getItem("role");
+  const token = getItem("token");
 
   const params = {
     user_id: getItem("userId"),
@@ -157,7 +158,7 @@ const Navbar = () => {
       </div>
 
       <div className="hidden md:flex items-center gap-3">
-        {localStorageRole && localStorageRole !== "user" && (
+        {token && localStorageRole && localStorageRole !== "user" && (
           <span className="px-4 py-3 bg-yellow-500 text-[#00008B] text-[0.85rem] rounded-full">
             {localStorageRole?.toUpperCase()}
           </span>

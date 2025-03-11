@@ -75,8 +75,6 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const token = getItem("token");
-
   const onLogoutUser = () => {
     removeItem("token");
     removeItem("userId");

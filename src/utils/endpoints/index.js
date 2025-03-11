@@ -1,6 +1,6 @@
 export const endpoints = {
-  login: "api/auth/login",
-  signup: "api/auth/register",
+  login: "api/auth/user/login",
+  signup: "api/auth/user/register",
   product: "api/product",
   category: "api/category",
   service: "api/service",
@@ -12,5 +12,5 @@ export const endpoints = {
   contact: "api/contact",
   blogs: "api/blog",
   reviews: "api/review",
-  ordermy:'api/order/history',
+  ordermy: "api/order/history",
 };

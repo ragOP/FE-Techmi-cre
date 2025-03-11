@@ -1,66 +1,3 @@
-// import React from "react";
-// import Image from "../image";
-// import { calculateDiscountPercentage } from "../../../utils/percentage/calculateDiscountPercentage";
-// import Rating from "../../rating";
-
-// const ProductCard = ({
-//   image,
-//   price,
-//   discountedPrice,
-//   name,
-//   smallDescription,
-//   rating,
-//   onClick,
-//   onAddToCart,
-//   showAddToCart = true,
-// }) => {
-//   const discountPercentage = calculateDiscountPercentage(price, discountedPrice);
-
-//   return (
-//     <div
-//       onClick={onClick && onClick}
-//       className="shadow-lg mb-5 lg:h-[30rem] h-[30rem] xl:h-[40rem] rounded-2xl p-6 max-h-fit relative cursor-pointer transition-transform transform hover:scale-105"
-//     >
-//       <Image
-//         src={image}
-//         alt={name}
-//         css="rounded-2xl h-[35%] w-full object-cover"
-//       />
-//       <p className="text-[#191919] mt-4 font-semibold text-lg truncate" style={{ maxWidth: '75%' }}>
-//         {name}
-//       </p>
-//       <p className="text-gray-500 mt-1 text-sm line-clamp-2">
-//         {smallDescription}
-//       </p>
-
-//       <div className="mt-4 flex flex-row gap-3 items-center">
-//         <p className="text-[#000] font-semibold text-lg">
-//           ₹{discountedPrice || 0}
-//           <span className="text-gray-400 line-through text-sm ml-2">₹{price || 0}</span>
-//         </p>
-//         {discountedPrice && (
-//           <p className="text-xs text-orange-600 mt-1">
-//             ({discountPercentage}% OFF)
-//           </p>
-//         )}
-//       </div>
-
-//       <Rating rating={4} />
-
-//       {showAddToCart && (
-//         <button
-//           onClick={onAddToCart && onAddToCart}
-//           className="mt-4 py-2 px-4 rounded-3xl w-full font-semibold border border-[#00008B] text-blue-500 hover:bg-blue-50 transition-colors"
-//         >
-//           Add to cart
-//         </button>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ProductCard;
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -86,7 +23,7 @@ const ProductCard = ({
   id,
   rating = 4.5,
   reviewsCount = 250,
-  stock = 5, // If stock <= 5, show "Hurry, only X left!"
+  stock = 5,
   seller = "Official Store",
   fastDelivery = true,
   emiAvailable = true,
@@ -104,10 +41,14 @@ const ProductCard = ({
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(variants[0]);
-  const discount = price
+  const discount = discountedPrice
     ? Math.round(((price - discountedPrice) / price) * 100)
     : 0;
-  const activeUsers = Math.floor(Math.random() * 300) + 50; // Random viewers count
+  const activeUsers = Math.floor(Math.random() * 300) + 50;
+
+  // console.log(discount, price)
+
+  const finalPrice = discountedPrice ? discountedPrice : price;
 
   return (
     <div
@@ -169,11 +110,15 @@ const ProductCard = ({
 
         {/* Price & Discount */}
         <div className="flex items-center mt-2">
-          <p className="text-lg font-bold text-[#00008B]">₹{discountedPrice}</p>
-          <p className="text-sm text-gray-500 line-through ml-2">₹{price}</p>
-          <span className="text-xs bg-red-500 text-white px-2 py-1 ml-2 rounded">
-            -{discount}%
-          </span>
+          <p className="text-lg font-bold text-[#00008B]">₹{finalPrice}</p>
+          {discountedPrice && (
+            <p className="text-sm text-gray-500 line-through ml-2">₹{price}</p>
+          )}
+          {discount > 0 && (
+            <span className="text-xs bg-red-500 text-white px-2 py-1 ml-2 rounded">
+              -{discount}%
+            </span>
+          )}
         </div>
 
         {/* Ratings */}

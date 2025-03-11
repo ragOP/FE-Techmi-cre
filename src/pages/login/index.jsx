@@ -33,18 +33,21 @@ const Login = () => {
         const data = response?.data;
         const tokenData = data?.token;
         const userId = data?.id;
+        const role = data?.role;
+        const name = data?.name;
 
         if (tokenData) {
           const localStoragePayload = {
             token: tokenData,
             userId: userId,
+            role: role,
+            name: name,
           };
           setItem(localStoragePayload);
 
           toast.success("Login successful!");
 
           const pendingProduct = getItem("pendingProduct");
-          console.log(pendingProduct, ">>>>>> Pending Product")
           if (pendingProduct) {
             const payload = {
               user_id: userId,

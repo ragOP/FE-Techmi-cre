@@ -63,6 +63,9 @@ const App = () => {
 
       if (decodedToken.exp < currentTime) {
         removeItem("token");
+        removeItem("userId");
+        removeItem("role");
+        removeItem("name");
         toast.error("Your session has expired. Please login again.", {
           autoClose: 3000,
           theme: "colored",
@@ -71,6 +74,9 @@ const App = () => {
     } catch (error) {
       console.error("Error decoding token:", error);
       removeItem("token");
+      removeItem("userId");
+      removeItem("role");
+      removeItem("name");
     }
   };
 
@@ -84,7 +90,7 @@ const App = () => {
 
   return (
     <>
-   {/* sds */}
+      {/* sds */}
       <div className="bg-[#82c8e51a]">
         {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
         <Suspense fallback={<LazyLoader />}>

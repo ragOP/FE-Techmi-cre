@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
 import logo from "../../assets/navbar/crm.webp";
 import cart from "../../assets/navbar/shopping-cart.svg";
 import order from "../../assets/navbar/shopping-cart.svg";
@@ -10,27 +10,28 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { fetchCart } from "../../pages/cart/helper/fecthCart";
 import { useQuery } from "@tanstack/react-query";
+import { Package } from "lucide-react";
 
 const buttonVariants = {
   hover: {
-    scale: 1.05, // Slightly scale up on hover
-    backgroundColor: "#dce2f7", // Change background color on hover
-    color: "#FFFFFF", // Change text color on hover
+    scale: 1.05,
+    backgroundColor: "#dce2f7",
+    color: "#FFFFFF",
     transition: { duration: 0.2 },
   },
   tap: {
-    scale: 0.95, // Slightly scale down on tap
+    scale: 0.95,
   },
 };
 
 const navLinkVariants = {
   hover: {
-    scale: 1.1, // Slightly scale up on hover
-    color: "#00008B", // Change text color on hover
+    scale: 1.1,
+    color: "#00008B",
     transition: { duration: 0.2 },
   },
   tap: {
-    scale: 0.95, // Slightly scale down on tap
+    scale: 0.95,
   },
 };
 
@@ -46,6 +47,10 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [totalCartItems, setTotalCartItems] = useState(0);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const localStorageName = getItem("name");
+  const localStorageRole = getItem("role");
 
   const params = {
     user_id: getItem("userId"),
@@ -58,7 +63,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const user = getItem("token");
-    console.log(user, ">>> USER")
     if (cartProducts && user) {
       setTotalCartItems(cartProducts?.items?.length);
     } else {
@@ -74,9 +78,13 @@ const Navbar = () => {
 
   const onLogoutUser = () => {
     removeItem("token");
+    removeItem("userId");
+    removeItem("role");
+    removeItem("name");
     setIsUserLoggedIn(false);
     setTotalCartItems(0);
     toast.success("Logout successful!");
+    navigate("/");
   };
 
   const onLoginUser = () => {
@@ -85,15 +93,16 @@ const Navbar = () => {
 
   const handleCartClick = () => {
     if (!isUserLoggedIn) {
-      toast.error("Please login to add items to cart");
+      toast.error("Please login to view cart");
       navigate("/login");
     } else {
       navigate("/cart");
     }
   };
+
   const handleOrderClick = () => {
     if (!isUserLoggedIn) {
-      toast.error("Please login to add items to cart");
+      toast.error("Please login to view orders");
       navigate("/login");
     } else {
       navigate("/order");
@@ -107,6 +116,10 @@ const Navbar = () => {
       setIsUserLoggedIn(false);
     }
   }, [token]);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   return (
     <div className="bg-[#FBF6F166] px-6 py-3 flex items-center justify-between relative">
@@ -144,6 +157,11 @@ const Navbar = () => {
       </div>
 
       <div className="hidden md:flex items-center gap-3">
+        {localStorageRole !== "user" && (
+          <span className="px-4 py-3 bg-yellow-500 text-[#00008B] text-[0.85rem] rounded-full">
+            {localStorageRole?.toUpperCase()}
+          </span>
+        )}
         <motion.button
           onClick={handleOrderClick}
           className="flex items-center border-2 border-[#00008B] gap-1.5 px-4 py-2 rounded-full"
@@ -151,8 +169,8 @@ const Navbar = () => {
           whileHover="hover"
           whileTap="tap"
         >
-          <img src={order} alt="Cart" className="h-[23px] w-[23px]" />
-          <motion.span className="text-[#00008B] font-medium text-lg">
+          <Package className="text-[#00008B]" />
+          <motion.span className="text-[#00008B] font-medium text-md">
             My Orders
           </motion.span>
         </motion.button>
@@ -165,12 +183,10 @@ const Navbar = () => {
           whileTap="tap"
         >
           <img src={cart} alt="Cart" className="h-[23px] w-[23px]" />
-          <div className="w-6 h-6 rounded-full absolute bg-blue-900 -top-2 -right-1">
-            <span className="text-gray-50 text-xs absolute top-1 left-2.5">
-              {totalCartItems}
-            </span>
+          <div className="w-6 h-6 rounded-full absolute bg-blue-900 -top-2 -right-1 flex items-center justify-center">
+            <span className="text-gray-50 text-xs">{totalCartItems || 0}</span>
           </div>
-          <motion.span className="text-[#00008B] font-medium text-lg">
+          <motion.span className="text-[#00008B] font-medium text-md">
             Cart
           </motion.span>
         </motion.button>
@@ -181,16 +197,29 @@ const Navbar = () => {
             className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full"
           >
             <img src={user} alt="User" className="h-[23px] w-[23px]" />
-            <span className="text-[#FFFFFF] text-lg">Login</span>
+            <span className="text-[#FFFFFF] text-md">Login</span>
           </button>
         ) : (
-          <button
-            onClick={onLogoutUser}
-            className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full"
-          >
-            <img src={user} alt="User" className="h-[23px] w-[23px]" />
-            <span className="text-[#FFFFFF] text-lg">Logout</span>
-          </button>
+          <div className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center border border-black gap-1.5 px-4 py-2 bg-[#00008B] rounded-full"
+            >
+              <img src={user} alt="User" className="h-[23px] w-[23px]" />
+              <span className="text-[#FFFFFF] text-md">{localStorageName}</span>
+              <FiChevronDown className="text-[#FFFFFF]" />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute top-12 right-0 bg-white shadow-md rounded-md w-40 z-50">
+                <button
+                  onClick={onLogoutUser}
+                  className="w-full text-left px-4 py-2 text-[#00008B] hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

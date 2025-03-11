@@ -8,5 +8,9 @@ export const endpoints = {
   product_by_id: "api/product",
   address: "api/address",
   coupon: "api/coupon",
-  order: "api/order"
+  order: "api/order",
+  contact: "api/contact",
+  blogs: "api/blog",
+  reviews: "api/review",
+  ordermy:'api/order/history',
 };

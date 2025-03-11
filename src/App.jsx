@@ -16,6 +16,7 @@ import ContactUs from "./pages/contact";
 import BlogUI from "./pages/blog";
 import SingleBlog from "./pages/single_blog";
 import Blog from "./pages/blog";
+import Order from "./pages/order";
 
 const WHATSAPP_USER_NAME = "Abhishek";
 const WHATSAPP_PHONE_NUMBER = "9409718733";
@@ -83,6 +84,7 @@ const App = () => {
 
   return (
     <>
+   {/* sds */}
       <div className="bg-[#82c8e51a]">
         {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
         <Suspense fallback={<LazyLoader />}>
@@ -102,6 +104,9 @@ const App = () => {
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/blogs" element={<Blog />} />
             <Route path="/blogs/:id" element={<SingleBlog />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/order" element={<Order />} />
+            </Route>
             <Route element={<ProtectedRoute />}>
               <Route path="/cart" element={<Cart />} />
             </Route>

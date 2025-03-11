@@ -5,17 +5,21 @@ import ProductDescription from "../../components/single_product/Product_Descript
 import ProductAddToCart from "../../components/single_product/Add_To_Cart";
 import ProductInfo from "../../components/single_product/Product_Information";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, QueryClient, useQueryClient } from "@tanstack/react-query";
 import { fetchSingleProduct } from "./helper";
 import { fetchCart } from "../cart/helper/fecthCart";
-import { getItem } from "../../utils/local_storage";
+import { getItem, setItem } from "../../utils/local_storage";
 import { toast } from "react-toastify";
+import ReviewSlider from "../../components/review";
+import { fetchReviews } from "../../components/review/helper";
+import ReviewModal from "../../components/review_modal";
 
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
 
   const { data: productData } = useQuery({
     queryKey: ["productData", id],
@@ -27,23 +31,41 @@ export default function ProductPage() {
     queryFn: () => fetchCart(),
   });
 
+
+  const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
-    mutationFn: () => fetchCart({
-      method: "POST",
-      body: {
-        user_id: getItem("userId"),
-        product_id: id,
-        quantity: quantity,
-      },
-    }),
+    mutationFn: () =>
+      fetchCart({
+        method: "POST",
+        body: {
+          user_id: getItem("userId"),
+          product_id: id,
+          quantity: quantity,
+        },
+      }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
-  const handleAddToCart = () => {
+const handleAddToCart = (product) => {
+    const token = getItem("token");
+  
+    if (!token) {
+      const payload = {
+        pendingProduct : JSON.stringify(product)
+      }
+      setItem(payload);
+      return navigate("/login");
+    }
+  
+    if (isPending) return;  
     addToCartMutation();
+  };
+
+  const handleOpenReview = () => {
+    setIsOpen(true);
   };
 
   const scrollToTop = () => {
@@ -78,6 +100,8 @@ export default function ProductPage() {
       <CartAlternativeProduct />
       <ProductInfo />
       <CartAlternativeProduct />
+      <ReviewSlider id={id} handleOpenReview={handleOpenReview} />
+      <ReviewModal isOpen={isOpen} setIsOpen={setIsOpen} id={id} />
     </div>
   );
 }

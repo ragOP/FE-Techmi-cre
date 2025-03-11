@@ -3,14 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../../common/product_card";
 import SearchBar from "../../common/Search_Bar";
 import Filter from "../filter";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
 import { isArrayWithValues } from "../../../utils/array/isArrayWithValues";
 import { fetchCategories } from "../../home/Categ_Options/helpers/fetchCategories";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
-import { getItem } from "../../../utils/local_storage";
+import { getItem, setItem } from "../../../utils/local_storage";
 
 const SearchResult = () => {
   const navigate = useNavigate();
@@ -60,6 +60,7 @@ const SearchResult = () => {
     queryFn: () => fetchProducts({ params }),
   });
 
+  const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: ({ payload }) =>
       fetchCart({
@@ -68,28 +69,32 @@ const SearchResult = () => {
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
-  const handleAddToCart = (product) => {
+const handleAddToCart = (product) => {
     const token = getItem("token");
-
+  
     if (!token) {
+      const payload = {
+        pendingProduct : JSON.stringify(product)
+      }
+      setItem(payload);
       return navigate("/login");
     }
-
+  
     if (isPending) return;
-
+  
     const userId = getItem("userId");
-
+  
     setSelectedId(product._id);
     const payload = {
       user_id: userId,
       product_id: product?._id,
       quantity: 1,
     };
-
+  
     addToCartMutation({ payload });
   };
 

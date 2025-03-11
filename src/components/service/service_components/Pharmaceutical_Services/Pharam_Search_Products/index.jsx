@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AnimationSlider from "../../../../common/animations";
 import ProductCard from "../../../../common/product_card";
 import { fetchProducts } from "../../../../home/featured_products/helper/fetchProducts";
@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import LoadingSpinner from "../../../../loader/LoadingSpinner";
 import { fetchCart } from "../../../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
-import { getItem } from "../../../../../utils/local_storage";
+import { getItem, setItem } from "../../../../../utils/local_storage";
 import { useState } from "react";
 
 export const PharmaSearchProducts = ({ debouncedQuery }) => {
@@ -35,6 +35,8 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
     navigate(`/product/${product._id}`);
   };
 
+
+  const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: ({ payload }) =>
       fetchCart({
@@ -43,28 +45,32 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
-  const handleAddToCart = (product) => {
+const handleAddToCart = (product) => {
     const token = getItem("token");
-
+  
     if (!token) {
+      const payload = {
+        pendingProduct : JSON.stringify(product)
+      }
+      setItem(payload);
       return navigate("/login");
     }
-
+  
     if (isPending) return;
-
+  
     const userId = getItem("userId");
-
+  
     setSelectedId(product._id);
     const payload = {
       user_id: userId,
       product_id: product?._id,
       quantity: 1,
     };
-
+  
     addToCartMutation({ payload });
   };
 

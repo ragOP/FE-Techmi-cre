@@ -1,10 +1,22 @@
-import { useEffect } from "react";
-import contact from "../../assets/contact/conatct.png";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { getSingleBlogData } from "./helper";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
+
 export default function SingleBlog() {
+  const { id } = useParams();
+  
+  const { data: blog, isLoading } = useQuery({
+    queryKey: ["blog_data", id], 
+    queryFn: () => getSingleBlogData(id),
+    select: (data) => data?.response?.data,
+  });
+
   useEffect(() => {
     window.scroll(0, 0);
-  }, [])
+  }, []);
+
   return (
     <motion.div
       className="container mx-auto p-6"
@@ -12,107 +24,73 @@ export default function SingleBlog() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
     >
-      <motion.h1
-        className="text-2xl font-bold"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-      >
-        Laundry Pickup And Delivery Services Advantages
-      </motion.h1>
-      <motion.p
-        className="text-gray-600"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-      >
-        Explore our latest stories, tips, and trends—crafted to inform, inspire,
-        and spark your creativity.
-      </motion.p>
+      {isLoading ? (
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-300 rounded-md w-2/3 mb-4"></div>
+          <div className="h-5 bg-gray-200 rounded-md w-1/2 mb-6"></div>
+          <div className="w-full h-60 bg-gray-300 rounded-lg shadow-md mb-6"></div>
+          <div className="space-y-4">
+            <div className="h-5 bg-gray-200 rounded-md w-full"></div>
+            <div className="h-5 bg-gray-200 rounded-md w-5/6"></div>
+            <div className="h-5 bg-gray-200 rounded-md w-3/4"></div>
+            <div className="h-5 bg-gray-200 rounded-md w-2/3"></div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <motion.h1
+            className="text-2xl font-bold"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            {blog?.title}
+          </motion.h1>
 
-      <motion.div
-        className="mt-6"
-        initial={{ opacity: 0, y: 20, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.7, duration: 0.8 }}
-      >
-        <img
-          src={contact}
-          alt="Laundry Service"
-          className="w-full max-h-[60vh] rounded-lg shadow-md"
-        />
-      </motion.div>
+          <motion.p
+            className="text-gray-600"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            {blog?.short_description}
+          </motion.p>
 
-      <motion.h2
-        className="text-xl font-bold mt-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, duration: 0.8 }}
-      >
-        The Benefits of a Pickup and Delivery Laundry Service
-      </motion.h2>
-      <motion.p
-        className="text-gray-700 mt-2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1, duration: 0.8 }}
-      >
-        In this blog post, we’ll talk about the benefits of a pickup and
-        delivery laundry service and why it might be the perfect solution for
-        your laundry needs.
-      </motion.p>
-
-      {[
-        {
-          title: "Convenience",
-          delay: 1.3,
-          content:
-            "One of the biggest advantages of a pickup and delivery laundry service is how convenient it is. You no longer need to find time in your busy schedule to do laundry or visit the laundromat. Instead, a professional service will come right to your door to pick up your laundry, saving you time and effort.",
-        },
-        {
-          title: "Time-Saving",
-          delay: 1.5,
-          content:
-            "Laundry can take up a lot of your time, especially if you have a big family or a busy life. With a pickup and delivery laundry service, you can save hours each week. Instead of using your free time to wash and fold clothes, you can focus on other important things or enjoy activities you love.",
-        },
-        {
-          title: "Professional Quality",
-          delay: 1.7,
-          content:
-            "When you use a professional laundry service like Care Sync, you can expect great quality and care. These services use the best machines and detergents to ensure your clothes are cleaned thoroughly and gently. Many services also offer special cleaning for delicate or tough-to-clean fabrics, helping your clothes last longer.",
-        },
-      ].map((section, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: section.delay, duration: 0.8 }}
-        >
-          <h3 className="text-lg font-semibold mt-4">{section.title}</h3>
-          <p className="text-gray-700 mt-2">{section.content}</p>
-        </motion.div>
-      ))}
-
-      <motion.h3
-        className="text-lg font-semibold mt-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.9, duration: 0.8 }}
-      >
-        Conclusion
-      </motion.h3>
-      <motion.p
-        className="text-gray-700 mt-2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.1, duration: 0.8 }}
-      >
-        A pickup and delivery laundry service offers many benefits: convenience,
-        time-saving, professional quality, customizable options,
-        eco-friendliness, and cost-effectiveness. With Care Sync handling your
-        clothes, you can focus on what really matters—spending time with your
-        family, enjoying a hobby, or simply relaxing.
-      </motion.p>
+          <motion.div
+            className="mt-6"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.7, duration: 0.8 }}
+          >
+            <img
+              src={blog?.bannerImageUrl}
+              alt={blog?.title}
+              className="w-full max-h-[60vh] rounded-lg shadow-md"
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            {blog?.content ? (
+              blog.content
+                .replace(/\\n/g, "\n")
+                .split(/\n{2,}/)
+                .map((paragraph, index) => (
+                  <p
+                    key={index}
+                    className="text-gray-700 mt-4 leading-relaxed text-lg"
+                  >
+                    {paragraph}
+                  </p>
+                ))
+            ) : (
+              <p className="text-gray-500 italic">No content available.</p>
+            )}
+          </motion.div>
+        </>
+      )}
     </motion.div>
   );
 }

@@ -4,10 +4,15 @@ import prescription from "../../../assets/solutions/prescription.svg";
 import OurServices from "../service_components/Laundry_Service/Our_Services";
 import Testimonials from "../../common/testimonial";
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Vectortick from "../../../assets/services/para/Vectortick.svg";
 import Vectorgrey from "../../../assets/services/para/vectorgrey.svg";
-import { getItem } from "../../../utils/local_storage";
+import { getItem, setItem } from "../../../utils/local_storage";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { useNavigate } from "react-router";
 import LoadingSpinner from "../../loader/LoadingSpinner";
@@ -154,7 +159,7 @@ export const LaundaryCard = ({
     product_id: id,
     quantity: 1,
   };
-
+  const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: () =>
       fetchCart({
@@ -163,11 +168,23 @@ export const LaundaryCard = ({
       }),
     onSuccess: () => {
       toast.success("Product added to cart!");
-      navigate("/cart");
+      queryClient.invalidateQueries({ queryKey: ["cart_products"] });
     },
   });
 
   const handleAddToCart = () => {
+    const token = getItem("token");
+    if (!token) {
+      const product = {
+        _id: id,
+      };
+      const payload = {
+        pendingProduct: JSON.stringify(product),
+      };
+      console.log(payload, "......>>>>>>>>");
+      setItem(payload);
+      return navigate("/login");
+    }
     addToCartMutation();
   };
 

@@ -111,9 +111,7 @@ const ProductCard = ({
         {/* Price & Discount */}
         <div className="flex items-center mt-2">
           <p className="text-lg font-bold text-[#00008B]">₹{finalPrice}</p>
-          {discountedPrice && (
             <p className="text-sm text-gray-500 line-through ml-2">₹{price}</p>
-          )}
           {discount > 0 && (
             <span className="text-xs bg-red-500 text-white px-2 py-1 ml-2 rounded">
               -{discount}%

@@ -106,7 +106,7 @@ const CartAlternativeProduct = () => {
                     discounted_price: product.discounted_price,
                     salesperson_discounted_price:
                       product.salesperson_discounted_price,
-                    dnd_discounted_price: product.customer_discounted_price,
+                      dnd_discounted_price: product.dnd_discounted_price,
                   });
 
                   return (

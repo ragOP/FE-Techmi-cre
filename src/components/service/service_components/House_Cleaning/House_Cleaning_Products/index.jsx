@@ -7,10 +7,13 @@ import { fetchCart } from "../../../../../pages/cart/helper/fecthCart";
 import LoadingSpinner from "../../../../loader/LoadingSpinner";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { getDiscountBasedOnRole } from "../../../../../utils/products/getDiscountBasedOnRole";
+import AnimationSlider from "../../../../common/animations";
 
 const HouseCleaningProducts = ({ category }) => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState(null);
+  const localStorageRole = getItem("role");
 
   const name = category?.name;
   const id = category?._id;
@@ -77,24 +80,34 @@ const handleAddToCart = (product) => {
       ) : (
         <>
           {houseCleaningProducts && houseCleaningProducts.length > 0 ? (
-            <div className="flex flex-col md:flex-row p-4 gap-8 justify-center items-center">
-              {houseCleaningProducts.map((product) => (
-                <div key={product._id} className="w-full md:w-1/4">
-                  <ProductCard
-                    image={product.banner_image}
-                    price={product.price}
-                    name={product.name}
-                    id={product._id}
-                    discountedPrice={product.discounted_price}
-                    smallDescription={product.small_description}
-                    onAddToCart={() => handleAddToCart(product)}
-                    showAddToCart={true}
-                    isProductAdd={isPending}
-                    selectedId={selectedId}
-                  />
-                </div>
-              ))}
-            </div>
+              <AnimationSlider>
+                {houseCleaningProducts.map((product) => {
+                  const discountPrice = getDiscountBasedOnRole({
+                    role: localStorageRole,
+                    discounted_price: product.discounted_price,
+                    salesperson_discounted_price:
+                      product.salesperson_discounted_price,
+                      dnd_discounted_price: product.dnd_discounted_price,
+                  });
+
+                  return (
+                    <div key={product._id}>
+                      <ProductCard
+                        image={product.banner_image}
+                        price={product.price}
+                        name={product.name}
+                        discountedPrice={discountPrice}
+                        smallDescription={product.small_description}
+                        id={product._id}
+                        onClick={() => navigate(`/product/${product._id}`)}
+                        selectedId={selectedId}
+                        onAddToCart={() => handleAddToCart(product)}
+                        isProductAdd={isPending}
+                      />
+                    </div>
+                  );
+                })}
+              </AnimationSlider>
           ) : (
             <div className="text-center text-gray-500">No products found.</div>
           )}

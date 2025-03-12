@@ -91,10 +91,10 @@ const FeaturedProducts = () => {
               {topProducts.map((product) => {
                 const discountPrice = getDiscountBasedOnRole({
                   role: localStorageRole,
-                  discounted_price: product.discountedPrice,
+                  discounted_price: product.discounted_price,
                   salesperson_discounted_price:
                     product.salesperson_discounted_price,
-                  dnd_discounted_price: product.dnd_discounted_price,
+                    dnd_discounted_price: product.dnd_discounted_price,
                 });
 
                 return (

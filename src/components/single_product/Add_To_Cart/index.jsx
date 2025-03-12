@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import securePayment from "../../../assets/single_product/second.png";
 import trustedPharmacy from "../../../assets/single_product/first.png";
 import genuineProducts from "../../../assets/single_product/third.png";
 import protinexBanner from "../../../assets/single_product/last.png";
 import { ChevronDown } from "lucide-react";
 import CartLoader from "../../loader/CartLoader";
+import { getItem } from "../../../utils/local_storage";
+import { useQuery } from "@tanstack/react-query";
+import { fetchUserDistubtors } from "./helper";
 
 const ProductAddToCart = ({
   product,
@@ -13,15 +16,28 @@ const ProductAddToCart = ({
   handleAddToCart,
   isAddingToCart,
 }) => {
+  const [role, setRole] = useState("");
+  const [distibutorUsers, setDistributorUser] = useState([]);
+
+  const params = {
+    role: getItem("role"),
+  }
+
+  const { data: users } = useQuery({
+    queryKey: ["fetch_distributors"],
+    queryFn: () => fetchUserDistubtors({params}),
+  });
+
+
+  useEffect(() => {
+    setRole(getItem("role"));
+    if(users){
+      console.log(users);
+      setDistributorUser(users);
+    }
+  }, [users]);
   return (
     <div className="w-full lg:w-[30%]">
-      <div className="text-lg font-bold">
-        ₹{product?.discounted_price || product?.price}*
-        <span className="ml-3 text-gray-500 text-sm font-normal line-through">
-          {" "}
-          MRP ₹{product?.discounted_price}
-        </span>
-      </div>
       <div className="mt-2 flex gap-2 text-sm">
         <span className="px-2 py-1 bg-blue-50 text-blue-900 rounded-md">
           Free <span className="text-gray-900">Delivery</span>
@@ -37,6 +53,28 @@ const ProductAddToCart = ({
       <p className="text-xs text-gray-900 mt-1">
         Delivering to: 122019, Jupiter
       </p>
+
+      {(role === "dnd" || role === "salesperson") && (
+        <>
+          <label className="block text-sm mt-3 text-gray-500">
+            {role === "dnd" ? 'Select Your SalesPerson': 'Select Your Doctor/Distrubutor'}
+          </label>
+          <div className="relative mt-1">
+            <select
+              className="border-2 border-gray-900 rounded-lg px-3 py-2 w-full bg-gray-100 appearance-none"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            >
+              {distibutorUsers.length > 0 && distibutorUsers.map((user) => (
+                <option key={user?._id} value={user?._id}>
+                  {user?.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 pointer-events-none" />
+          </div>
+        </>
+      )}
 
       <div className="relative mt-3">
         <select
@@ -58,7 +96,13 @@ const ProductAddToCart = ({
         onClick={handleAddToCart}
         className="w-full mt-4 border-2 border-blue-900 text-blue-900 rounded-3xl py-2"
       >
-        {isAddingToCart ? <div className="my-1"><CartLoader /></div>  : "Add To Cart"}
+        {isAddingToCart ? (
+          <div className="my-1">
+            <CartLoader />
+          </div>
+        ) : (
+          "Add To Cart"
+        )}
       </button>
       <button className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-3 ">
         Buy Now

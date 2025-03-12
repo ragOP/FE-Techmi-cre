@@ -1,44 +1,62 @@
-import React from "react";
-import offer1 from "../../../assets/productoffer/offer1.svg";
-import offer2 from "../../../assets/productoffer/offer2.svg";
-import offer3 from "../../../assets/productoffer/offer3.svg";
-import offer4 from "../../../assets/productoffer/offer4.svg";
-import offer5 from "../../../assets/productoffer/offer5.svg";
+import React, { useEffect, useState } from "react";
 
-const Index = () => {
-    const images = [
-        { id: 1, src: offer1, alt: "Offer 1" },
-        { id: 2, src: offer2, alt: "Offer 2" },
-        { id: 3, src: offer3, alt: "Offer 3" },
-        { id: 4, src: offer4, alt: "Offer 4" },
-        { id: 5, src: offer5, alt: "Offer 5" },
-    ];
+const Index = ({ homeConfig, isLoading }) => {
+  const [images, setImages] = useState([]);
 
-    return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
-            {/* Large Featured Image */}
-            <div className="lg:col-span-1">
+  useEffect(() => {
+    if (homeConfig) {
+      setImages(
+        [
+          homeConfig?.banner1,
+          homeConfig?.banner2,
+          homeConfig?.banner3,
+          homeConfig?.banner4,
+          homeConfig?.banner5,
+        ].filter(Boolean)
+      );
+    }
+  }, [homeConfig]);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
+      <div className="lg:col-span-1">
+        {isLoading ? (
+          <div className="w-full h-[500px] bg-gray-300 rounded-lg animate-pulse"></div>
+        ) : images.length > 0 ? (
+          <img
+            src={images[0]}
+            alt="Featured Banner"
+            className="rounded-lg w-full h-full max-h-[500px] object-cover"
+          />
+        ) : (
+          <div className="w-full h-[500px] bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+            No Image Available
+          </div>
+        )}
+      </div>
+      <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+        {isLoading
+          ? // Skeleton Loader for Right Side Images
+            Array(4)
+              .fill(null)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[240px] bg-gray-300 rounded-lg animate-pulse"
+                ></div>
+              ))
+          : images.slice(1).map((src, index) => (
+              <div key={index} className="w-full h-full">
                 <img
-                    src={images[0].src}
-                    alt={images[0].alt}
-                    className="rounded-lg w-full h-full max-h-[500px] object-cover"
+                  src={src}
+                  alt={`Banner ${index + 2}`}
+                  className="rounded-lg w-full h-full max-h-[240px] object-cover"
                 />
-            </div>
-
-            {/* Right Side Grid */}
-            <div className="lg:col-span-2 grid grid-cols-2 gap-4">
-                {images.slice(1).map((image) => (
-                    <div key={image.id} className="w-full h-full">
-                        <img
-                            src={image.src}
-                            alt={image.alt}
-                            className="rounded-lg w-full h-full max-h-[240px] object-cover"
-                        />
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+              </div>
+            ))}
+      </div>
+    </div>
+  );
 };
 
 export default Index;

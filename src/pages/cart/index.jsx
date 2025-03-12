@@ -21,6 +21,7 @@ import { getItem } from "../../utils/local_storage";
 import CouponDialog from "./components/CouponDialog";
 import { toast } from "react-toastify";
 import { placeOrder } from "./helper/order";
+import { getAddresses } from "./helper/getAddresses";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -47,6 +48,11 @@ export default function Cart() {
   const { data: cartProducts, isLoading } = useQuery({
     queryKey: ["cart_products"],
     queryFn: () => fetchCart({ params }),
+  });
+
+  const { data: addresses } = useQuery({
+    queryKey: ["user_addresses"],
+    queryFn: () => getAddresses({ id: getItem("userId") }),
   });
 
   const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation({
@@ -187,6 +193,20 @@ export default function Cart() {
   useEffect(() => {
     scrollToTop()
   }, []);
+
+  useEffect(() => {
+    if (addresses && addresses.length > 0) {
+      const defaultAddress = addresses.find(address => address.isPrimary === false);
+      
+      if (defaultAddress) {
+        setAddress(defaultAddress);
+      } else {
+        setAddress({});
+      }
+    } else {
+      setAddress({});
+    }
+  }, [addresses]);  
 
   return (
     <>

@@ -79,20 +79,6 @@ const AddressDialog = ({ onClose, setAddress }) => {
     },
   });
 
-  useEffect(() => {
-    if (addresses && addresses.length > 0) {
-      const defaultAddress = addresses.find(address => address.default === true);
-      
-      if (defaultAddress) {
-        setAddress(defaultAddress);
-      } else {
-        setAddress({});
-      }
-    } else {
-      setAddress({});
-    }
-  }, [addresses]);  
-
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-start justify-center p-4 overflow-auto">
       <div className="bg-white rounded-lg w-full max-w-2xl shadow-xl mt-20 mb-8">

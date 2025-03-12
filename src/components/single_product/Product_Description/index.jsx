@@ -4,12 +4,35 @@ import afternoon from "../../../assets/single_product/afternoon.png";
 import night from "../../../assets/single_product/night.png";
 import { convertDate } from "../../../utils/date_time";
 import { calculateDiscountPercentage } from "../../../utils/percentage/calculateDiscountPercentage";
+import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import { getItem } from "../../../utils/local_storage";
+import { useEffect, useState } from "react";
 
 const ProductDescription = ({ product }) => {
   const price = product?.price;
   const discountedPrice = product?.discounted_price || price;
-  const discountPercentage = calculateDiscountPercentage(product?.price, discountedPrice);
+  const localStorageRole = getItem("role");
+  const [modifiedPrice, setModifiedPrice] = useState(0);
+  const [modidifedDiscount, setModifiedDiscount] = useState(0);
 
+  useEffect(() => {
+    if (!product) return;
+
+    const discountPrice = getDiscountBasedOnRole({
+      role: localStorageRole,
+      discounted_price: product?.discounted_price,
+      salesperson_discounted_price: product?.salesperson_discounted_price,
+      dnd_discounted_price: product?.dnd_discounted_price,
+    });
+    setModifiedPrice(discountPrice);
+
+    const discountPercentage = calculateDiscountPercentage(
+      product?.price,
+      discountPrice
+    );
+    setModifiedDiscount(discountPercentage)
+  }, [product, localStorageRole]);
+  
   return (
     <div className="w-full lg:w-[40%]">
       <div className="flex justify-between items-start">
@@ -27,11 +50,17 @@ const ProductDescription = ({ product }) => {
       </div>
 
       <div className="mt-4 flex items-center">
-        <span className="text-green-600 text-2xl font-bold">₹{product?.discounted_price || product?.price}</span>
-        {product?.discounted_price && <span className="text-gray-500 text-normal line-through ml-2">₹{product?.price}</span>}
-        {discountedPrice && (
-          <p className="text-xs text-orange-600 ml-4">
-            ({discountPercentage}% OFF)
+        <span className="text-green-600 text-2xl font-bold">
+          ₹{modifiedPrice || product?.price}
+        </span>
+        {product?.discounted_price && (
+          <span className="text-gray-500 text-normal line-through ml-2">
+            ₹{product?.price}
+          </span>
+        )}
+        {product?.discounted_price && (
+          <p className="text-xs text-orange-600 ml-2 ">
+            ( {modidifedDiscount}% OFF )
           </p>
         )}
       </div>
@@ -78,10 +107,11 @@ const ProductDescription = ({ product }) => {
         ].map((item, index) => (
           <div
             key={index}
-            className={`${item.status === "Out of Stock"
-              ? "cursor-not-allowed"
-              : "cursor-pointer"
-              } border p-2 rounded-3xl shadow-sm text-center bg-gray-50`}
+            className={`${
+              item.status === "Out of Stock"
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            } border p-2 rounded-3xl shadow-sm text-center bg-gray-50`}
           >
             <p className="text-sm font-medium border-b pb-2">{item.weight}</p>
             <p className="text-lg font-semibold">{item.price}</p>
@@ -157,7 +187,9 @@ const ProductDescription = ({ product }) => {
           <span className="font-semibold text-gray-700">
             Expires on or after:
           </span>
-          <span className="text-gray-900">{convertDate(product?.expiry_date)}</span>
+          <span className="text-gray-900">
+            {convertDate(product?.expiry_date)}
+          </span>
         </div>
       </div>
     </div>

@@ -13,4 +13,6 @@ export const endpoints = {
   blogs: "api/blog",
   reviews: "api/review",
   ordermy: "api/order/history",
+  home: "api/home",
+  distrubtors: "api/auth/user/role"
 };

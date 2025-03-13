@@ -36,7 +36,7 @@ const HouseCleaning = () => {
 
   useEffect(() => {
     if (selectedCategory && productsRef.current) {
-      productsRef.current.scrollIntoView({ behavior: "smooth" });
+      productsRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedCategory]);
   return (

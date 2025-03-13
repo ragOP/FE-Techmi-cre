@@ -22,6 +22,7 @@ import CouponDialog from "./components/CouponDialog";
 import { toast } from "react-toastify";
 import { placeOrder } from "./helper/order";
 import { getAddresses } from "./helper/getAddresses";
+import { getDiscountBasedOnRole } from "../../utils/products/getDiscountBasedOnRole";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -32,6 +33,8 @@ export default function Cart() {
   const params = {
     user_id: getItem("userId"),
   };
+  const localStorageRole = getItem("role");
+
   const [openAddress, setOpenAddress] = useState(false);
   const [openCoupon, setOpenCoupon] = useState(false);
   const [discountCoupon, setDiscountCoupon] = useState([]);
@@ -55,37 +58,41 @@ export default function Cart() {
     queryFn: () => getAddresses({ id: getItem("userId") }),
   });
 
-  const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation({
-    mutationFn: (payload) => placeOrder({payload}),
-    onSuccess: (data) => {
-      if(data?.response?.status >= 400){
-        toast.error(data?.response?.data?.message || "Something went wrong");
-        return;
-      }else{
-        toast.success("Order placed successfully!");
-        queryClient.invalidateQueries({ queryKey: ["cart_products"] });
-        setDiscountCoupon([]);
-      }
-      scrollToTop();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Order failed, please try again later");
+  console.log("cartProducts", cartProducts);
+
+  const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation(
+    {
+      mutationFn: (payload) => placeOrder({ payload }),
+      onSuccess: (data) => {
+        if (data?.response?.status >= 400) {
+          toast.error(data?.response?.data?.message || "Something went wrong");
+          return;
+        } else {
+          toast.success("Order placed successfully!");
+          queryClient.invalidateQueries({ queryKey: ["cart_products"] });
+          setDiscountCoupon([]);
+        }
+        scrollToTop();
+      },
+      onError: (error) => {
+        toast.error(error.message || "Order failed, please try again later");
+      },
     }
-  });
-  
+  );
+
   const handlePlaceOrder = async () => {
     const payload = {
       cartId: cartProducts?._id,
       addressId: address?._id,
-      couponId: discountCoupon?.[0]?._id || null
+      couponId: discountCoupon?.[0]?._id || null,
     };
-  
+
     if (!payload.cartId || !payload.addressId) {
       toast.error("Please select an address");
       return;
-    }  
+    }
     placeOrderMutation(payload);
-  };  
+  };
 
   const queryClient = useQueryClient();
   const { mutate: updateCart, isPending } = useMutation({
@@ -109,12 +116,22 @@ export default function Cart() {
   });
 
   const getDiscount = (products) => {
-    const discount = products.reduce(
-      (sum, item) =>
-        sum +
-        (item.product.price - item.product.discounted_price) * item.quantity,
-      0
-    );
+    // const discount = products.reduce(
+    //   (sum, item) =>
+    //     sum +
+    //     (item.product.price - item.product.discounted_price) * item.quantity,
+    //   0
+    // );
+    const discount = products.reduce((sum, item) => {
+      const discountedPrice = getDiscountBasedOnRole({
+        role: localStorageRole,
+        discounted_price: item.product.discounted_price,
+        salesperson_discounted_price: item.product.salesperson_discounted_price,
+        dnd_discounted_price: item.product.dnd_discounted_price,
+      });
+
+      return sum + (item.product.price - discountedPrice) * item.quantity;
+    }, 0);
     setDiscount(discount);
   };
 
@@ -168,15 +185,24 @@ export default function Cart() {
   useEffect(() => {
     if (discountCoupon.length > 0) {
       const { discountValue, maxDiscount, discountType } = discountCoupon[0];
-      let couponDiscountedPrice = discountType === "fixed" 
-        ? discountValue 
-        : totalPrice * (discountValue / 100);
+      let couponDiscountedPrice =
+        discountType === "fixed"
+          ? discountValue
+          : totalPrice * (discountValue / 100);
 
-      couponDiscountedPrice = Math.min(couponDiscountedPrice, maxDiscount || couponDiscountedPrice);
-      couponDiscountedPrice = Math.min(couponDiscountedPrice, totalPrice - discount);
+      couponDiscountedPrice = Math.min(
+        couponDiscountedPrice,
+        maxDiscount || couponDiscountedPrice
+      );
+      couponDiscountedPrice = Math.min(
+        couponDiscountedPrice,
+        totalPrice - discount
+      );
 
       setDiscountedPrice(couponDiscountedPrice);
-      setFinalPrice(totalPrice - discount - couponDiscountedPrice + platformFee);
+      setFinalPrice(
+        totalPrice - discount - couponDiscountedPrice + platformFee
+      );
     } else {
       setDiscountedPrice(0);
       setFinalPrice(totalPrice - discount + platformFee);
@@ -189,15 +215,17 @@ export default function Cart() {
       behavior: "smooth",
     });
   };
-  
+
   useEffect(() => {
-    scrollToTop()
+    scrollToTop();
   }, []);
 
   useEffect(() => {
     if (addresses && addresses.length > 0) {
-      const defaultAddress = addresses.find(address => address.isPrimary === false);
-      
+      const defaultAddress = addresses.find(
+        (address) => address.isPrimary === false
+      );
+
       if (defaultAddress) {
         setAddress(defaultAddress);
       } else {
@@ -206,7 +234,7 @@ export default function Cart() {
     } else {
       setAddress({});
     }
-  }, [addresses]);  
+  }, [addresses]);
 
   return (
     <>
@@ -233,85 +261,95 @@ export default function Cart() {
             )}
             {isLoading && <LoadingSpinner />}
             <div className="mt-6">
-              {cart.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex lg:flex-row items-start justify-start lg:items-center lg:justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
-                >
-                  <div className="flex flex-col lg:flex-row lg:items-center sm:w-[70%] w-auto">
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.name}
-                      className="w-36 h-36 lg:w-28 lg:h-28 object-cover rounded"
-                    />
-                    <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[170%] lg:w-[65%]">
-                      <h3 className="font-semibold text-lg">
-                        {item.product.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {item.product.full_description || "No description"}
-                      </p>
-                      {removeCart && item.product._id === selectedId ? (
-                        <div className="w-fit mt-2">
-                          <CartLoader />
-                        </div>
-                      ) : (
-                        <span
-                          onClick={() =>
-                            handleRemoveItemFromCart(item.product._id)
-                          }
-                          className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
-                        >
-                          Remove
-                        </span>
-                      )}
+              {cart.map((item) => {
+                console.log(">>", cart);
+                const product = item.product;
+                const discountPrice = getDiscountBasedOnRole({
+                  role: localStorageRole,
+                  discounted_price: product.discounted_price,
+                  salesperson_discounted_price:
+                    product.salesperson_discounted_price,
+                  dnd_discounted_price: product.dnd_discounted_price,
+                });
+
+                console.log("discountPrice", discountPrice);
+                return (
+                  <div
+                    key={item._id}
+                    className="flex lg:flex-row items-start justify-start lg:items-center lg:justify-between p-4 mb-4 border-b border-gray-200 bg-gray-50"
+                  >
+                    <div className="flex flex-col lg:flex-row lg:items-center sm:w-[70%] w-auto">
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.name}
+                        className="w-36 h-36 lg:w-28 lg:h-28 object-cover rounded"
+                      />
+                      <div className="ml-0 mt-4 lg:ml-4 mr-4 w-[170%] lg:w-[65%]">
+                        <h3 className="font-semibold text-lg">
+                          {item.product.name}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {item.product.full_description || "No description"}
+                        </p>
+                        {removeCart && item.product._id === selectedId ? (
+                          <div className="w-fit mt-2">
+                            <CartLoader />
+                          </div>
+                        ) : (
+                          <span
+                            onClick={() =>
+                              handleRemoveItemFromCart(item.product._id)
+                            }
+                            className="text-[#4D4D4D] text-xs mt-2 border-b border-[#4D4D4D] cursor-pointer"
+                          >
+                            Remove
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center flex-col mt-8 lg:-mt-8 sm:w-[30%] w-auto">
-                    <p className="font-bold text-lg ">
-                      ₹
-                      {item.product.discounted_price
-                        ? item.product.discounted_price
-                        : item.product.price}{" "}
-                      {item.product.discounted_price && (
-                        <span className="line-through text-gray-500 text-xs">
-                          ₹{item.product.price}
-                        </span>
-                      )}
-                      {/* <span className="text-[#297C00] text-sm">
+                    <div className="flex items-center flex-col mt-8 lg:-mt-8 sm:w-[30%] w-auto">
+                      <p className="font-bold text-lg ">
+                        ₹{discountPrice}{" "}
+                        {item.product.discounted_price && (
+                          <span className="line-through text-gray-500 text-xs">
+                            ₹{item.product.price}
+                          </span>
+                        )}
+                        {/* <span className="text-[#297C00] text-sm">
                     {item.product.discount || 0}% off
                   </span> */}
-                    </p>
-                    <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
-                      <button
-                        disabled={isPending}
-                        onClick={() => updateQuantity(item.product, -1)}
-                        className="text-3xl pb-1"
-                      >
-                        -
-                      </button>
-                      {isPending &&
-                      !removeCart &&
-                      item.product._id === selectedId ? (
-                        <div className="mx-2">
-                          <CartLoader />
-                        </div>
-                      ) : (
-                        <span className="mx-3 font-medium">
-                          {item.quantity}
-                        </span>
-                      )}
-                      <button
-                        disabled={isPending}
-                        onClick={() => updateQuantity(item.product, 1)}
-                        className="text-2xl pb-1"
-                      >
-                        +
-                      </button>
+                      </p>
+                      <div className="flex items-center justify-center mt-2 rounded-3xl border-blue-900 w-28 border-2">
+                        <button
+                          disabled={isPending}
+                          onClick={() => updateQuantity(item.product, -1)}
+                          className="text-3xl pb-1"
+                        >
+                          -
+                        </button>
+                        {isPending &&
+                        !removeCart &&
+                        item.product._id === selectedId ? (
+                          <div className="mx-2">
+                            <CartLoader />
+                          </div>
+                        ) : (
+                          <span className="mx-3 font-medium">
+                            {item.quantity}
+                          </span>
+                        )}
+                        <button
+                          disabled={isPending}
+                          onClick={() => updateQuantity(item.product, 1)}
+                          className="text-2xl pb-1"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
           {cart.length > 0 && (
@@ -371,7 +409,9 @@ export default function Cart() {
               </p>
               <hr className="border-dashed border-gray-900" />
               <p className="flex justify-between font-bold text-lg mt-2">
-                To be paid <span>₹{Number(finalPrice).toFixed(2)}</span>
+                {/* To be paid <span>₹{Number(finalPrice).toFixed(2)}</span> */}
+                To be paid{" "}
+                <span>₹{Number(cartProducts.total_price).toFixed(2)}</span>
               </p>
               <div className="mt-2 border-t border-gray-900">
                 <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>
@@ -409,7 +449,13 @@ export default function Cart() {
                   isPlacingOrder ? "pointer-events-none" : ""
                 } w-full mt-6 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
               >
-                {isPlacingOrder ? <div className="my-1"><CartLoader /></div> : "Proceed to Checkout"}
+                {isPlacingOrder ? (
+                  <div className="my-1">
+                    <CartLoader />
+                  </div>
+                ) : (
+                  "Proceed to Checkout"
+                )}
               </button>
             </div>
           )}

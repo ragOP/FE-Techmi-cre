@@ -54,7 +54,7 @@ const Signup = () => {
             <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
                 {/* Title */}
                 <h1 className="text-2xl font-bold text-gray-900">Sign Up</h1>
-                <p className="text-gray-500 mt-1">Create your TravelWise account</p>
+                <p className="text-gray-500 mt-1">Create your account</p>
 
                 <form onSubmit={handleSubmit}>
                     {/* Full Name */}

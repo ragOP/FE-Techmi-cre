@@ -81,7 +81,7 @@ const Login = () => {
         {/* Title */}
         <h1 className="text-2xl font-bold text-gray-900">Login</h1>
         <p className="text-gray-500 mt-1">
-          Login to access your TravelWise account
+          Login to access your account
         </p>
 
         <form onSubmit={handleSubmit}>

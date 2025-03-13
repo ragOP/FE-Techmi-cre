@@ -26,7 +26,7 @@ const Service = () => {
 
   const scrollToRef = (ref) => {
     setTimeout(() => {
-      ref.current.scrollIntoView({ behavior: "smooth" });
+      ref.current?.scrollIntoView({ behavior: "smooth" });
     }, 1000);
   };
 

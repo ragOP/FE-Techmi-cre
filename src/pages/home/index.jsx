@@ -20,7 +20,7 @@ const Home = () => {
     queryFn: () => addHomeConfig({}),
   });
   const { data: internalPageConfig } = useQuery({
-      queryKey: ["service_config"],
+      queryKey: ["internal_config"],
       queryFn: () => getInternalConfig({}),
     });
   return (

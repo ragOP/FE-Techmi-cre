@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getBlogData } from "./helper";
 import { useEffect, useState } from "react";
 import { timeAgo } from "../../utils/check_date_diffrence";
+import { truncateString } from "../../utils/truncate_string";
 
 export default function Blog() {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ export default function Blog() {
     featured: true,
   };
 
-
   const { data: blogData, isLoading } = useQuery({
     queryKey: ["blog_data_featured"],
     queryFn: () => getBlogData({ params }),
@@ -25,7 +25,7 @@ export default function Blog() {
 
   const { data: latestBlog, isPending } = useQuery({
     queryKey: ["blog_data"],
-    queryFn: () => getBlogData({ }),
+    queryFn: () => getBlogData({}),
     select: (data) => data?.response?.data,
   });
 
@@ -86,7 +86,8 @@ export default function Blog() {
                   </div>
                 </div>
               ))
-            :  posts.length > 0 && posts.map((post, index) => (
+            : posts.length > 0 &&
+              posts.map((post, index) => (
                 <motion.div
                   key={post._id}
                   onClick={() => navigate(`/blogs/${post._id}`)}
@@ -111,7 +112,8 @@ export default function Blog() {
                     <div className="absolute bottom-5">
                       <h3 className="text-lg font-semibold">{post.title}</h3>
                       <p className="text-sm">
-                        {post?.author?.name || "Unknown"} • {timeAgo(post.createdAt)}
+                        {post?.author?.name || "Unknown"} •{" "}
+                        {timeAgo(post.createdAt)}
                       </p>
                       <p className="text-xs">{post.company}</p>
                     </div>
@@ -154,7 +156,8 @@ export default function Blog() {
                     </div>
                   </div>
                 ))
-              :  latestPosts.length > 0 && latestPosts.map((post, index) => (
+              : latestPosts.length > 0 &&
+                latestPosts.map((post, index) => (
                   <motion.div
                     key={post._id}
                     onClick={() => navigate(`/blogs/${post._id}`)}
@@ -166,12 +169,12 @@ export default function Blog() {
                     <img
                       src={post.bannerImageUrl}
                       alt={post.title}
-                      className="w-12 h-12 md:w-16 md:h-16 rounded-lg object-cover"
+                      className="w-14 h-14 md:w-16 md:h-16 rounded-lg object-cover"
                     />
                     <div className="ml-2 text-sm">
                       <p>{post.title}</p>
                       <span className="text-gray-500 text-xs md:text-sm">
-                        {post.short_description}
+                        {truncateString(post.short_description, 90)}
                       </span>
                     </div>
                   </motion.div>

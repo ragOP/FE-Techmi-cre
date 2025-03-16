@@ -9,7 +9,6 @@ export const getToken = () => {
 };
 
 export const removeToken = () => {
-  console.log("REMOVE TOKEN", getItem(TOKEN_KEY));
   removeItem(TOKEN_KEY);
 };
 
@@ -26,7 +25,6 @@ export const isTokenValid = () => {
     return false;
   }
 };
-
 
 export const autoLogout = (logoutCallback) => {
   const token = getToken();

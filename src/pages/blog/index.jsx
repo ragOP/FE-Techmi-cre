@@ -52,7 +52,7 @@ export default function Blog() {
         className="text-2xl md:text-3xl font-bold text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.8 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
       >
         Insights, Ideas, and Inspiration
       </motion.h1>
@@ -60,7 +60,7 @@ export default function Blog() {
         className="text-center text-gray-600 text-sm md:text-base"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.8 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
       >
         Explore our latest stories, tips, and trends—crafted to inform, inspire,
         and spark your creativity.
@@ -70,7 +70,7 @@ export default function Blog() {
           className="w-full md:w-[70%] grid grid-cols-1 sm:grid-cols-2 gap-6"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.8, duration: 1 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
         >
           {isLoading && posts.length === 0
             ? Array.from({ length: 4 }).map((_, index) => (
@@ -86,17 +86,17 @@ export default function Blog() {
                   </div>
                 </div>
               ))
-            :  posts.map((post, index) => (
+            :  posts.length > 0 && posts.map((post, index) => (
                 <motion.div
-                  key={post.id}
+                  key={post._id}
                   onClick={() => navigate(`/blogs/${post._id}`)}
                   className="relative cursor-pointer rounded-2xl overflow-hidden shadow-lg"
                   whileHover={{ scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 250 }}
                 >
                   <img
-                    src={post.bannerImageUrl}
-                    alt={post.title}
+                    src={post?.bannerImageUrl}
+                    alt={post?.title}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 flex flex-col justify-end p-4 text-white">
@@ -106,12 +106,12 @@ export default function Blog() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1 + index * 0.15, duration: 0.6 }}
                     >
-                      {post.category}
+                      {post.category || "Uncategorised"}
                     </motion.span>
                     <div className="absolute bottom-5">
                       <h3 className="text-lg font-semibold">{post.title}</h3>
                       <p className="text-sm">
-                        {post.author} • {timeAgo(post.createdAt)}
+                        {post?.author?.name || "Unknown"} • {timeAgo(post.createdAt)}
                       </p>
                       <p className="text-xs">{post.company}</p>
                     </div>
@@ -123,7 +123,7 @@ export default function Blog() {
           className="w-full md:w-[30%]"
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1, duration: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
         >
           <div className="flex gap-2">
             <input
@@ -141,7 +141,7 @@ export default function Blog() {
 
           <h2 className="mt-6 text-lg md:text-xl font-bold">Latest Posts</h2>
           <motion.div className="mt-4 space-y-4">
-            {isPending && latestPosts.length === 0
+            {isPending && latestPosts && latestPosts.length === 0
               ? Array.from({ length: 3 }).map((_, index) => (
                   <div
                     key={index}
@@ -154,7 +154,7 @@ export default function Blog() {
                     </div>
                   </div>
                 ))
-              :  latestPosts.map((post, index) => (
+              :  latestPosts.length > 0 && latestPosts.map((post, index) => (
                   <motion.div
                     key={post._id}
                     onClick={() => navigate(`/blogs/${post._id}`)}

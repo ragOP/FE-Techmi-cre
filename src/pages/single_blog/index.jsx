@@ -6,9 +6,9 @@ import { useParams } from "react-router-dom";
 
 export default function SingleBlog() {
   const { id } = useParams();
-  
+
   const { data: blog, isLoading } = useQuery({
-    queryKey: ["blog_data", id], 
+    queryKey: ["blog_data", id],
     queryFn: () => getSingleBlogData(id),
     select: (data) => data?.response?.data,
   });
@@ -72,23 +72,9 @@ export default function SingleBlog() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-          >
-            {blog?.content ? (
-              blog.content
-                .replace(/\\n/g, "\n")
-                .split(/\n{2,}/)
-                .map((paragraph, index) => (
-                  <p
-                    key={index}
-                    className="text-gray-700 mt-4 leading-relaxed text-lg"
-                  >
-                    {paragraph}
-                  </p>
-                ))
-            ) : (
-              <p className="text-gray-500 italic">No content available.</p>
-            )}
-          </motion.div>
+            className="mt-5"
+            dangerouslySetInnerHTML={{ __html: blog?.content }}
+          />
         </>
       )}
     </motion.div>

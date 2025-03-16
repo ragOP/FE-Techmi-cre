@@ -17,6 +17,8 @@ import BlogUI from "./pages/blog";
 import SingleBlog from "./pages/single_blog";
 import Blog from "./pages/blog";
 import Order from "./pages/order";
+import { useQuery } from "@tanstack/react-query";
+import { getFooterConfig } from "./components/footer/helper";
 
 const WHATSAPP_USER_NAME = "Abhishek";
 const WHATSAPP_PHONE_NUMBER = "9409718733";
@@ -36,6 +38,11 @@ const App = () => {
   const hideLayoutRoutes = ["/login", "/signup"];
 
   const [initalWebsiteLoader, setInitialWebsiteLoader] = useState(true);
+
+  const { data: footerConfig, isLoading } = useQuery({
+    queryKey: ["footer_config"],
+    queryFn: () => getFooterConfig({}),
+  });
 
   useEffect(() => {
     setTimeout(() => {
@@ -92,7 +99,7 @@ const App = () => {
     <>
       {/* sds */}
       <div className="bg-[#82c8e51a]">
-        {!hideLayoutRoutes.includes(location.pathname) && <Navbar />}
+        {!hideLayoutRoutes.includes(location.pathname) && <Navbar logo={footerConfig?.logo}/>}
         <Suspense fallback={<LazyLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -107,7 +114,7 @@ const App = () => {
             <Route path="/service" element={<Service />} />
             <Route path="/search" element={<SearchResult />} />
             <Route path="/product/:id" element={<SingleProduct />} />
-            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/contact" element={<ContactUs footerConfig={footerConfig}/>} />
             <Route path="/blogs" element={<Blog />} />
             <Route path="/blogs/:id" element={<SingleBlog />} />
             <Route element={<ProtectedRoute />}>
@@ -119,7 +126,7 @@ const App = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
-        {!hideLayoutRoutes.includes(location.pathname) && <Footer />}
+        {!hideLayoutRoutes.includes(location.pathname) && <Footer footerConfig={footerConfig} />}
         <FloatingWhatsApp
           phoneNumber={WHATSAPP_PHONE_NUMBER}
           accountName={WHATSAPP_USER_NAME}

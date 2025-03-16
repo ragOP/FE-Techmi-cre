@@ -15,7 +15,7 @@ import prescription from "../../assets/solutions/prescription.svg";
 
 const Home = () => {
   const { data: homeConfig, isLoading } = useQuery({
-    queryKey: ["user_addresses"],
+    queryKey: ["home_config"],
     queryFn: () => addHomeConfig({}),
   });
   return (

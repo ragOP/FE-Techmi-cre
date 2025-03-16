@@ -14,5 +14,7 @@ export const endpoints = {
   reviews: "api/review",
   ordermy: "api/order/history",
   home: "api/home",
-  distrubtors: "api/auth/user/role"
+  distrubtors: "api/auth/user/role",
+  service_page: "api/service-page",
+  header: "api/header"
 };

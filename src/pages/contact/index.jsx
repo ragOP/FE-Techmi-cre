@@ -11,7 +11,7 @@ import CartLoader from "../../components/loader/CartLoader";
 
 const position = [28.5691, 77.2786];
 
-const Contact = () => {
+const Contact = ({footerConfig}) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -144,12 +144,12 @@ const Contact = () => {
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:justify-between mt-8 gap-6">
             {[
-              { icon: Phone, text: "+91 9578376478" },
+              { icon: Phone, text: footerConfig?.phoneNumber },
               {
                 icon: PinIcon,
-                text: "123, Main Street, Chiplun, Maharashtra - 415283",
+                text: footerConfig?.address,
               },
-              { icon: Clock, text: "Mon-Fri: 9AM - 6PM | Sat: 9AM - 4PM" },
+              { icon: Clock, text: footerConfig?.timming },
             ].map((item, index) => (
               <motion.div
                 key={index}

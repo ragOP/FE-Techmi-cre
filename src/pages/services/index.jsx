@@ -8,6 +8,8 @@ import Tagtitle from "../../components/service/service_components/Pharmaceutical
 import ServiceDescription from "../../components/service_description";
 import { description } from "../../constant";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { getServiceConfig } from "./helper";
 
 // Variants for the card animations
 const cardVariants = {
@@ -23,6 +25,11 @@ const Service = () => {
   const pharmaceuticalRef = useRef(null);
   const laundryServiceRef = useRef(null);
   const serviceRef = useRef(null);
+
+  const { data: serviceConfig, isLoading } = useQuery({
+    queryKey: ["service_config"],
+    queryFn: () => getServiceConfig({}),
+  });
 
   const scrollToRef = (ref) => {
     setTimeout(() => {
@@ -49,7 +56,11 @@ const Service = () => {
 
   return (
     <div>
-      <Tagtitle />
+      <Tagtitle
+        title={serviceConfig?.heading}
+        subTitle={serviceConfig?.subheading}
+        isLoading={isLoading}
+      />
       <CategoryGrid />
 
       {selectedCardTitle && (
@@ -66,67 +77,110 @@ const Service = () => {
         </div>
       )}
 
-      {!selectedCardTitle && <ServiceDetailsBox ref={serviceRef} />}
+      {!selectedCardTitle && (
+        <ServiceDetailsBox
+          ref={serviceRef}
+          serviceConfig={serviceConfig}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 };
 
 export default Service;
 
-export const ServiceDetailsBox = forwardRef((prop, ref) => {
-  return (
-    <div ref={ref}>
-      {/* First Card - Comes from the left */}
-      <motion.div
-        variants={cardVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-      >
-        <ServiceDescription
-          reverse={false}
-          title="House Cleaning"
-          image="https://res.cloudinary.com/dacwig3xk/image/upload/v1740342553/uploads/images/wrmpnukabjaqfpbzuehl.png"
-          description={description[0]}
-        />
-      </motion.div>
+export const ServiceDetailsBox = forwardRef(
+  ({ serviceConfig, isLoading }, ref) => {
+    if (isLoading) {
+      return (
+        <div
+          ref={ref}
+          className="flex flex-col w-full items-center justify-center space-y-6"
+        >
+          {[1, 2, 3].map((index) => (
+            <div
+              key={index}
+              className="animate-pulse bg-gray-100 shadow-md rounded-xl p-6 w-full max-w-5xl h-60 flex items-center space-x-6"
+            >
+              <div className="w-36 h-36 bg-gray-300 rounded-lg"></div>
 
-      {/* Second Card - Comes from the right */}
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, x: 100 }, // Start offscreen to the right
-          visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut", delay: 0.3 } },
-        }}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-      >
-        <ServiceDescription
-          reverse={true}
-          title="Pharmaceutical"
-          image="https://res.cloudinary.com/dacwig3xk/image/upload/v1740342674/uploads/images/ou5nt9qf4yctozmcwgwc.png"
-          description={description[1]}
-        />
-      </motion.div>
+              <div className="flex-1 space-y-4">
+                <div className="h-6 bg-gray-300 rounded w-2/3"></div>
+                <div className="h-4 bg-gray-300 rounded w-full"></div>
+                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    
+    return (
+      <div ref={ref}>
+        {/* First Card - Comes from the left */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
+          <ServiceDescription
+            reverse={false}
+            title="House Cleaning"
+            image={serviceConfig.houseCleaningImage}
+            description={serviceConfig.houseCleaningDescription}
+            rating={serviceConfig.houseCleaningReviews}
+          />
+        </motion.div>
 
-      {/* Third Card - Comes from the left */}
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, x: -100 }, // Start offscreen to the left
-          visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut", delay: 0.6 } },
-        }}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-      >
-        <ServiceDescription
-          reverse={false}
-          title="Laundry Services"
-          image="https://res.cloudinary.com/dacwig3xk/image/upload/v1740342717/uploads/images/jvg1lophws6vvjsudjcy.png"
-          description={description[2]}
-        />
-      </motion.div>
-    </div>
-  );
-});
+        {/* Second Card - Comes from the right */}
+        <motion.div
+          variants={{
+            hidden: { opacity: 0, x: 100 }, // Start offscreen to the right
+            visible: {
+              opacity: 1,
+              x: 0,
+              transition: { duration: 0.8, ease: "easeOut", delay: 0.3 },
+            },
+          }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
+          <ServiceDescription
+            reverse={true}
+            title="Pharmaceutical"
+            image={serviceConfig.pharmaImage}
+            description={serviceConfig.pharmaDescription}
+            rating={serviceConfig.pharmaReviews}
+          />
+        </motion.div>
 
+        {/* Third Card - Comes from the left */}
+        <motion.div
+          variants={{
+            hidden: { opacity: 0, x: -100 }, // Start offscreen to the left
+            visible: {
+              opacity: 1,
+              x: 0,
+              transition: { duration: 0.8, ease: "easeOut", delay: 0.6 },
+            },
+          }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+        >
+          <ServiceDescription
+            reverse={false}
+            title="Laundry Services"
+            image={serviceConfig.laundryImage}
+            description={serviceConfig.laundryDescription}
+            rating={serviceConfig.laundryReviews}
+          />
+        </motion.div>
+      </div>
+    );
+  }
+);

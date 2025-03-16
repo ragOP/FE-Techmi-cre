@@ -2,8 +2,9 @@ import React from "react";
 import logo from "../../assets/navbar/Logo.svg";
 
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const Footer = () => {
+const Footer = ({footerConfig}) => {
   const data = {
     data1: {
       icons: [
@@ -33,12 +34,27 @@ const Footer = () => {
     },
   };
 
+  const handleCheckLink = (id) => {
+    switch (id) {
+      case 1:
+        return footerConfig?.facebookLink;
+      case 2: 
+        return footerConfig?.twitterLink;
+      case 3:
+        return footerConfig?.instagramLink;
+      case 4:
+        return footerConfig?.linkedInLink;
+      default:
+        return null;
+    }
+  }
+
   return (
     <footer className="bg-[#FBF6F1E5] py-10 px-6 text-sm  text-gray-800 mt-20">
       <div className="max-w-[90%] w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 space-y-6 lg:space-x-8 lg:place-items-center ">
         <div className="flex flex-col gap-y-7">
           <div className="flex items-center gap-1.5">
-            <img src={logo} alt="" className="h-[60px] w-[60px]" />
+            <img src={footerConfig?.logo} alt="" className="h-[60px] w-[60px]" />
             <p className="text-[#1C0547] font-semibold text-xl leading-none">
               <span className="text-[#00008B]">Lo</span>
               <span className="text-[#1C0547]">go</span>
@@ -48,14 +64,15 @@ const Footer = () => {
             </p>
           </div>
           <p className="text-base">
-            70 Washington Square South, <br />
-            New York, NY 10012, United States
+            {footerConfig?.address}
           </p>
-          <a href="#" className="text-blue-600 underline">Show on map</a>
+          <a href={footerConfig?.mapLink} className="text-blue-600 underline">Show on map</a>
           <div className="flex gap-x-4">
             {data.data1.icons.map((item) => (
               <div key={item.id} className="text-2xl text-blue-600">
-                {item.icon}
+                <a href={handleCheckLink(item.id)} target="_blank" rel="noopener noreferrer">
+                  {item.icon}
+                </a>
               </div>
             ))}
           </div>
@@ -63,9 +80,9 @@ const Footer = () => {
 
         <div className="flex flex-col gap-y-8 ">
           <h3 className="font-bold text-xl text-blue-900">Need help</h3>
-          <p className="font-bold lg:text-lg xl:text-2xl text-blue-900">9876 788 - HGGGY - 888</p>
-          <p className="text-base ">Mon-Fri: 9:00 - 20:00 <br /> Sat: 9:00 - 15:00</p>
-          <a href="mailto:inbox@gigachad.com" className="text-blue-600">✉ inbox@gigachad.com</a>
+          <p className="font-bold lg:text-lg xl:text-2xl text-blue-900">{footerConfig?.phoneNumber}</p>
+          <p className="text-base ">{footerConfig?.timming}</p>
+          <a href={`mailto:${footerConfig?.email}`} className="text-blue-600">✉ {footerConfig?.email}</a>
         </div>
 
         <div className="flex flex-col gap-y-5 ">
@@ -93,8 +110,6 @@ const Footer = () => {
             ))}
           </ul>
         </div>
-
-
       </div>
     </footer>
   );

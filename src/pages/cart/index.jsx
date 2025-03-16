@@ -409,9 +409,9 @@ export default function Cart() {
               </p>
               <hr className="border-dashed border-gray-900" />
               <p className="flex justify-between font-bold text-lg mt-2">
-                {/* To be paid <span>₹{Number(finalPrice).toFixed(2)}</span> */}
-                To be paid{" "}
-                <span>₹{Number(cartProducts.total_price).toFixed(2)}</span>
+                To be paid <span>₹{Number(finalPrice).toFixed(2)}</span>
+                {/* To be paid{" "} */}
+                {/* <span>₹{Number(cartProducts.total_price).toFixed(2)}</span> */}
               </p>
               <div className="mt-2 border-t border-gray-900">
                 <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>

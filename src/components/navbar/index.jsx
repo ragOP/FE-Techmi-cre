@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
-import logo from "../../assets/navbar/crm.webp";
 import cart from "../../assets/navbar/shopping-cart.svg";
 import order from "../../assets/navbar/shopping-cart.svg";
 import user from "../../assets/navbar/circle-user-round.svg";
@@ -42,7 +41,7 @@ const navContents = [
   { title: "Contact Us", route: "/contact" },
 ];
 
-const Navbar = () => {
+const Navbar = ({logo}) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);

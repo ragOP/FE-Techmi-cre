@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import CartLoader from "../../loader/CartLoader";
 import ServiceFilter from "../../service_filter";
 
-const LaundryService = () => {
+const LaundryService = ({internalPageConfig}) => {
   const productsRef = useRef(null);
   const [filterCategories, setFilterCategories] = useState([]);
   const [testimonialData, setTestimonialData] = useState([
@@ -63,9 +63,8 @@ const LaundryService = () => {
       />
       <Aboutus
         title="About Us"
-        desc="We are your one-stop solution for all your laundry needs. Discover why Caresync is the best laundry service provider in India and why customers trust us for their laundry requirements."
-        desc2="Whether you are a student or a busy professional living away from home, our laundry services promise to free up your time and deliver a clean, spotless set of clothes. We treat your laundry with great care."
-        src={prescription}
+        desc={internalPageConfig?.aboutDescription}
+        src={internalPageConfig?.aboutUsImage}
       />
 
       {selectedCategory && (

@@ -10,6 +10,7 @@ import { description } from "../../constant";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { getServiceConfig } from "./helper";
+import { getInternalConfig } from "../../components/service/LaundryService/helper";
 
 // Variants for the card animations
 const cardVariants = {
@@ -29,6 +30,11 @@ const Service = () => {
   const { data: serviceConfig, isLoading } = useQuery({
     queryKey: ["service_config"],
     queryFn: () => getServiceConfig({}),
+  });
+
+  const { data: internalPageConfig, } = useQuery({
+    queryKey: ["internal_config"],
+    queryFn: () => getInternalConfig({}),
   });
 
   const scrollToRef = (ref) => {
@@ -66,13 +72,13 @@ const Service = () => {
       {selectedCardTitle && (
         <div className="mt-6">
           <div ref={houseCleaningRef}>
-            {selectedCardTitle === "House Cleaning" && <HouseCleaning />}
+            {selectedCardTitle === "House Cleaning" && <HouseCleaning internalPageConfig={internalPageConfig}/>}
           </div>
           <div ref={pharmaceuticalRef}>
-            {selectedCardTitle === "Pharmaceutical" && <Pharmaceutical />}
+            {selectedCardTitle === "Pharmaceutical" && <Pharmaceutical internalPageConfig={internalPageConfig} />}
           </div>
           <div ref={laundryServiceRef}>
-            {selectedCardTitle === "Laundry Service" && <LaundryService />}
+            {selectedCardTitle === "Laundry Service" && <LaundryService internalPageConfig={internalPageConfig}/>}
           </div>
         </div>
       )}

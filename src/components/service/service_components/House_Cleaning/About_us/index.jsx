@@ -8,7 +8,6 @@ const Aboutus = ({ title, desc, desc2, src }) => {
           {title}
         </h1>
         <p className="mb-6 text-black lg:text-lg font-medium">{desc}</p>
-        <p className="mb-6 text-black lg:text-lg font-medium">{desc2}</p>
 
         <button className="text-white bg-[#00008B] shadow-2xl  py-4 text-base  font-semibold w-[150px] rounded-full   ">
           Book Now

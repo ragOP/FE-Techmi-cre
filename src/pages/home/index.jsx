@@ -12,12 +12,17 @@ import { useQuery } from "@tanstack/react-query";
 import { addHomeConfig } from "./helper";
 import Aboutus from "../../components/service/service_components/House_Cleaning/About_us";
 import prescription from "../../assets/solutions/prescription.svg";
+import { getInternalConfig } from "../../components/service/LaundryService/helper";
 
 const Home = () => {
   const { data: homeConfig, isLoading } = useQuery({
     queryKey: ["home_config"],
     queryFn: () => addHomeConfig({}),
   });
+  const { data: internalPageConfig } = useQuery({
+      queryKey: ["service_config"],
+      queryFn: () => getInternalConfig({}),
+    });
   return (
     <AnimatePresence>
       <motion.div
@@ -88,10 +93,9 @@ const Home = () => {
           viewport={{ once: true }}
         >
           <Aboutus
-            title="About Us"
-            desc="We are your one-stop solution for all your laundry needs. Discover why Caresync is the best laundry service provider in India and why customers trust us for their laundry requirements."
-            desc2="Whether you are a student or a busy professional living away from home, our laundry services promise to free up your time and deliver a clean, spotless set of clothes. We treat your laundry with great care."
-            src={prescription}
+          title="About Us"
+            desc={internalPageConfig?.aboutDescription}
+            src={internalPageConfig?.aboutUsImage}
           />
         </motion.div>
 

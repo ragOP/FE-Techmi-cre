@@ -16,5 +16,6 @@ export const endpoints = {
   home: "api/home",
   distrubtors: "api/auth/user/role",
   service_page: "api/service-page",
-  header: "api/header"
+  header: "api/header",
+  internal_page: "api/internal"
 };

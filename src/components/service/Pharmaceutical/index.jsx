@@ -8,7 +8,7 @@ import Trendingnew from "../service_components/Pharmaceutical_Services/Trending_
 import CategoriesPharma from "../service_components/Pharmaceutical_Services/Categories";
 import { PharmaSearchProducts } from "../service_components/Pharmaceutical_Services/Pharam_Search_Products";
 
-const Pharmaceutical = () => {
+const Pharmaceutical = ({internalPageConfig}) => {
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
   return (
@@ -18,7 +18,7 @@ const Pharmaceutical = () => {
       </div>
       <PharmaSearchProducts debouncedQuery={debouncedQuery} />
       <CategoriesPharma />
-      <Diabetes />
+      <Diabetes internalPageConfig={internalPageConfig} />
       <Newproduct />
       <Knowmore />
       <HealthCondition />

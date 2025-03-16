@@ -7,8 +7,9 @@ import prescription from "../../../assets/solutions/prescription.svg"
 import Testimonials from "../../common/testimonial"
 import HouseCleaningProducts from "../service_components/House_Cleaning/House_Cleaning_Products"
 import ServiceFilter from "../../service_filter"
+import { useQuery } from "@tanstack/react-query"
 
-const HouseCleaning = () => {
+const HouseCleaning = ({internalPageConfig}) => {
   const productsRef = useRef(null);
   const [filterCategories, setFilterCategories] = useState([])
 
@@ -45,8 +46,8 @@ const HouseCleaning = () => {
       <Services setFilterCategories={setFilterCategories} setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} />
       <Aboutus
         title="About Us"
-        desc="Care Sync is a leading professional cleaning company, known for delivering high-quality services in Delhi NCR and beyond. We offer comprehensive cleaning solutions for both residential and commercial spaces. From deep cleaning to pest control, we ensure your space is spotless, hygienic, and comfortable."
-        src={prescription}
+        desc={internalPageConfig?.aboutDescription}
+        src={internalPageConfig?.aboutUsImage}
       />
       {selectedCategory && (
         <div ref={productsRef}>

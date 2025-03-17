@@ -87,10 +87,10 @@ const ProductCard = ({
         </div>
       )}
 
-      {/* Live Viewers */}
+      {/* Live Viewers
       <div className="absolute top-12 left-3 bg-green-600 text-white text-xs px-2 py-1 rounded-md">
         👀 {activeUsers} viewing now
-      </div>
+      </div> */}
 
       {/* Product Image */}
       <div className="relative h-56 w-full flex justify-center items-center">
@@ -111,7 +111,7 @@ const ProductCard = ({
         {/* Price & Discount */}
         <div className="flex items-center mt-2">
           <p className="text-lg font-bold text-[#00008B]">₹{finalPrice}</p>
-            <p className="text-sm text-gray-500 line-through ml-2">₹{price}</p>
+          <p className="text-sm text-gray-500 line-through ml-2">₹{price}</p>
           {discount > 0 && (
             <span className="text-xs bg-red-500 text-white px-2 py-1 ml-2 rounded">
               -{discount}%

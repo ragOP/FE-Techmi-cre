@@ -107,7 +107,7 @@ export default function Blog() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1 + index * 0.15, duration: 0.6 }}
                     >
-                      {post.category || "Uncategorised"}
+                      {post?.service?.name || "Uncategorised"}
                     </motion.span>
                     <div className="absolute bottom-5">
                       <h3 className="text-lg font-semibold">{post.title}</h3>

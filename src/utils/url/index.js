@@ -1,5 +1,5 @@
 import { isDev } from "../is_dev";
 
 export const BACKEND_URL = isDev()
-  ? "https://techmi-crm-be.onrender.com"
-  : "https://techmi-crm-be.onrender.com";
+  ? "http://84.247.129.99:8000"
+  : "http://84.247.129.99:8000";

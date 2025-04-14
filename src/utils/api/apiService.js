@@ -14,24 +14,25 @@ export const apiService = async ({
   signal
 }) => {
   try {
-    const token = getItem("token");
+    const user = getItem("user");
+    const token = user?.token;
 
     const requestObj = {
-      url: customUrl 
-        ? customUrl 
-        : `/api/proxy/${endpoint}`, // 🧠 Route through secure proxy
+      url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,
+      params,
       method,
       data,
-      params,
-      signal,
-      headers: {
+      signal
+    };
+
+    if (token || _token) {
+      // Merge custom headers with the Authorization header
+      requestObj.headers = {
         ...headers,
         "ngrok-skip-browser-warning": "xyz",
-        ...(!removeToken && (token || _token)
-          ? { Authorization: `Bearer ${_token || token}` }
-          : {}),
-      }
-    };
+        ...(!removeToken ? { Authorization: `Bearer ${_token || token}` } : {}),
+      };
+    }
 
     const { data: res } = await axios(requestObj);
     return { response: res };

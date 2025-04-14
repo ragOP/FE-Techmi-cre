@@ -17,21 +17,21 @@ export const apiService = async ({
     const token = getItem("token");
 
     const requestObj = {
-      url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,
-      params,
+      url: customUrl 
+        ? customUrl 
+        : `/api/proxy/${endpoint}`, // 🧠 Route through secure proxy
       method,
       data,
-      signal
-    };
-
-    if (token || _token) {
-      // Merge custom headers with the Authorization header
-      requestObj.headers = {
+      params,
+      signal,
+      headers: {
         ...headers,
         "ngrok-skip-browser-warning": "xyz",
-        ...(!removeToken ? { Authorization: `Bearer ${_token || token}` } : {}),
-      };
-    }
+        ...(!removeToken && (token || _token)
+          ? { Authorization: `Bearer ${_token || token}` }
+          : {}),
+      }
+    };
 
     const { data: res } = await axios(requestObj);
     return { response: res };

@@ -8,7 +8,7 @@ export const apiService = async ({
   data,
   params,
   token: _token,
-  headers,
+  headers = {},
   customUrl,
   removeToken = false,
   signal
@@ -17,22 +17,23 @@ export const apiService = async ({
     const user = getItem("user");
     const token = user?.token;
 
+    const requestHeaders = {
+      "ngrok-skip-browser-warning": "true",
+      ...headers,
+    };
+
+    if (!removeToken && (token || _token)) {
+      requestHeaders.Authorization = `Bearer ${_token || token}`;
+    }
+
     const requestObj = {
       url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,
       params,
       method,
       data,
-      signal
+      signal,
+      headers: requestHeaders,
     };
-
-    if (token || _token) {
-      // Merge custom headers with the Authorization header
-      requestObj.headers = {
-        ...headers,
-        "ngrok-skip-browser-warning": "xyz",
-        ...(!removeToken ? { Authorization: `Bearer ${_token || token}` } : {}),
-      };
-    }
 
     const { data: res } = await axios(requestObj);
     return { response: res };

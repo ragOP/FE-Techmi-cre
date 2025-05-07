@@ -17,5 +17,7 @@ export const endpoints = {
   distrubtors: "api/auth/user/role",
   service_page: "api/service-page",
   header: "api/header",
-  internal_page: "api/internal"
+  internal_page: "api/internal",
+  payment: "api/payment/create-session",
+  cashfreeOrderDetails: "api/payment/details",
 };

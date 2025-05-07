@@ -145,7 +145,7 @@ const Navbar = ({logo}) => {
               className={({ isActive }) =>
                 `text-lg font-semibold px-3 py-2 ${
                   isActive ? "text-[#00008B] underline" : ""
-                }`
+                } whitespace-nowrap`
               }
             >
               {n.title}
@@ -168,7 +168,7 @@ const Navbar = ({logo}) => {
           whileTap="tap"
         >
           <Package className="text-[#00008B]" />
-          <motion.span className="text-[#00008B] font-medium text-md">
+          <motion.span className="text-[#00008B] font-medium text-md whitespace-nowrap">
             My Orders
           </motion.span>
         </motion.button>

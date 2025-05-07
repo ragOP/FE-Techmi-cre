@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import LastMinuteBuy from "../../components/cart/Cart_Last_Minute_Buy";
 import CartAlternativeProduct from "../../components/cart/Cart_Alternative_Product";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { fetchCart } from "./helper/fecthCart";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/loader/LoadingSpinner";
@@ -23,8 +23,18 @@ import { toast } from "react-toastify";
 import { placeOrder } from "./helper/order";
 import { getAddresses } from "./helper/getAddresses";
 import { getDiscountBasedOnRole } from "../../utils/products/getDiscountBasedOnRole";
+import Checkout from "../../components/checkout";
+import PaymentProcessing from "../../components/payment_processing";
 
 export default function Cart() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("orderId");
+
+  console.log("orderId", orderId);
+
   const [cart, setCart] = useState([]);
   const [shippingFee, setShippingFee] = useState(null);
   const [removeCart, setRemoveCart] = useState(false);
@@ -57,8 +67,6 @@ export default function Cart() {
     queryKey: ["user_addresses"],
     queryFn: () => getAddresses({ id: getItem("userId") }),
   });
-
-  console.log("cartProducts", cartProducts);
 
   const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation(
     {
@@ -94,7 +102,6 @@ export default function Cart() {
     placeOrderMutation(payload);
   };
 
-  const queryClient = useQueryClient();
   const { mutate: updateCart, isPending } = useMutation({
     mutationFn: (updatedCart) =>
       fetchCart({
@@ -262,7 +269,6 @@ export default function Cart() {
             {isLoading && <LoadingSpinner />}
             <div className="mt-6">
               {cart.map((item) => {
-                console.log(">>", cart);
                 const product = item.product;
                 const discountPrice = getDiscountBasedOnRole({
                   role: localStorageRole,
@@ -272,7 +278,6 @@ export default function Cart() {
                   dnd_discounted_price: product.dnd_discounted_price,
                 });
 
-                console.log("discountPrice", discountPrice);
                 return (
                   <div
                     key={item._id}
@@ -443,7 +448,7 @@ export default function Cart() {
                 </div>
               </div>
 
-              <button
+              {/* <button
                 onClick={handlePlaceOrder}
                 className={`${
                   isPlacingOrder ? "pointer-events-none" : ""
@@ -456,7 +461,13 @@ export default function Cart() {
                 ) : (
                   "Proceed to Checkout"
                 )}
-              </button>
+              </button> */}
+              <Checkout
+                isPlacingOrder={isPlacingOrder}
+                couponId={discountCoupon?.[0]?._id}
+                addressId={address?._id}
+                cartId={cartProducts?._id}
+              />
             </div>
           )}
         </div>
@@ -473,6 +484,20 @@ export default function Cart() {
           appliedCoupons={discountCoupon}
           setAppliedCoupons={setDiscountCoupon}
         />
+      )}
+
+      {orderId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <PaymentProcessing
+              placeOrderMutation={placeOrderMutation}
+              isPlacingOrder={isPlacingOrder}
+              onClose={() => {
+                window.history.replaceState(null, "", window.location.pathname);
+              }}
+            />
+          </div>
+        </div>
       )}
     </>
   );

@@ -19,6 +19,7 @@ import Blog from "./pages/blog";
 import Order from "./pages/order";
 import { useQuery } from "@tanstack/react-query";
 import { getFooterConfig } from "./components/footer/helper";
+import PaymentProcessing from "./components/payment_processing";
 
 const WHATSAPP_USER_NAME = "Abhishek";
 const WHATSAPP_PHONE_NUMBER = "9409718733";
@@ -99,7 +100,9 @@ const App = () => {
     <>
       {/* sds */}
       <div className="bg-[#82c8e51a]">
-        {!hideLayoutRoutes.includes(location.pathname) && <Navbar logo={footerConfig?.logo}/>}
+        {!hideLayoutRoutes.includes(location.pathname) && (
+          <Navbar logo={footerConfig?.logo} />
+        )}
         <Suspense fallback={<LazyLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -114,11 +117,17 @@ const App = () => {
             <Route path="/service" element={<Service />} />
             <Route path="/search" element={<SearchResult />} />
             <Route path="/product/:id" element={<SingleProduct />} />
-            <Route path="/contact" element={<ContactUs footerConfig={footerConfig}/>} />
+            <Route
+              path="/contact"
+              element={<ContactUs footerConfig={footerConfig} />}
+            />
             <Route path="/blogs" element={<Blog />} />
             <Route path="/blogs/:id" element={<SingleBlog />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/order" element={<Order />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/payment" element={<PaymentProcessing />} />
             </Route>
             <Route element={<ProtectedRoute />}>
               <Route path="/cart" element={<Cart />} />
@@ -126,7 +135,9 @@ const App = () => {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
-        {!hideLayoutRoutes.includes(location.pathname) && <Footer footerConfig={footerConfig} />}
+        {!hideLayoutRoutes.includes(location.pathname) && (
+          <Footer footerConfig={footerConfig} />
+        )}
         <FloatingWhatsApp
           phoneNumber={WHATSAPP_PHONE_NUMBER}
           accountName={WHATSAPP_USER_NAME}

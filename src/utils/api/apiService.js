@@ -14,8 +14,9 @@ export const apiService = async ({
   signal
 }) => {
   try {
-    const user = getItem("user");
-    const token = user?.token;
+    // const user = getItem("user");
+    const token = getItem("token");
+    // const token = user?.token;
 
     const requestHeaders = {
       "ngrok-skip-browser-warning": "true",

@@ -25,6 +25,8 @@ import { getAddresses } from "./helper/getAddresses";
 import { getDiscountBasedOnRole } from "../../utils/products/getDiscountBasedOnRole";
 import Checkout from "../../components/checkout";
 import PaymentProcessing from "../../components/payment_processing";
+import { isArrayWithValues } from "../../utils/array/isArrayWithValues";
+import { fetchUserDistributors } from "./helper/fetchUserDistributors";
 
 export default function Cart() {
   const queryClient = useQueryClient();
@@ -32,8 +34,7 @@ export default function Cart() {
 
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
-
-  console.log("orderId", orderId);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const [cart, setCart] = useState([]);
   const [shippingFee, setShippingFee] = useState(null);
@@ -87,20 +88,6 @@ export default function Cart() {
       },
     }
   );
-
-  const handlePlaceOrder = async () => {
-    const payload = {
-      cartId: cartProducts?._id,
-      addressId: address?._id,
-      couponId: discountCoupon?.[0]?._id || null,
-    };
-
-    if (!payload.cartId || !payload.addressId) {
-      toast.error("Please select an address");
-      return;
-    }
-    placeOrderMutation(payload);
-  };
 
   const { mutate: updateCart, isPending } = useMutation({
     mutationFn: (updatedCart) =>
@@ -171,6 +158,19 @@ export default function Cart() {
       });
     }
   };
+
+  const distributorsParams = { role: "user" };
+
+  const {
+    data: users = [],
+    isLoading: isLoadingUsers,
+    isError,
+  } = useQuery({
+    queryKey: ["fetch_distributors"],
+    queryFn: () => fetchUserDistributors({ params: distributorsParams }),
+    select: (data) => data?.response?.data,
+  });
+
   const handleRemoveItemFromCart = (productId) => {
     setSelectedId(productId);
     setRemoveCart(true);
@@ -221,6 +221,11 @@ export default function Cart() {
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  const onSelectUser = (e) => {
+    const selectedUserId = e.target.value;
+    setSelectedUser(selectedUserId);
   };
 
   useEffect(() => {
@@ -277,6 +282,8 @@ export default function Cart() {
                     product.salesperson_discounted_price,
                   dnd_discounted_price: product.dnd_discounted_price,
                 });
+
+                console.log("product", product, discountPrice);
 
                 return (
                   <div
@@ -462,11 +469,41 @@ export default function Cart() {
                   "Proceed to Checkout"
                 )}
               </button> */}
+              {(localStorageRole === "dnd" ||
+                localStorageRole === "salesperson") && (
+                <div className="mt-2 mb-2">
+                  <label
+                    htmlFor="userSelect"
+                    className="block text-md font-[600] "
+                  >
+                    Select User
+                  </label>
+                  <select
+                    id="userSelect"
+                    value={selectedUser}
+                    className="mt-1 block w-full  pl-4 pt-4 pb-4  text-base border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    onChange={onSelectUser}
+                  >
+                    <option value={null}>Select a user</option>
+                    {isArrayWithValues(users) ? (
+                      users?.map((user) => (
+                        <option key={user._id} value={user._id}>
+                          {user.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={null}>No users available</option>
+                    )}
+                  </select>
+                </div>
+              )}
+
               <Checkout
                 isPlacingOrder={isPlacingOrder}
                 couponId={discountCoupon?.[0]?._id}
                 addressId={address?._id}
                 cartId={cartProducts?._id}
+                currentSelectedUser={selectedUser}
               />
             </div>
           )}
@@ -492,6 +529,7 @@ export default function Cart() {
             <PaymentProcessing
               placeOrderMutation={placeOrderMutation}
               isPlacingOrder={isPlacingOrder}
+              currentSelectedUser={selectedUser}
               onClose={() => {
                 window.history.replaceState(null, "", window.location.pathname);
               }}

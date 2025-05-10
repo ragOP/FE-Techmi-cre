@@ -4,10 +4,19 @@ import { apiService } from "../../utils/api/apiService";
 import { toast } from "react-toastify";
 import { endpoints } from "../../utils/endpoints";
 import { useNavigate } from "react-router";
+import { getItem } from "../../utils/local_storage";
 
-function Checkout({ addressId, cartId, couponId, isPlacingOrder }) {
+function Checkout({
+  addressId,
+  cartId,
+  couponId,
+  isPlacingOrder,
+  currentSelectedUser,
+}) {
   const navigate = useNavigate();
   let cashfree;
+
+  const localStorageRole = getItem("role");
 
   // Initialize Cashfree SDK
   const initializeSDK = async () => {
@@ -28,6 +37,8 @@ function Checkout({ addressId, cartId, couponId, isPlacingOrder }) {
           addressId: addressId,
           cartId: cartId,
           couponId: couponId,
+          amount: 100,
+          orderedForUser: currentSelectedUser,
         },
       });
       return apiResponse?.response?.data?.payment_session_id;
@@ -39,6 +50,12 @@ function Checkout({ addressId, cartId, couponId, isPlacingOrder }) {
   };
 
   const doPayment = async () => {
+    if (localStorageRole === "salesperson" || localStorageRole === "dnd") {
+      if (!currentSelectedUser) {
+        toast.error("Please select a user to place the order");
+        return;
+      }
+    }
     const paymentSessionId = await createPaymentSession();
 
     if (!paymentSessionId) {
@@ -71,7 +88,7 @@ function Checkout({ addressId, cartId, couponId, isPlacingOrder }) {
           <div className="my-1">
             <CartLoader />
           </div>
-    ) : (
+        ) : (
           "Proceed to Checkout"
         )}
       </button>

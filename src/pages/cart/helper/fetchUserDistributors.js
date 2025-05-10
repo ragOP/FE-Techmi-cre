@@ -1,12 +1,11 @@
-import { apiService } from "../../..//utils/api/apiService";
+import { apiService } from "../../../utils/api/apiService";
 import { endpoints } from "../../../utils/endpoints";
 
-export const getAllCoupons = async ({ params }) => {
+export const fetchUserDistributors = async ({ params }) => {
   try {
     const apiResponse = await apiService({
-      endpoint: endpoints.coupon,
-      params: params,
-      method: "GET",
+      endpoint: endpoints.distributors,
+      params,
     });
 
     return apiResponse;

@@ -11,7 +11,7 @@ const Order = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(5); // Change this based on your design
+  const [ordersPerPage] = useState(10); 
 
   const userId = getItem("userId");
 
@@ -66,7 +66,7 @@ const Order = () => {
   return (
     <div className="m-6 min-h-screen bg-gray-100 rounded-lg shadow-xl p-6">
       <div className="flex flex-col space-y-6 md:space-y-8">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-2">
           Your Orders
         </h2>
 
@@ -88,8 +88,15 @@ const Order = () => {
 
             <div className="mb-6">
               <h4 className="font-semibold text-lg text-gray-700">
-                Total: ₹{order.totalAmount}
+                Total: ₹{order.discountedPriceAfterCoupon}
               </h4>
+              <p className="text-sm text-gray-500">
+                Order Date:{" "}
+                {new Date(order.createdAt).toLocaleString("en-US", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </p>
               <div className="mt-2">
                 <h4 className="font-semibold text-md">Delivery Address:</h4>
                 <p className="text-gray-600">{order.address.name}</p>

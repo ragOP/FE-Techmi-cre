@@ -19,6 +19,7 @@ const addressInitialState = {
   landmark: "",
   alternatePhone: "",
   addressType: "home",
+  isPrimary: false,
 };
 
 const AddressDialog = ({ onClose, setAddress }) => {
@@ -81,7 +82,7 @@ const AddressDialog = ({ onClose, setAddress }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/30 flex items-start justify-center p-4 overflow-auto">
-      <div className="bg-white rounded-lg w-full max-w-2xl shadow-xl mt-20 mb-8">
+      <div className="bg-white rounded-lg w-full max-w-2xl shadow-xl mt-20 mb-8 ">
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold">
             {editingAddress
@@ -293,6 +294,23 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
           </div>
         </div>
 
+        {/* Is Primary */}
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            name="isPrimary"
+            checked={formData.isPrimary || false}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                isPrimary: e.target.checked,
+              }))
+            }
+            className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded"
+          />
+          <label className="text-sm font-medium">Set as Primary Address</label>
+        </div>
+
         {/* Form Actions */}
         <div className="flex justify-end gap-4 mt-6 border-t pt-4">
           <button
@@ -328,9 +346,7 @@ const AddressItem = ({ address, onEdit, onDelete, setAddress, onClose }) => {
   };
 
   return (
-    <div
-      className="border rounded-md p-4 hover:border-primary cursor-pointer group"
-    >
+    <div className="border rounded-md p-4 hover:border-primary cursor-pointer group">
       <div className="flex items-start justify-between">
         <div onClick={handleSelectAdress}>
           <div className="flex items-center gap-2 mb-2">
@@ -386,7 +402,9 @@ const AddressList = ({
   onClose,
 }) => {
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col gap-4 justify-between">
+     
+
       <div className="space-y-4">
         {isLoading ? (
           [...Array(3)].map((_, i) => (
@@ -414,9 +432,9 @@ const AddressList = ({
         )}
       </div>
 
-      <button
+       <button
         onClick={onAddNew}
-        className="w-full mt-6 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-primary hover:text-primary transition-colors"
+        className="w-full mt-2 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-primary hover:text-primary transition-colors"
       >
         + Add New Address
       </button>

@@ -3,14 +3,24 @@ import { toast } from "react-toastify";
 import { apiService } from "../../utils/api/apiService";
 import { endpoints } from "../../utils/endpoints";
 import { useNavigate, useSearchParams } from "react-router";
+import { getItem } from "../../utils/local_storage";
 
-const PaymentProcessing = ({ placeOrderMutation, isPlacingOrder, onClose }) => {
+const PaymentProcessing = ({
+  currentSelectedUser,
+  placeOrderMutation,
+  isPlacingOrder,
+  onClose,
+}) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
   const cartId = searchParams.get("cartId");
   const addressId = searchParams.get("addressId");
   const couponId = searchParams.get("couponId");
+  const orderedForUser = searchParams.get("orderedForUser");
+
+  const localStorageRole = getItem("role");
+  const localStorageId = getItem("userId");
 
   const [loading, setLoading] = useState(true);
 
@@ -22,11 +32,21 @@ const PaymentProcessing = ({ placeOrderMutation, isPlacingOrder, onClose }) => {
       return;
     }
 
+    console.log(
+      "localStorageRole:",
+      localStorageRole,
+      localStorageId,
+      currentSelectedUser
+    );
+
     const payload = {
       cartId,
       addressId,
       couponId: couponId || null,
       orderId,
+      ...(localStorageRole === "salesperson" || localStorageRole === "dnd"
+        ? { orderedBy: localStorageId, orderedForUser: orderedForUser }
+        : {}),
     };
 
     placeOrderMutation(payload);

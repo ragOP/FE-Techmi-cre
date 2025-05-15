@@ -17,7 +17,7 @@ const Trendingnew = () => {
   const localStorageRole = getItem("role");
 
   const params = {
-    is_best_seller: true,
+    is_super_selling: true,
     page: 1,
     per_page: 10,
   };

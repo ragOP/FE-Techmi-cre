@@ -504,6 +504,7 @@ export default function Cart() {
                 addressId={address?._id}
                 cartId={cartProducts?._id}
                 currentSelectedUser={selectedUser}
+                finalPrice={finalPrice}
               />
             </div>
           )}

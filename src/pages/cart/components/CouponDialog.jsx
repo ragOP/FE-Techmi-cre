@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { getAllCoupons } from "../helper/coupon";
 import { useQuery } from "@tanstack/react-query";
@@ -9,10 +9,10 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const couponParams = {
-    showOnlyActive: true,
+    showOnlyValid: true,
     page: 1,
     per_page: 100,
-  }
+  };
 
   const { data: availableCoupons, isLoading } = useQuery({
     queryKey: ["available_coupons"],
@@ -112,7 +112,9 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                     <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                   </div>
                 ))
-              : availableCoupons && availableCoupons.length > 0 && availableCoupons.map((coupon) => (
+              : availableCoupons &&
+                availableCoupons.length > 0 &&
+                availableCoupons.map((coupon) => (
                   <div
                     key={coupon.code}
                     className={`border rounded-md p-4 hover:border-primary transition-colors ${
@@ -130,7 +132,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                             </span>
                           </div>
                           <span className="text-green-600 font-medium">
-                            {coupon.discountType === "fixed" ? "₹" : ""} {" "}
+                            {coupon.discountType === "fixed" ? "₹" : ""}{" "}
                             {coupon.discountValue}
                             {coupon.discountType === "percentage"
                               ? "%"
@@ -151,9 +153,7 @@ const CouponDialog = ({ onClose, appliedCoupons, setAppliedCoupons }) => {
                             } on all products`}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
-                          {dayjs(coupon.endDate).format(
-                            "DD/MM/YYYY hh:mm A"
-                          )}{" "}
+                          {dayjs(coupon.endDate).format("DD/MM/YYYY hh:mm A")}{" "}
                           {/* {"|"}{" "} */}
                           {/* <span>{coupon.terms || "Min Purchase of 2500"}</span> */}
                         </p>

@@ -12,6 +12,7 @@ function Checkout({
   couponId,
   isPlacingOrder,
   currentSelectedUser,
+  finalPrice
 }) {
   const navigate = useNavigate();
   let cashfree;
@@ -37,7 +38,7 @@ function Checkout({
           addressId: addressId,
           cartId: cartId,
           couponId: couponId,
-          amount: 100,
+          amount: Number(finalPrice),
           orderedForUser: currentSelectedUser,
         },
       });

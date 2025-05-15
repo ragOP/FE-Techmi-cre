@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AnimationSlider from "../../common/animations";
 import ProductCard from "../../common/product_card";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProducts } from "../featured_products/helper/fetchProducts";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../loader/LoadingSpinner";
@@ -9,9 +9,10 @@ import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+
 const SellingServices = () => {
   const params = {
-    is_best_seller: true,
+    is_super_selling: true,
     page: 1,
     per_page: 10,
   };
@@ -20,15 +21,10 @@ const SellingServices = () => {
   const [selectedId, setSelectedId] = useState(null);
   const localStorageRole = getItem("role");
 
-  const {
-    data: superSellingProducts,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: superSellingProducts, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: () => fetchProducts({ params }),
   });
-
 
   const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
@@ -43,28 +39,28 @@ const SellingServices = () => {
     },
   });
 
-const handleAddToCart = (product) => {
+  const handleAddToCart = (product) => {
     const token = getItem("token");
-  
+
     if (!token) {
       const payload = {
-        pendingProduct : JSON.stringify(product)
-      }
+        pendingProduct: JSON.stringify(product),
+      };
       setItem(payload);
       return navigate("/login");
     }
-  
+
     if (isPending) return;
-  
+
     const userId = getItem("userId");
-  
+
     setSelectedId(product._id);
     const payload = {
       user_id: userId,
       product_id: product?._id,
       quantity: 1,
     };
-  
+
     addToCartMutation({ payload });
   };
 
@@ -86,7 +82,7 @@ const handleAddToCart = (product) => {
                     discounted_price: product.discounted_price,
                     salesperson_discounted_price:
                       product.salesperson_discounted_price,
-                      dnd_discounted_price: product.dnd_discounted_price,
+                    dnd_discounted_price: product.dnd_discounted_price,
                   });
 
                   return (

@@ -41,7 +41,7 @@ const navContents = [
   { title: "Contact Us", route: "/contact" },
 ];
 
-const Navbar = ({logo}) => {
+const Navbar = ({ logo }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
@@ -181,9 +181,13 @@ const Navbar = ({logo}) => {
           whileTap="tap"
         >
           <img src={cart} alt="Cart" className="h-[23px] w-[23px]" />
-          <div className="w-6 h-6 rounded-full absolute bg-blue-900 -top-2 -right-1 flex items-center justify-center">
-            <span className="text-gray-50 text-xs">{totalCartItems || 0}</span>
-          </div>
+          {isUserLoggedIn && (
+            <div className="w-6 h-6 rounded-full absolute bg-blue-900 -top-2 -right-1 flex items-center justify-center">
+              <span className="text-gray-50 text-xs">
+                {totalCartItems || 0}
+              </span>
+            </div>
+          )}
           <motion.span className="text-[#00008B] font-medium text-md">
             Cart
           </motion.span>

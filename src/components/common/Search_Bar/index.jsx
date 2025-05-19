@@ -8,7 +8,7 @@ const SearchBar = ({ debouncedQuery, setDebouncedQuery }) => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (query.trim()) {
+    if (query && query?.trim()) {
       navigate(`/search?q=${encodeURIComponent(query)}`);
     }
   };
@@ -28,11 +28,15 @@ const SearchBar = ({ debouncedQuery, setDebouncedQuery }) => {
   return (
     <div className="w-full flex flex-col items-center py-6 px-4">
       <div className="w-full flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-black">What are you looking for?</h2>
+        <h2 className="text-xl font-semibold text-black">
+          What are you looking for?
+        </h2>
         <div className="flex items-center text-sm text-gray-600 gap-x-2">
           <img src={Vector} alt="Order Icon" className="w-4 h-4" />
           <span>Order with prescription.</span>
-          <a href="#" className="text-[#00008B] font-semibold">UPLOAD NOW &gt;</a>
+          <a href="#" className="text-[#00008B] font-semibold">
+            UPLOAD NOW &gt;
+          </a>
         </div>
       </div>
 
@@ -61,7 +65,6 @@ const SearchBar = ({ debouncedQuery, setDebouncedQuery }) => {
         </button>
       </div>
     </div>
-
   );
 };
 

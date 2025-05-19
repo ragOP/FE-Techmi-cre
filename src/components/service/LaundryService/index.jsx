@@ -20,8 +20,9 @@ import useToast from "../../../hooks";
 import { toast } from "react-toastify";
 import CartLoader from "../../loader/CartLoader";
 import ServiceFilter from "../../service_filter";
+import ProductEmptyState from "../../empty_state/ProductEmptyState";
 
-const LaundryService = ({internalPageConfig}) => {
+const LaundryService = ({ internalPageConfig }) => {
   const productsRef = useRef(null);
   const [filterCategories, setFilterCategories] = useState([]);
   const [testimonialData, setTestimonialData] = useState([
@@ -133,7 +134,7 @@ export const LaundaryCardList = ({ category }) => {
               })}
             </div>
           ) : (
-            <div className="text-center text-gray-500">No products found.</div>
+            <ProductEmptyState />
           )}
         </>
       )}

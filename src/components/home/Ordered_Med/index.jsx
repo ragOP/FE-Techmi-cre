@@ -3,13 +3,19 @@ import AnimationSlider from "../../common/animations";
 
 import ProductCard from "../../common/product_card";
 import { fetchProducts } from "../featured_products/helper/fetchProducts";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import ProductEmptyState from "../../empty_state/ProductEmptyState";
 
 const OrderedMed = () => {
   const navigate = useNavigate();
@@ -32,7 +38,6 @@ const OrderedMed = () => {
     queryFn: () => fetchProducts({ params }),
   });
 
-
   const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
     mutationFn: ({ payload }) =>
@@ -46,28 +51,28 @@ const OrderedMed = () => {
     },
   });
 
-const handleAddToCart = (product) => {
+  const handleAddToCart = (product) => {
     const token = getItem("token");
-  
+
     if (!token) {
       const payload = {
-        pendingProduct : JSON.stringify(product)
-      }
+        pendingProduct: JSON.stringify(product),
+      };
       setItem(payload);
       return navigate("/login");
     }
-  
+
     if (isPending) return;
-  
+
     const userId = getItem("userId");
-  
+
     setSelectedId(product._id);
     const payload = {
       user_id: userId,
       product_id: product?._id,
       quantity: 1,
     };
-  
+
     addToCartMutation({ payload });
   };
 
@@ -90,7 +95,7 @@ const handleAddToCart = (product) => {
                     discounted_price: product.discounted_price,
                     salesperson_discounted_price:
                       product.salesperson_discounted_price,
-                      dnd_discounted_price: product.dnd_discounted_price,
+                    dnd_discounted_price: product.dnd_discounted_price,
                   });
 
                   return (
@@ -112,9 +117,7 @@ const handleAddToCart = (product) => {
                 })}
               </AnimationSlider>
             ) : (
-              <div className="text-center text-gray-500">
-                No products found.
-              </div>
+              <ProductEmptyState />
             )}
           </>
         )}

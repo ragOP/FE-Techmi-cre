@@ -9,6 +9,7 @@ import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import ProductEmptyState from "../../empty_state/ProductEmptyState";
 
 const LastMinuteBuy = () => {
   const navigate = useNavigate();
@@ -118,9 +119,7 @@ const LastMinuteBuy = () => {
                 })}
               </AnimationSlider>
             ) : (
-              <div className="text-center text-gray-500">
-                No products found.
-              </div>
+           <ProductEmptyState />
             )}
           </>
         )}

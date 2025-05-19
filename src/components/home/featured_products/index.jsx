@@ -14,6 +14,7 @@ import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import ProductEmptyState from "../../empty_state/ProductEmptyState";
 
 const FeaturedProducts = () => {
   const navigate = useNavigate();
@@ -94,7 +95,7 @@ const FeaturedProducts = () => {
                   discounted_price: product.discounted_price,
                   salesperson_discounted_price:
                     product.salesperson_discounted_price,
-                    dnd_discounted_price: product.dnd_discounted_price,
+                  dnd_discounted_price: product.dnd_discounted_price,
                 });
 
                 return (
@@ -116,7 +117,7 @@ const FeaturedProducts = () => {
               })}
             </AnimationSlider>
           ) : (
-            <div className="text-center text-gray-500">No products found.</div>
+            <ProductEmptyState />
           )}
         </>
       )}

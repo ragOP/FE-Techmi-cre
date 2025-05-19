@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
 import AnimationSlider from "../../common/animations";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import ProductEmptyState from "../../empty_state/ProductEmptyState";
 
 const SearchResult = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const SearchResult = () => {
   const selectedServiceId = location.state?.selectedCardId || null;
   const searchParams = new URLSearchParams(location.search);
   const searchQuery = searchParams.get("q") || "";
-  const categoryId = location.state.categoryId || null;
+  const categoryId = location?.state?.categoryId || null;
 
   const [filters, setFilters] = useState({
     page: 1,
@@ -138,39 +139,37 @@ const SearchResult = () => {
           <LoadingSpinner />
         ) : isArrayWithValues(allProducts) ? (
           <div className="grid grid-cols-1 space-y-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-x-4 ">
-            {allProducts && allProducts.length > 0 && 
-                allProducts.map((product) => {
-                  const discountPrice = getDiscountBasedOnRole({
-                    role: localStorageRole,
-                    discounted_price: product.discounted_price,
-                    salesperson_discounted_price:
-                      product.salesperson_discounted_price,
-                      dnd_discounted_price: product.dnd_discounted_price,
-                  });
+            {allProducts &&
+              allProducts.length > 0 &&
+              allProducts.map((product) => {
+                const discountPrice = getDiscountBasedOnRole({
+                  role: localStorageRole,
+                  discounted_price: product.discounted_price,
+                  salesperson_discounted_price:
+                    product.salesperson_discounted_price,
+                  dnd_discounted_price: product.dnd_discounted_price,
+                });
 
-                  return (
-                    <div key={product._id}>
-                      <ProductCard
-                        image={product.banner_image}
-                        price={product.price}
-                        name={product.name}
-                        discountedPrice={discountPrice}
-                        smallDescription={product.small_description}
-                        id={product._id}
-                        onClick={() => navigate(`/product/${product._id}`)}
-                        selectedId={selectedId}
-                        onAddToCart={() => handleAddToCart(product)}
-                        isProductAdd={isPending}
-                      />
-                    </div>
-                  );
-                })
-            }
+                return (
+                  <div key={product._id}>
+                    <ProductCard
+                      image={product.banner_image}
+                      price={product.price}
+                      name={product.name}
+                      discountedPrice={discountPrice}
+                      smallDescription={product.small_description}
+                      id={product._id}
+                      onClick={() => navigate(`/product/${product._id}`)}
+                      selectedId={selectedId}
+                      onAddToCart={() => handleAddToCart(product)}
+                      isProductAdd={isPending}
+                    />
+                  </div>
+                );
+              })}
           </div>
         ) : !isLoading && !isArrayWithValues(allProducts) ? (
-          <div className="flex align-center justify-center mt-10">
-            <p className="text-center text-gray-500">No products found.</p>
-          </div>
+          <ProductEmptyState />
         ) : null}
       </div>
     </div>

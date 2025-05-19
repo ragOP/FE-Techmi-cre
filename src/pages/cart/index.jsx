@@ -1,8 +1,6 @@
 import {
   ChevronRight,
-  CrossIcon,
   MapPinIcon,
-  Ticket,
   TicketPercentIcon,
   X,
 } from "lucide-react";
@@ -37,7 +35,7 @@ export default function Cart() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [cart, setCart] = useState([]);
-  const [shippingFee, setShippingFee] = useState(null);
+  const [shippingFee, setShippingFee] = useState(0);
   const [removeCart, setRemoveCart] = useState(false);
   const [discount, setDiscount] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
@@ -403,6 +401,9 @@ export default function Cart() {
               <p className="flex justify-between mb-4 text-gray-600">
                 Platform Fee <span>₹{platformFee}</span>
               </p>
+              <p className="flex justify-between mb-4 text-gray-600">
+                GST <span>₹{platformFee}</span>
+              </p>
               <p className="flex justify-between mb-4 text-[#297C00] font-medium">
                 Total Discount <span>-₹{Number(discount).toFixed(2)}</span>
               </p>
@@ -455,20 +456,6 @@ export default function Cart() {
                 </div>
               </div>
 
-              {/* <button
-                onClick={handlePlaceOrder}
-                className={`${
-                  isPlacingOrder ? "pointer-events-none" : ""
-                } w-full mt-6 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
-              >
-                {isPlacingOrder ? (
-                  <div className="my-1">
-                    <CartLoader />
-                  </div>
-                ) : (
-                  "Proceed to Checkout"
-                )}
-              </button> */}
               {(localStorageRole === "dnd" ||
                 localStorageRole === "salesperson") && (
                 <div className="mt-2 mb-2">

@@ -31,12 +31,14 @@ const Signup = lazy(() => import("./pages/signup"));
 const SearchResult = lazy(() => import("./components/search/Search_Result"));
 const Cart = lazy(() => import("./pages/cart"));
 const SingleProduct = lazy(() => import("./pages/single_product"));
+const ForgetPassword = lazy(() => import("./pages/forget_password"));
+const ResetPassword = lazy(() => import("./pages/reset_password"));
 
 const App = () => {
   const location = useLocation();
   const token = localStorage.getItem("token");
 
-  const hideLayoutRoutes = ["/login", "/signup"];
+  const hideLayoutRoutes = ["/login", "/signup", "forgot-password", "reset-password"];
 
   const [initalWebsiteLoader, setInitialWebsiteLoader] = useState(true);
 
@@ -106,6 +108,8 @@ const App = () => {
         <Suspense fallback={<LazyLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/forgot-password" element={<ForgetPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route
               path="/login"
               element={token ? <Navigate to="/" replace /> : <Login />}

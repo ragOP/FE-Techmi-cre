@@ -7,6 +7,7 @@ import { getAddresses } from "../helper/getAddresses";
 import { deleteAddress } from "../helper/deleteAddress";
 import { updateAddress } from "../helper/updateAddress";
 import { Edit, Trash2 } from "lucide-react";
+import { statesList } from "../../../utils/state/statesList";
 
 const addressInitialState = {
   name: "",
@@ -16,6 +17,7 @@ const addressInitialState = {
   address: "",
   city: "",
   state: "",
+  state_code: "",
   landmark: "",
   alternatePhone: "",
   addressType: "home",
@@ -231,15 +233,35 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">State</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium text-gray-700">State</label>
+            <select
               name="state"
-              value={formData.state}
-              onChange={handleInputChange}
+              value={formData.state || ""}
+              onChange={(e) => {
+                const selectedState = statesList.find(state => state.name === e.target.value);
+                handleInputChange({
+                  target: {
+                    name: "state",
+                    value: selectedState.name
+                  }
+                });
+                handleInputChange({
+                  target: {
+                    name: "state_code",
+                    value: selectedState.code
+                  }
+                });
+              }}
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
               required
-            />
+            >
+              <option value="">Select State</option>
+              {statesList.map((state) => (
+                <option key={state.code} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

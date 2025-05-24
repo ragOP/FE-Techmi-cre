@@ -1,9 +1,9 @@
 export const endpoints = {
   login: "api/auth/user/login",
   signup: "api/auth/user/register",
-  product: "api/product",
+  product: "api/product?is_active=true",
   category: "api/category",
-  service: "api/service",
+  service: "api/service?is_active=true",
   cart: "api/cart",
   product_by_id: "api/product",
   address: "api/address",

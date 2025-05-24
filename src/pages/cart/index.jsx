@@ -228,7 +228,7 @@ export default function Cart() {
   useEffect(() => {
     if (addresses && addresses.length > 0) {
       const defaultAddress = addresses.find(
-        (address) => address.isPrimary === false
+        (address) => address.isPrimary === true
       );
 
       if (defaultAddress) {

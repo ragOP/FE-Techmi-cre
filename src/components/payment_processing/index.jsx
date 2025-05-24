@@ -25,19 +25,11 @@ const PaymentProcessing = ({
   const [loading, setLoading] = useState(true);
 
   const onPlaceOrder = async () => {
-    console.log("Placing order with cartId:", cartId, addressId);
     if (!cartId || !addressId) {
       toast.error("Missing cart or address information.");
       onClose();
       return;
     }
-
-    console.log(
-      "localStorageRole:",
-      localStorageRole,
-      localStorageId,
-      currentSelectedUser
-    );
 
     const payload = {
       cartId,
@@ -69,8 +61,8 @@ const PaymentProcessing = ({
         const data = apiResponse?.response?.data?.[0];
 
         if (data?.payment_status === "SUCCESS") {
+          await onPlaceOrder();
           toast.success("Payment verified successfully!");
-          onPlaceOrder();
           navigate("/order");
         } else {
           toast.error("Payment not verified. Redirecting to cart.");

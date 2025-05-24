@@ -55,13 +55,13 @@ const App = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      autoLogout(() => {
-        alert("Session expired! Logging out...");
-      });
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if (token) {
+  //     autoLogout(() => {
+  //       alert("Session expired! Logging out...");
+  //     });
+  //   }
+  // }, [token]);
 
   const checkTokenExpiration = () => {
     const storedToken = getItem("token");

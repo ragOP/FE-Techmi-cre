@@ -64,7 +64,7 @@ export default function Cart() {
 
   const { mutate: placeOrderMutation, isPending: isPlacingOrder } = useMutation(
     {
-      mutationFn: (payload) => placeOrder({ payload }),
+      mutationFn: async (payload) => placeOrder({ payload }),
       onSuccess: (data) => {
         if (data?.response?.status >= 400) {
           toast.error(data?.response?.data?.message || "Something went wrong");

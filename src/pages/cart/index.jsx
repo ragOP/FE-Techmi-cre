@@ -1,9 +1,4 @@
-import {
-  ChevronRight,
-  MapPinIcon,
-  TicketPercentIcon,
-  X,
-} from "lucide-react";
+import { ChevronRight, MapPinIcon, TicketPercentIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import LastMinuteBuy from "../../components/cart/Cart_Last_Minute_Buy";
 import CartAlternativeProduct from "../../components/cart/Cart_Alternative_Product";
@@ -298,8 +293,15 @@ export default function Cart() {
                         <h3 className="font-semibold text-lg">
                           {item.product.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
-                          {item.product.full_description || "No description"}
+                        <p
+                          className="text-sm text-gray-500 line-clamp-2 overflow-hidden text-ellipsis max-w-xs"
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {item.product.small_description || "No description"}
                         </p>
                         {removeCart && item.product._id === selectedId ? (
                           <div className="w-fit mt-2">

@@ -55,6 +55,11 @@ const Login = () => {
               quantity: 1,
             };
 
+            if (pendingProduct.inventory < 1) {
+              toast.error('Item is out of stock');
+            return;
+          }
+
             addToCartMutation({ payload });
 
             removeItem("pendingProduct");

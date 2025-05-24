@@ -73,6 +73,11 @@ const OrderedMed = () => {
       quantity: 1,
     };
 
+    if (product.inventory < 1) {
+      toast.error('Item is out of stock');
+    return;
+  }
+
     addToCartMutation({ payload });
   };
 

@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { endpoints } from "../../utils/endpoints";
 import { useNavigate } from "react-router";
 import { getItem } from "../../utils/local_storage";
+import { checkInventory } from "../../pages/cart/helper/checkInventory";
 
 function Checkout({
   addressId,
@@ -12,7 +13,8 @@ function Checkout({
   couponId,
   isPlacingOrder,
   currentSelectedUser,
-  finalPrice
+  finalPrice,
+  cart,
 }) {
   const navigate = useNavigate();
   let cashfree;
@@ -56,6 +58,23 @@ function Checkout({
         toast.error("Please select a user to place the order");
         return;
       }
+    }
+    const productIds = cart.map((item) => item.product._id);
+    const quantityWithProductIds = cart.map((item) => ({
+      product_id: item.product._id,
+      quantity: item.quantity,
+    }));
+    const inventoryCheck = await checkInventory({ productIds });
+    const productWithLowInventory = inventoryCheck.filter(
+      (item) =>
+        item.inventory <
+        quantityWithProductIds.find(
+          (item) => item.product_id
+        ).quantity
+    );
+    if (productWithLowInventory.length > 0) {
+      toast.error("Some products are out of stock");
+      return;
     }
     const paymentSessionId = await createPaymentSession();
 

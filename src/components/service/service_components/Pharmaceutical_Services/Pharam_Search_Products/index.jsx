@@ -78,6 +78,11 @@ export const PharmaSearchProducts = ({ debouncedQuery }) => {
       quantity: 1,
     };
 
+    if (product.inventory < 1) {
+      toast.error('Item is out of stock');
+    return;
+  }
+
     addToCartMutation({ payload });
   };
 

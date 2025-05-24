@@ -494,6 +494,7 @@ export default function Cart() {
                 cartId={cartProducts?._id}
                 currentSelectedUser={selectedUser}
                 finalPrice={finalPrice}
+                cart={cartProducts?.items}
               />
             </div>
           )}

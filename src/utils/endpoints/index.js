@@ -21,4 +21,5 @@ export const endpoints = {
   payment: "api/payment/create-session",
   cashfreeOrderDetails: "api/payment/details",
   distributors: "api/auth/user/role",
+  inventoryCheck: "api/inventory/check",
 };

@@ -60,7 +60,17 @@ const handleAddToCart = (product) => {
       return navigate("/login");
     }
   
-    if (isPending) return;  
+    if (isPending) return;
+
+    if (productData.inventory < Number(quantity)) {
+      if(productData.inventory > 0) {
+        toast.error(`Only ${productData.inventory} items available in stock`);
+      } else {
+        toast.error("Out of stock");
+      }
+      return;
+    }
+      
     addToCartMutation();
   };
 

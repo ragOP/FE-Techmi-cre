@@ -154,7 +154,11 @@ export default function Cart() {
     }
   };
 
-  const distributorsParams = { role: "user" };
+  const distributorsParams = { 
+    role: localStorageRole === "dnd" ? "salesperson" : 
+          localStorageRole === "salesperson" ? "salesperson" : 
+          "dnd" 
+  };
 
   const {
     data: users = [],

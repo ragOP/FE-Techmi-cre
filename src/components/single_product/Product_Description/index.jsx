@@ -7,6 +7,7 @@ import { calculateDiscountPercentage } from "../../../utils/percentage/calculate
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
 import { getItem } from "../../../utils/local_storage";
 import { useEffect, useState } from "react";
+import InventoryStatus from "../Product_Information/InventoryStatus";
 
 const ProductDescription = ({ product }) => {
   const price = product?.price;
@@ -32,6 +33,8 @@ const ProductDescription = ({ product }) => {
     );
     setModifiedDiscount(discountPercentage)
   }, [product, localStorageRole]);
+
+  console.log(product)
   
   return (
     <div className="w-full lg:w-[40%]">
@@ -69,12 +72,13 @@ const ProductDescription = ({ product }) => {
         <span className="px-2 py-1 bg-blue-100 text-blue-900 rounded-md">
           Free <span className="text-gray-900">Delivery</span>
         </span>
-        <span className="px-2 py-1 bg-blue-100 text-blue-900 rounded-md">
+        <InventoryStatus quantity={product?.inventory} />
+        {/* <span className="px-2 py-1 bg-blue-100 text-blue-900 rounded-md">
           50% OFF <span className="text-gray-900">on SFD Card</span>
-        </span>
+        </span> */}
       </div>
 
-      <div className="flex gap-4 mt-4 border-b border-dashed border-gray-500 pb-4">
+      {/* <div className="flex gap-4 mt-4 border-b border-dashed border-gray-500 pb-4">
         {[
           {
             weight: "340 gm",
@@ -121,9 +125,9 @@ const ProductDescription = ({ product }) => {
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
 
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold">Medicine Dosage</h3>
           <p className="text-sm text-blue-800 cursor-pointer"> View More</p>
@@ -166,7 +170,7 @@ const ProductDescription = ({ product }) => {
         <p className="text-xs mt-2 text-gray-500 cursor-pointer">
           In detail description of dosage
         </p>
-      </div>
+      </div> */}
 
       <div className="mt-6 text-sm text-gray-800">
         <div className="flex justify-between py-1">
@@ -181,7 +185,7 @@ const ProductDescription = ({ product }) => {
         </div>
         <div className="flex justify-between py-1">
           <span className="font-semibold text-gray-700">Return Policy:</span>
-          <span className="text-blue-600">3 Days Returnable</span>
+          <span className="text-blue-600">7 Days Returnable</span>
         </div>
         <div className="flex justify-between py-1">
           <span className="font-semibold text-gray-700">

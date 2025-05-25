@@ -42,17 +42,17 @@ const ProductAddToCart = ({
         <span className="px-2 py-1 bg-blue-50 text-blue-900 rounded-md">
           Free <span className="text-gray-900">Delivery</span>
         </span>
-        <span className="px-2 py-1 bg-blue-50 text-blue-900 rounded-md">
+        {/* <span className="px-2 py-1 bg-blue-50 text-blue-900 rounded-md">
           50% OFF <span className="text-gray-900">on SFD Card</span>
-        </span>
+        </span> */}
       </div>
-      <p className="text-sm text-gray-600 mt-2">
+      {/* <p className="text-sm text-gray-600 mt-2">
         Get it delivered by{" "}
         <span className="text-blue-900 font-semibold">10pm, Today</span>
-      </p>
-      <p className="text-xs text-gray-900 mt-1">
+      </p> */}
+      {/* <p className="text-xs text-gray-900 mt-1">
         Delivering to: 122019, Jupiter
-      </p>
+      </p> */}
 
       {(role === "dnd" || role === "salesperson") && (
         <>
@@ -104,7 +104,7 @@ const ProductAddToCart = ({
           "Add To Cart"
         )}
       </button>
-      <button className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-3 ">
+      <button onClick={() => console.log("Buy")} className="w-full mt-2 bg-blue-900 text-white rounded-3xl py-3 ">
         Buy Now
       </button>
 

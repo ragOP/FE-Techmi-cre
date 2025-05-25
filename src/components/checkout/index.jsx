@@ -104,13 +104,13 @@ function Checkout({
   };
 
   return (
-    <div className="row">
+    <div className="row mt-4">
       <p>Click below to open the checkout page in the current tab</p>
       <button
         onClick={doPayment}
         className={`${
           isPlacingOrder ? "pointer-events-none" : ""
-        } w-full mt-6 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
+        } w-full mt-4 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
       >
         {isPlacingOrder ? (
           <div className="my-1">

@@ -21,6 +21,7 @@ import PaymentProcessing from "../../components/payment_processing";
 import { isArrayWithValues } from "../../utils/array/isArrayWithValues";
 import { fetchUserDistributors } from "./helper/fetchUserDistributors";
 import { getTaxAmount } from "./helper/getTaxAmount";
+import { formatAddress } from "./helper/formatAddress";
 
 export default function Cart() {
   const queryClient = useQueryClient();
@@ -445,38 +446,36 @@ export default function Cart() {
               )}
               <hr className="border-dashed border-gray-900" />
               <p className="flex justify-between font-bold text-lg mt-2">
-                To be paid <span>₹{Number(finalPrice).toFixed(2)}</span>
-                {/* To be paid{" "} */}
-                {/* <span>₹{Number(cartProducts.total_price).toFixed(2)}</span> */}
+                To be paid{" "}
+                <span>
+                  ₹
+                  <span>
+                    ₹{(Number(finalPrice) + Number(taxAmount)).toFixed(2)}
+                  </span>
+                </span>
               </p>
               <div className="mt-2 border-t border-gray-900">
-                <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>
+                <div className="flex items-center justify-between pt-4">
+                  <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>
+                  <button
+                    onClick={onOpenAddressDialog}
+                    className="text-[#C62828] font-medium mt-2 hover:underline"
+                  >
+                    {Array.isArray(addresses) && addresses?.length > 0
+                      ? "Change Address"
+                      : "Add Address"}
+                  </button>
+                </div>
                 {address && Object.values(address).some((val) => val) && (
                   <div className="p-2 border border-gray-300 rounded-md bg-white shadow-sm max-w-md">
                     <p className="font-semibold text-gray-900">
                       {address.name},{address?.pincode}
                     </p>
                     <p className="text-gray-700">
-                      Delivering to - {address.landmark}, {address.locality},{" "}
-                      {address.address}, {address.city} - {address.mobile}
+                      Address- {formatAddress(address)}
                     </p>
                   </div>
                 )}
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MapPinIcon className="w-6 h-6" />
-                    <p className="text-gray-600 text-sm">
-                      Add your current address
-                    </p>
-                  </div>
-                  <button
-                    onClick={onOpenAddressDialog}
-                    className="text-[#C62828] font-medium mt-2 hover:underline"
-                  >
-                    {address ? "Edit Address" : "Add Address"}
-                  </button>
-                </div>
               </div>
 
               {(localStorageRole === "dnd" ||

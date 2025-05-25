@@ -6,37 +6,30 @@ import Lottie from "lottie-react";
 import emptyCartAnimation from "../../assets/EmptyCartAnimation.json";
 import { fetchOrder } from "../cart/helper/myOrder";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 const Order = () => {
-  const [orders, setOrders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10); 
 
   const userId = getItem("userId");
-
   const params = { user_id: userId };
 
-  const fetchOrdersData = async () => {
-    try {
-      setIsLoading(true);
+  const { 
+    data: orders = [], 
+    isLoading,
+    error 
+  } = useQuery({
+    queryKey: ["orders", userId],
+    queryFn: async () => {
       const response = await fetchOrder({ params });
-
-      if (response?.data) {
-        setOrders(response.data);
-      } else {
-        toast.error("Failed to fetch orders");
+      if (!response?.data) {
+        throw new Error("Failed to fetch orders");
       }
-    } catch (error) {
-      toast.error("Something went wrong!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrdersData();
-  }, [userId]);
+      return response.data;
+    },
+    enabled: !!userId,
+  });
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -52,6 +45,11 @@ const Order = () => {
 
   if (isLoading) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    toast.error(error.message || "Something went wrong!");
+    return null;
   }
 
   if (orders.length === 0) {

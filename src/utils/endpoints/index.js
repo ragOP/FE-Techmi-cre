@@ -22,4 +22,5 @@ export const endpoints = {
   cashfreeOrderDetails: "api/payment/details",
   distributors: "api/auth/user/role",
   inventoryCheck: "api/inventory/check",
+  testimonals: "api/testimonials",
 };

@@ -13,6 +13,9 @@ import { addHomeConfig } from "./helper";
 import Aboutus from "../../components/service/service_components/House_Cleaning/About_us";
 import prescription from "../../assets/solutions/prescription.svg";
 import { getInternalConfig } from "../../components/service/LaundryService/helper";
+import { fetchTestimonials } from "../../components/service/LaundryService/helper/fetchTestimonials";
+import Testimonials from "../../components/common/testimonial";
+import LoadingSpinner from "../../components/loader/LoadingSpinner";
 
 const Home = () => {
   const { data: homeConfig, isLoading } = useQuery({
@@ -20,9 +23,14 @@ const Home = () => {
     queryFn: () => addHomeConfig({}),
   });
   const { data: internalPageConfig } = useQuery({
-      queryKey: ["internal_config"],
-      queryFn: () => getInternalConfig({}),
-    });
+    queryKey: ["internal_config"],
+    queryFn: () => getInternalConfig({}),
+  });
+
+  const { data: testimonialsRes, isLoading: testimonialsLoading } = useQuery({
+    queryKey: ["testimonial"],
+    queryFn: () => fetchTestimonials(),
+  });
   return (
     <AnimatePresence>
       <motion.div
@@ -93,7 +101,7 @@ const Home = () => {
           viewport={{ once: true }}
         >
           <Aboutus
-          title="About Us"
+            title="About Us"
             desc={internalPageConfig?.aboutDescription}
             src={internalPageConfig?.aboutUsImage}
           />
@@ -117,6 +125,25 @@ const Home = () => {
           viewport={{ once: true }}
         >
           <Productoffer homeConfig={homeConfig} isLoading={isLoading} />
+        </motion.div>
+
+        {/* Testimonials */}
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+         <div className="pt-10">
+           <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10 text-center">
+            Our clients praise us <br /> for great service.
+          </h2>
+          {testimonialsLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <Testimonials testimonialData={testimonialsRes} />
+          )}
+         </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

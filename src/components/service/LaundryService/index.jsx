@@ -14,6 +14,7 @@ import Vectortick from "../../../assets/services/para/Vectortick.svg";
 import Vectorgrey from "../../../assets/services/para/vectorgrey.svg";
 import { getItem, setItem } from "../../../utils/local_storage";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
+import { fetchTestimonials } from "./helper/fetchTestimonials";
 import { useNavigate } from "react-router";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import useToast from "../../../hooks";
@@ -47,6 +48,11 @@ const LaundryService = ({ internalPageConfig }) => {
   ]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  const { data: testimonialsRes, isLoading: testimonialsLoading } = useQuery({
+    queryKey: ["testimonial"],
+    queryFn: () => fetchTestimonials(),
+  });  
+
   useEffect(() => {
     if (selectedCategory && productsRef.current) {
       productsRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,7 +83,11 @@ const LaundryService = ({ internalPageConfig }) => {
       <h2 className="xl:text-3xl text-2xl font-bold mb-2 px-10 text-center">
         Our clients praise us <br /> for great service.
       </h2>
-      <Testimonials testimonialData={testimonialData} />
+      {testimonialsLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <Testimonials testimonialData={testimonialsRes} />
+      )}
     </div>
   );
 };

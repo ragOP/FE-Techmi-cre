@@ -27,10 +27,12 @@ const Home = () => {
     queryFn: () => getInternalConfig({}),
   });
 
-  const { data: testimonialsRes, isLoading: testimonialsLoading } = useQuery({
+  const { data: testimonialsRes = [], isLoading: testimonialsLoading } = useQuery({
     queryKey: ["testimonial"],
     queryFn: () => fetchTestimonials(),
+    select: (data) => data?.data,
   });
+
   return (
     <AnimatePresence>
       <motion.div

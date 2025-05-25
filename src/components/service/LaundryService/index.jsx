@@ -48,10 +48,12 @@ const LaundryService = ({ internalPageConfig }) => {
   ]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const { data: testimonialsRes, isLoading: testimonialsLoading } = useQuery({
-    queryKey: ["testimonial"],
-    queryFn: () => fetchTestimonials(),
-  });  
+  const { data: testimonialsRes = [], isLoading: testimonialsLoading } =
+    useQuery({
+      queryKey: ["testimonial"],
+      queryFn: () => fetchTestimonials(),
+      select: (data) => data?.data,
+    });
 
   useEffect(() => {
     if (selectedCategory && productsRef.current) {

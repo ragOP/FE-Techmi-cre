@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import AnimationSlider from "../../common/animations";
 import ProductCard from "../../common/product_card";
 import { fetchProducts } from "../../home/featured_products/helper/fetchProducts";
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import LoadingSpinner from "../../loader/LoadingSpinner";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
@@ -52,34 +57,34 @@ const LastMinuteBuy = () => {
   });
 
   const handleAddToCart = (product) => {
-      const token = getItem("token");
-    
-      if (!token) {
-        const payload = {
-          pendingProduct : JSON.stringify(product)
-        }
-        setItem(payload);
-        return navigate("/login");
-      }
-    
-      if (isPending) return;
-    
-      const userId = getItem("userId");
-    
-      setSelectedId(product._id);
-      const payload = {
-        user_id: userId,
-        product_id: product?._id,
-        quantity: 1,
-      };
+    const token = getItem("token");
 
-      if (product.inventory < 1) {
-        toast.error('Item is out of stock');
+    if (!token) {
+      const payload = {
+        pendingProduct: JSON.stringify(product),
+      };
+      setItem(payload);
+      return navigate("/login");
+    }
+
+    if (isPending) return;
+
+    const userId = getItem("userId");
+
+    setSelectedId(product._id);
+    const payload = {
+      user_id: userId,
+      product_id: product?._id,
+      quantity: 1,
+    };
+
+    if (product.inventory < 1) {
+      toast.error("Item is out of stock");
       return;
     }
-    
-      addToCartMutation({ payload });
-    };
+
+    addToCartMutation({ payload });
+  };
 
   return (
     <>
@@ -94,7 +99,7 @@ const LastMinuteBuy = () => {
           </div>
         ) : (
           <>
-             {topOrderedProducts && topOrderedProducts.length > 0 ? (
+            {topOrderedProducts && topOrderedProducts.length > 0 ? (
               <AnimationSlider>
                 {topOrderedProducts.map((product) => {
                   const discountPrice = getDiscountBasedOnRole({
@@ -102,7 +107,7 @@ const LastMinuteBuy = () => {
                     discounted_price: product.discounted_price,
                     salesperson_discounted_price:
                       product.salesperson_discounted_price,
-                      dnd_discounted_price: product.dnd_discounted_price,
+                    dnd_discounted_price: product.dnd_discounted_price,
                   });
 
                   return (
@@ -119,13 +124,14 @@ const LastMinuteBuy = () => {
                         selectedId={selectedId}
                         onAddToCart={() => handleAddToCart(product)}
                         isProductAdd={isPending}
+                        hsnCode={product?.hsn_code}
                       />
                     </div>
                   );
                 })}
               </AnimationSlider>
             ) : (
-           <ProductEmptyState />
+              <ProductEmptyState />
             )}
           </>
         )}

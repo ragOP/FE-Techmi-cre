@@ -86,7 +86,7 @@ const Order = () => {
 
             <div className="mb-6">
               <h4 className="font-semibold text-lg text-gray-700">
-                Total: ₹{order.discountedPriceAfterCoupon}
+                Total: ₹{order.priceAfterTax}
               </h4>
               <p className="text-sm text-gray-500">
                 Order Date:{" "}
@@ -126,7 +126,7 @@ const Order = () => {
                       </p>
                       <p className="text-sm text-gray-500">
                         Total Price: ₹
-                        {item.product.discounted_price * item.quantity}
+                        {item.total_amount}
                       </p>
                     </div>
                   </div>

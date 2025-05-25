@@ -129,6 +129,7 @@ const CartAlternativeProduct = () => {
                         selectedId={selectedId}
                         onAddToCart={() => handleAddToCart(product)}
                         isProductAdd={isPending}
+                        hsnCode={product?.hsn_code}
                       />
                     </div>
                   );

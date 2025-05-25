@@ -20,6 +20,7 @@ import Checkout from "../../components/checkout";
 import PaymentProcessing from "../../components/payment_processing";
 import { isArrayWithValues } from "../../utils/array/isArrayWithValues";
 import { fetchUserDistributors } from "./helper/fetchUserDistributors";
+import { getTaxAmount } from "./helper/getTaxAmount";
 
 export default function Cart() {
   const queryClient = useQueryClient();
@@ -27,6 +28,8 @@ export default function Cart() {
 
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
+  const localStorageRole = getItem("role");
+
   const [selectedUser, setSelectedUser] = useState(null);
 
   const [cart, setCart] = useState([]);
@@ -37,7 +40,6 @@ export default function Cart() {
   const params = {
     user_id: getItem("userId"),
   };
-  const localStorageRole = getItem("role");
 
   const [openAddress, setOpenAddress] = useState(false);
   const [openCoupon, setOpenCoupon] = useState(false);
@@ -46,6 +48,7 @@ export default function Cart() {
   const [platformFee, setPlatFormFee] = useState(0);
   const [discountedPrice, setDiscountedPrice] = useState(0);
   const [address, setAddress] = useState({});
+  const [taxAmount, setTaxAmount] = useState(0);
 
   const onOpenAddressDialog = () => setOpenAddress(true);
   const onCloseAddressDialog = () => setOpenAddress(false);
@@ -105,12 +108,6 @@ export default function Cart() {
   });
 
   const getDiscount = (products) => {
-    // const discount = products.reduce(
-    //   (sum, item) =>
-    //     sum +
-    //     (item.product.price - item.product.discounted_price) * item.quantity,
-    //   0
-    // );
     const discount = products.reduce((sum, item) => {
       const discountedPrice = getDiscountBasedOnRole({
         role: localStorageRole,
@@ -130,6 +127,18 @@ export default function Cart() {
       getDiscount(cartProducts?.items);
     }
   }, [cartProducts?.items]);
+
+  useEffect(() => {
+    if (cartProducts?.items) {
+      const taxAmount = getTaxAmount(
+        cartProducts?.items,
+        discountedPrice,
+        address,
+        localStorageRole
+      );
+      setTaxAmount(taxAmount);
+    }
+  }, [cartProducts?.items, discountedPrice, address]);
 
   const updateQuantity = (product, change) => {
     setSelectedId(product._id);
@@ -154,10 +163,13 @@ export default function Cart() {
     }
   };
 
-  const distributorsParams = { 
-    role: localStorageRole === "dnd" ? "salesperson" : 
-          localStorageRole === "salesperson" ? "salesperson" : 
-          "dnd" 
+  const distributorsParams = {
+    role:
+      localStorageRole === "dnd"
+        ? "salesperson"
+        : localStorageRole === "salesperson"
+        ? "salesperson"
+        : "dnd",
   };
 
   const {
@@ -281,8 +293,6 @@ export default function Cart() {
                     product.salesperson_discounted_price,
                   dnd_discounted_price: product.dnd_discounted_price,
                 });
-
-                console.log("product", product, discountPrice);
 
                 return (
                   <div
@@ -428,6 +438,11 @@ export default function Cart() {
                   {shippingFee ? `₹${shippingFee}` : "As per delivery address"}
                 </span>
               </p>
+              {address && (
+                <p className="flex justify-between mb-4 text-[#297C00] font-medium">
+                  Tax <span>{taxAmount ? `₹${taxAmount}` : "-"}</span>
+                </p>
+              )}
               <hr className="border-dashed border-gray-900" />
               <p className="flex justify-between font-bold text-lg mt-2">
                 To be paid <span>₹{Number(finalPrice).toFixed(2)}</span>

@@ -11,14 +11,18 @@ import CartLoader from "../../loader/CartLoader";
 import PaymentProcessing from "../../payment_processing";
 import { load } from "@cashfreepayments/cashfree-js";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { getTaxAmount } from "../../../pages/cart/helper/getTaxAmount";
 
 const BuyNowModal = ({ isOpen, onClose, product }) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [selectedAddress, setSelectedAddress] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [taxAmount, setTaxAmount] = useState(0);
+
   const orderId = searchParams.get("orderId");
 
   useEffect(() => {
@@ -41,6 +45,26 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       }
     };
   }, [isOpen, orderId]);
+
+  useEffect(() => {
+    if (product && selectedAddress) {
+      const addressObj = addresses.find((addr) => addr._id === selectedAddress);
+      if (addressObj) {
+        // Wrap product in array to match getTaxAmount signature
+        const tax = getTaxAmount(
+          [
+            {
+              product,
+              quantity,
+            },
+          ],
+          0, 
+          addressObj
+        );
+        setTaxAmount(tax);
+      }
+    }
+  }, [product, quantity, selectedAddress]);
 
   const handleClose = () => {
     if (orderId) {
@@ -84,7 +108,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
 
   useEffect(() => {
     if (addresses?.length > 0) {
-      const defaultAddress = addresses.find(addr => addr.isPrimary);
+      const defaultAddress = addresses.find((addr) => addr.isPrimary);
       if (defaultAddress) {
         setSelectedAddress(defaultAddress._id);
       } else {
@@ -132,7 +156,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
 
     try {
       const paymentSessionId = await createPaymentSession();
-      console.log('Payment session ID:', paymentSessionId);
+      console.log("Payment session ID:", paymentSessionId);
 
       if (!paymentSessionId) {
         setIsPlacingOrder(false);
@@ -140,7 +164,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       }
 
       const cashfree = await load({
-        mode: "sandbox"
+        mode: "sandbox",
       });
 
       const checkoutOptions = {
@@ -148,7 +172,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
         redirectTarget: "_self",
       };
 
-      console.log('Initializing Cashfree with options:', checkoutOptions);
+      console.log("Initializing Cashfree with options:", checkoutOptions);
       await cashfree.checkout(checkoutOptions);
     } catch (error) {
       console.error("Error during payment:", error);
@@ -160,7 +184,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
   if (!isOpen && !orderId) return null;
 
   const modalContent = (
-    <div 
+    <div
       className="fixed inset-0 z-[9999] overflow-y-auto"
       aria-labelledby="modal-title"
       role="dialog"
@@ -168,17 +192,19 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       onClick={orderId ? undefined : handleClose}
     >
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div 
-          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           aria-hidden="true"
         ></div>
 
         {/* Modal panel */}
-        <div 
+        <div
           className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${
-            isAnimating ? 'opacity-100 translate-y-0 sm:scale-100' : 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
+            isAnimating
+              ? "opacity-100 translate-y-0 sm:scale-100"
+              : "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           }`}
-          onClick={e => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
         >
           {orderId ? (
             <PaymentProcessing
@@ -190,7 +216,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
             <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Buy Now</h2>
-                <button 
+                <button
                   onClick={handleClose}
                   className="text-gray-400 hover:text-gray-500 focus:outline-none"
                 >
@@ -201,14 +227,18 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
               <div className="space-y-4">
                 {/* Product Info */}
                 <div className="flex items-center space-x-4 border-b pb-4">
-                  <img 
-                    src={product.banner_image || product.images?.[0]} 
+                  <img
+                    src={product.banner_image || product.images?.[0]}
                     alt={product.name}
                     className="w-20 h-20 object-cover rounded-lg shadow-sm"
                   />
                   <div>
-                    <h3 className="font-medium text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-500">{product.small_description}</p>
+                    <h3 className="font-medium text-gray-900">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {product.small_description}
+                    </p>
                     <p className="text-lg font-semibold mt-1 text-blue-600">
                       ₹{product.discounted_price || product.price}
                     </p>
@@ -234,6 +264,23 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
                   </select>
                 </div>
 
+                <div className="border-t pt-4 mt-6">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-700">
+                      Total Amount
+                    </span>
+                    <span className="text-2xl font-bold text-blue-600">
+                      ₹{(product.discounted_price || product.price) * quantity}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="font-medium text-gray-700">Tax</span>
+                    <span className="text-lg font-semibold text-green-700">
+                      ₹{taxAmount}
+                    </span>
+                  </div>
+                </div>
+
                 {/* Quantity Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -251,7 +298,9 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
                       {quantity}
                     </span>
                     <button
-                      onClick={() => setQuantity(Math.min(product.inventory, quantity + 1))}
+                      onClick={() =>
+                        setQuantity(Math.min(product.inventory, quantity + 1))
+                      }
                       className="px-4 py-2 border rounded-lg hover:bg-gray-50"
                       disabled={quantity >= product.inventory}
                     >
@@ -266,9 +315,14 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
                 {/* Total */}
                 <div className="border-t pt-4 mt-6">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">Total Amount</span>
+                    <span className="font-medium text-gray-700">
+                      Total Amount
+                    </span>
                     <span className="text-2xl font-bold text-blue-600">
-                      ₹{(product.discounted_price || product.price) * quantity}
+                      ₹
+                      {Number(
+                        (product.discounted_price || product.price) * quantity
+                      ) + Number(taxAmount)}
                     </span>
                   </div>
                 </div>
@@ -298,4 +352,4 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
   return createPortal(modalContent, document.body);
 };
 
-export default BuyNowModal; 
+export default BuyNowModal;

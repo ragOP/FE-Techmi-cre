@@ -74,9 +74,9 @@ const Newproduct = () => {
     };
 
     if (product.inventory < 1) {
-      toast.error('Item is out of stock');
-    return;
-  }
+      toast.error("Item is out of stock");
+      return;
+    }
 
     addToCartMutation({ payload });
   };
@@ -116,6 +116,7 @@ const Newproduct = () => {
                       selectedId={selectedId}
                       onAddToCart={() => handleAddToCart(product)}
                       isProductAdd={isPending}
+                      hsnCode={product?.hsn_code}
                     />
                   </div>
                 );

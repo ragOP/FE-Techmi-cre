@@ -40,6 +40,7 @@ const ProductCard = ({
   showWishlist = false,
   isProductAdd = false,
   selectedId = null,
+  hsnCode
 }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -252,6 +253,7 @@ const ProductCard = ({
           price,
           discounted_price: discountedPrice,
           inventory,
+          hsn_code: hsnCode,
         }}
       />
     </>

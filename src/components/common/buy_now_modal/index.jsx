@@ -8,27 +8,44 @@ import { toast } from "react-toastify";
 import { apiService } from "../../../utils/api/apiService";
 import { endpoints } from "../../../utils/endpoints";
 import CartLoader from "../../loader/CartLoader";
+import PaymentProcessing from "../../payment_processing";
+import { load } from "@cashfreepayments/cashfree-js";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 const BuyNowModal = ({ isOpen, onClose, product }) => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const orderId = searchParams.get("orderId");
 
-  console.log(product, "product");
+  useEffect(() => {
+    if (orderId) {
+      setIsAnimating(true);
+      document.body.style.overflow = "hidden";
+    }
+  }, [orderId]);
 
   useEffect(() => {
     if (isOpen) {
       setIsAnimating(true);
       document.body.style.overflow = "hidden";
-    } else {
+    } else if (!orderId) {
       document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset";
+      if (!orderId) {
+        document.body.style.overflow = "unset";
+      }
     };
-  }, [isOpen]);
+  }, [isOpen, orderId]);
 
   const handleClose = () => {
+    if (orderId) {
+      navigate(window.location.pathname, { replace: true });
+    }
     setIsAnimating(false);
     setTimeout(() => {
       onClose();
@@ -40,15 +57,19 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
     queryFn: () => getAddresses({ id: getItem("userId") }),
   });
 
-  const { mutate: buyNowMutation, isPending } = useMutation({
+  const { mutate: placeOrderMutation } = useMutation({
     mutationFn: async (payload) => {
+      if (isPlacingOrder) {
+        return null;
+      }
       return await apiService({
         endpoint: endpoints.buyNow,
         method: "POST",
-        data: payload
+        data: payload,
       });
     },
     onSuccess: (data) => {
+      if (!data) return;
       if (data?.response?.success) {
         toast.success("Order placed successfully!");
         handleClose();
@@ -58,7 +79,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
     },
     onError: (error) => {
       toast.error(error?.message || "Something went wrong");
-    }
+    },
   });
 
   useEffect(() => {
@@ -72,7 +93,31 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
     }
   }, [addresses]);
 
-  const handleBuyNow = () => {
+  // Create Payment Session
+  const createPaymentSession = async () => {
+    try {
+      const apiResponse = await apiService({
+        endpoint: endpoints.payment,
+        method: "POST",
+        data: {
+          addressId: selectedAddress,
+          couponId: null,
+          amount: Number(product.discounted_price || product.price) * quantity,
+          orderedForUser: getItem("userId"),
+          orderType: "buyNow",
+          url: window.location.href,
+          productId: product._id,
+        },
+      });
+      return apiResponse?.response?.data?.payment_session_id;
+    } catch (error) {
+      console.error("Error creating payment session:", error);
+      toast.error("Failed to create payment session. Please try again.");
+      return null;
+    }
+  };
+
+  const handleBuyNow = async () => {
     if (!selectedAddress) {
       toast.error("Please select an address");
       return;
@@ -83,16 +128,36 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       return;
     }
 
-    const payload = {
-      productId: product._id,
-      addressId: selectedAddress,
-      quantity: quantity,
-    };
+    setIsPlacingOrder(true);
 
-    buyNowMutation(payload);
+    try {
+      const paymentSessionId = await createPaymentSession();
+      console.log('Payment session ID:', paymentSessionId);
+
+      if (!paymentSessionId) {
+        setIsPlacingOrder(false);
+        return;
+      }
+
+      const cashfree = await load({
+        mode: "sandbox"
+      });
+
+      const checkoutOptions = {
+        paymentSessionId: paymentSessionId,
+        redirectTarget: "_self",
+      };
+
+      console.log('Initializing Cashfree with options:', checkoutOptions);
+      await cashfree.checkout(checkoutOptions);
+    } catch (error) {
+      console.error("Error during payment:", error);
+      toast.error("An error occurred during payment. Please try again.");
+      setIsPlacingOrder(false);
+    }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !orderId) return null;
 
   const modalContent = (
     <div 
@@ -100,10 +165,9 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       aria-labelledby="modal-title"
       role="dialog"
       aria-modal="true"
-      onClick={handleClose}
+      onClick={orderId ? undefined : handleClose}
     >
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        {/* Background overlay */}
         <div 
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
           aria-hidden="true"
@@ -116,118 +180,116 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
           }`}
           onClick={e => e.stopPropagation()}
         >
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Buy Now</h2>
-              <button 
-                onClick={handleClose}
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-              >
-                <X size={24} />
-              </button>
-            </div>
+          {orderId ? (
+            <PaymentProcessing
+              placeOrderMutation={placeOrderMutation}
+              isPlacingOrder={isPlacingOrder}
+              onClose={handleClose}
+            />
+          ) : (
+            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Buy Now</h2>
+                <button 
+                  onClick={handleClose}
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                  <X size={24} />
+                </button>
+              </div>
 
-            <div className="space-y-4">
-              {/* Product Info */}
-              <div className="flex items-center space-x-4 border-b pb-4">
-                <img 
-                  src={product.banner_image || product.images?.[0]} 
-                  alt={product.name}
-                  className="w-20 h-20 object-cover rounded-lg shadow-sm"
-                />
+              <div className="space-y-4">
+                {/* Product Info */}
+                <div className="flex items-center space-x-4 border-b pb-4">
+                  <img 
+                    src={product.banner_image || product.images?.[0]} 
+                    alt={product.name}
+                    className="w-20 h-20 object-cover rounded-lg shadow-sm"
+                  />
+                  <div>
+                    <h3 className="font-medium text-gray-900">{product.name}</h3>
+                    <p className="text-sm text-gray-500">{product.small_description}</p>
+                    <p className="text-lg font-semibold mt-1 text-blue-600">
+                      ₹{product.discounted_price || product.price}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Address Selection */}
                 <div>
-                  <h3 className="font-medium text-gray-900">{product.name}</h3>
-                  <p className="text-sm text-gray-500">{product.small_description}</p>
-                  <p className="text-lg font-semibold mt-1 text-blue-600">
-                    ₹{product.discounted_price || product.price}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Delivery Address
+                  </label>
+                  <select
+                    value={selectedAddress}
+                    onChange={(e) => setSelectedAddress(e.target.value)}
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Address</option>
+                    {addresses?.map((address) => (
+                      <option key={address._id} value={address._id}>
+                        {address.name} - {address.address}, {address.city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Quantity Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Quantity
+                  </label>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                      disabled={quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="px-6 py-2 border rounded-lg min-w-[60px] text-center font-medium">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(Math.min(product.inventory, quantity + 1))}
+                      className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                      disabled={quantity >= product.inventory}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {product.inventory} items available
                   </p>
                 </div>
-              </div>
 
-              {/* Address Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Delivery Address
-                </label>
-                <select
-                  value={selectedAddress}
-                  onChange={(e) => setSelectedAddress(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                {/* Total */}
+                <div className="border-t pt-4 mt-6">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-700">Total Amount</span>
+                    <span className="text-2xl font-bold text-blue-600">
+                      ₹{(product.discounted_price || product.price) * quantity}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Buy Now Button */}
+                <button
+                  onClick={handleBuyNow}
+                  disabled={isPlacingOrder}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
                 >
-                  <option value="">Select Address</option>
-                  {addresses?.map((address) => (
-                    <option key={address._id} value={address._id}>
-                      {address.name} - {address.address}, {address.city}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Quantity Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Quantity
-                </label>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                    disabled={quantity <= 1}
-                  >
-                    -
-                  </button>
-                  <span className="px-6 py-2 border rounded-lg min-w-[60px] text-center font-medium">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(Math.min(product.inventory, quantity + 1))}
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                    disabled={quantity >= product.inventory}
-                  >
-                    +
-                  </button>
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  {product.inventory} items available
-                </p>
-              </div>
-
-              {/* Total */}
-              <div className="border-t pt-4 mt-6">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-700">Total Amount</span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    ₹{(product.discounted_price || product.price) * quantity}
-                  </span>
-                </div>
+                  {isPlacingOrder ? (
+                    <div className="flex justify-center">
+                      <CartLoader />
+                    </div>
+                  ) : (
+                    "Place Order"
+                  )}
+                </button>
               </div>
             </div>
-          </div>
-
-          {/* Modal footer */}
-          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              disabled={isPending}
-              className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              {isPending ? (
-                <div className="flex justify-center">
-                  <CartLoader />
-                </div>
-              ) : (
-                "Place Order"
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={handleClose}
-              className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-            >
-              Cancel
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>

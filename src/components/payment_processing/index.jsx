@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { apiService } from "../../utils/api/apiService";
 import { endpoints } from "../../utils/endpoints";
@@ -14,8 +14,11 @@ const PaymentProcessing = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get("orderId");
+  const orderType = searchParams.get("orderType");
   const cartId = searchParams.get("cartId");
   const addressId = searchParams.get("addressId");
+  const productId = searchParams.get("productId");
+  const quantity = searchParams.get("quantity");
   const couponId = searchParams.get("couponId");
   const orderedForUser = searchParams.get("orderedForUser");
 
@@ -23,28 +26,54 @@ const PaymentProcessing = ({
   const localStorageId = getItem("userId");
 
   const [loading, setLoading] = useState(true);
+  const hasProcessedOrder = useRef(false);
 
   const onPlaceOrder = async () => {
-    if (!cartId || !addressId) {
-      toast.error("Missing cart or address information.");
-      onClose();
+    if (hasProcessedOrder.current) {
       return;
     }
 
-    const payload = {
-      cartId,
-      addressId,
-      couponId: couponId || null,
-      orderId,
-      ...(localStorageRole === "salesperson" || localStorageRole === "dnd"
-        ? { orderedBy: localStorageId, orderedForUser: orderedForUser }
-        : {}),
-    };
+    if(orderType !== "buyNow"){
+      if (!cartId || !addressId) {
+        toast.error("Missing cart or address information.");
+        onClose();
+        return;
+      }
+    }
 
-    placeOrderMutation(payload);
+    if(orderType === "buyNow"){
+      const payload = {
+        addressId,
+        couponId: couponId || null,
+        productId,
+        quantity,
+        orderId,
+        ...(localStorageRole === "salesperson" || localStorageRole === "dnd"
+          ? { orderedBy: localStorageId, orderedForUser: orderedForUser }
+          : {}),
+      };
+
+      hasProcessedOrder.current = true;
+      placeOrderMutation(payload);
+    } else {
+      const payload = {
+        cartId,
+        addressId,
+        couponId: couponId || null,
+        orderId,
+        ...(localStorageRole === "salesperson" || localStorageRole === "dnd"
+          ? { orderedBy: localStorageId, orderedForUser: orderedForUser }
+          : {}),
+      };
+
+      hasProcessedOrder.current = true;
+      placeOrderMutation(payload);
+    }
   };
 
   useEffect(() => {
+    let isSubscribed = true;
+
     if (!orderId) {
       toast.error("Invalid order ID");
       onClose();
@@ -52,31 +81,50 @@ const PaymentProcessing = ({
     }
 
     const verifyAndPlaceOrder = async () => {
+      if (hasProcessedOrder.current) {
+        return;
+      }
+
       try {
         const apiResponse = await apiService({
           endpoint: `${endpoints.cashfreeOrderDetails}/${orderId}`,
           method: "GET",
         });
 
+        if (!isSubscribed) return;
+
         const data = apiResponse?.response?.data?.[0];
 
         if (data?.payment_status === "SUCCESS") {
           await onPlaceOrder();
-          toast.success("Payment verified successfully!");
-          navigate("/order");
+          if (isSubscribed) {
+            toast.success("Payment verified successfully!");
+            navigate("/order");
+          }
         } else {
-          toast.error("Payment not verified. Redirecting to cart.");
-          onClose();
+          if (isSubscribed) {
+            toast.error("Payment not verified. Redirecting to cart.");
+            onClose();
+          }
         }
       } catch (error) {
-        toast.error("Something went wrong during payment verification.");
-        onClose();
+        if (isSubscribed) {
+          toast.error("Something went wrong during payment verification.");
+          onClose();
+        }
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     verifyAndPlaceOrder();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isSubscribed = false;
+    };
   }, [orderId]);
 
   if (loading) {

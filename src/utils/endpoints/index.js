@@ -23,4 +23,5 @@ export const endpoints = {
   distributors: "api/auth/user/role",
   inventoryCheck: "api/inventory/check",
   testimonals: "api/testimonials",
+  buyNow: "api/order/buy-now",
 };

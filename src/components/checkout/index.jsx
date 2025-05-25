@@ -73,7 +73,9 @@ function Checkout({
         ).quantity
     );
     if (productWithLowInventory.length > 0) {
-      toast.error("Some products are out of stock");
+      productWithLowInventory.forEach((item) => {
+        toast.error(`${item.name} is out of stock`);
+      });
       return;
     }
     const paymentSessionId = await createPaymentSession();

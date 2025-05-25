@@ -14,4 +14,4 @@ export const checkInventory = async ({ productIds }) => {
   } catch (error) {
     throw error;
   }
-}; 
+};

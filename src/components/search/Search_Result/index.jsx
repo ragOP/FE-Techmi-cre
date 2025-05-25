@@ -162,6 +162,7 @@ const SearchResult = () => {
                       price={product.price}
                       name={product.name}
                       discountedPrice={discountPrice}
+                      inventory={product.inventory}
                       smallDescription={product.small_description}
                       id={product._id}
                       onClick={() => navigate(`/product/${product._id}`)}

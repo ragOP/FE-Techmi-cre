@@ -71,7 +71,9 @@ export default function Cart() {
           return;
         } else {
           toast.success("Order placed successfully!");
-          queryClient.invalidateQueries({ queryKey: ["cart_products"] });
+          queryClient.invalidateQueries({
+            queryKey: ["cart_products", "orders"],
+          });
           setDiscountCoupon([]);
         }
         scrollToTop();
@@ -453,7 +455,7 @@ export default function Cart() {
                     onClick={onOpenAddressDialog}
                     className="text-[#C62828] font-medium mt-2 hover:underline"
                   >
-                    Add Address
+                    {address ? "Edit Address" : "Add Address"}
                   </button>
                 </div>
               </div>

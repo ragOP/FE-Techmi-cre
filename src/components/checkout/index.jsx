@@ -59,24 +59,30 @@ function Checkout({
         return;
       }
     }
-    const productIds = cart.map((item) => item.product._id);
-    const quantityWithProductIds = cart.map((item) => ({
-      product_id: item.product._id,
-      quantity: item.quantity,
-    }));
-    const inventoryCheck = await checkInventory({ productIds });
-    const productWithLowInventory = inventoryCheck.filter(
-      (item) =>
-        item.inventory <
-        quantityWithProductIds.find(
-          (item) => item.product_id
-        ).quantity
-    );
-    if (productWithLowInventory.length > 0) {
-      productWithLowInventory.forEach((item) => {
-        toast.error(`${item.name} is out of stock`);
-      });
-      return;
+    const productIds = cart
+      .filter(item => item.product.product_type !== 'service')
+      .map(item => item.product._id);
+    const quantityWithProductIds = cart
+      .filter(item => item.product.product_type !== 'service')
+      .map((item) => ({
+        product_id: item.product._id,
+        quantity: item.quantity,
+      }));
+    if(productIds.length !== 0){
+      const inventoryCheck = await checkInventory({ productIds });
+      const productWithLowInventory = inventoryCheck.filter(
+        (item) =>
+          item.inventory <
+          quantityWithProductIds.find(
+            (item) => item.product_id
+          ).quantity
+      );
+      if (productWithLowInventory.length > 0) {
+        productWithLowInventory.forEach((item) => {
+          toast.error(`${item.name} is out of stock`);
+        });
+        return;
+      }
     }
     const paymentSessionId = await createPaymentSession();
 

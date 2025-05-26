@@ -22,6 +22,7 @@ import { isArrayWithValues } from "../../utils/array/isArrayWithValues";
 import { fetchUserDistributors } from "./helper/fetchUserDistributors";
 import { getTaxAmount } from "./helper/getTaxAmount";
 import { formatAddress } from "./helper/formatAddress";
+import UserSelect from "../../components/user/UserSelect";
 
 export default function Cart() {
   const queryClient = useQueryClient();
@@ -164,25 +165,6 @@ export default function Cart() {
     }
   };
 
-  const distributorsParams = {
-    role:
-      localStorageRole === "dnd"
-        ? "salesperson"
-        : localStorageRole === "salesperson"
-        ? "salesperson"
-        : "dnd",
-  };
-
-  const {
-    data: users = [],
-    isLoading: isLoadingUsers,
-    isError,
-  } = useQuery({
-    queryKey: ["fetch_distributors"],
-    queryFn: () => fetchUserDistributors({ params: distributorsParams }),
-    select: (data) => data?.response?.data,
-  });
-
   const handleRemoveItemFromCart = (productId) => {
     setSelectedId(productId);
     setRemoveCart(true);
@@ -259,6 +241,10 @@ export default function Cart() {
       setAddress({});
     }
   }, [addresses]);
+
+  const finalPriceAfterTax = (Number(finalPrice) + Number(taxAmount)).toFixed(
+    2
+  );
 
   return (
     <>
@@ -446,13 +432,7 @@ export default function Cart() {
               )}
               <hr className="border-dashed border-gray-900" />
               <p className="flex justify-between font-bold text-lg mt-2">
-                To be paid{" "}
-                <span>
-                  ₹
-                  <span>
-                    ₹{(Number(finalPrice) + Number(taxAmount)).toFixed(2)}
-                  </span>
-                </span>
+                To be paid <span>₹{finalPriceAfterTax}</span>
               </p>
               <div className="mt-2 border-t border-gray-900">
                 <div className="flex items-center justify-between pt-4">
@@ -480,31 +460,10 @@ export default function Cart() {
 
               {(localStorageRole === "dnd" ||
                 localStorageRole === "salesperson") && (
-                <div className="mt-2 mb-2">
-                  <label
-                    htmlFor="userSelect"
-                    className="block text-md font-[600] "
-                  >
-                    Select User
-                  </label>
-                  <select
-                    id="userSelect"
-                    value={selectedUser}
-                    className="mt-1 block w-full  pl-4 pt-4 pb-4  text-base border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    onChange={onSelectUser}
-                  >
-                    <option value={null}>Select a user</option>
-                    {isArrayWithValues(users) ? (
-                      users?.map((user) => (
-                        <option key={user._id} value={user._id}>
-                          {user.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value={null}>No users available</option>
-                    )}
-                  </select>
-                </div>
+                <UserSelect
+                  selectedUser={selectedUser}
+                  onSelectUser={onSelectUser}
+                />
               )}
 
               <Checkout
@@ -513,7 +472,7 @@ export default function Cart() {
                 addressId={address?._id}
                 cartId={cartProducts?._id}
                 currentSelectedUser={selectedUser}
-                finalPrice={finalPrice}
+                finalPrice={finalPriceAfterTax}
                 cart={cartProducts?.items}
               />
             </div>
@@ -534,7 +493,7 @@ export default function Cart() {
         />
       )}
 
-      {orderId && (
+      {/* {orderId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <PaymentProcessing
@@ -547,7 +506,7 @@ export default function Cart() {
             />
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

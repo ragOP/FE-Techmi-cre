@@ -38,7 +38,12 @@ const App = () => {
   const location = useLocation();
   const token = localStorage.getItem("token");
 
-  const hideLayoutRoutes = ["/login", "/signup", "forgot-password", "reset-password"];
+  const hideLayoutRoutes = [
+    "/login",
+    "/signup",
+    "forgot-password",
+    "reset-password",
+  ];
 
   const [initalWebsiteLoader, setInitialWebsiteLoader] = useState(true);
 
@@ -131,10 +136,13 @@ const App = () => {
               <Route path="/order" element={<Order />} />
             </Route>
             <Route element={<ProtectedRoute />}>
-              <Route path="/payment" element={<PaymentProcessing />} />
+              <Route path="/order-processing" element={<PaymentProcessing />} />
             </Route>
             <Route element={<ProtectedRoute />}>
               <Route path="/cart" element={<Cart />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/payment-processing" element={<PaymentProcessing />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

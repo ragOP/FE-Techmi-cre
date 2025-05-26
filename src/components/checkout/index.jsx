@@ -6,6 +6,7 @@ import { endpoints } from "../../utils/endpoints";
 import { useNavigate } from "react-router";
 import { getItem } from "../../utils/local_storage";
 import { checkInventory } from "../../pages/cart/helper/checkInventory";
+import { useState } from "react";
 
 function Checkout({
   addressId,
@@ -19,6 +20,7 @@ function Checkout({
   const navigate = useNavigate();
   let cashfree;
 
+  const [creatingSession, setCreatingSession] = useState(false);
   const localStorageRole = getItem("role");
 
   // Initialize Cashfree SDK
@@ -32,7 +34,12 @@ function Checkout({
 
   // Create Payment Session
   const createPaymentSession = async () => {
+    if (creatingSession) {
+      toast.error("Payment session is already being created. Please wait.");
+      return null;
+    }
     try {
+      setCreatingSession(true);
       const apiResponse = await apiService({
         endpoint: endpoints.payment,
         method: "POST",
@@ -49,6 +56,8 @@ function Checkout({
       console.error("Error creating payment session:", error);
       toast.error("Failed to create payment session. Please try again.");
       return null;
+    } finally {
+      setCreatingSession(false);
     }
   };
 
@@ -60,22 +69,20 @@ function Checkout({
       }
     }
     const productIds = cart
-      .filter(item => item.product.product_type !== 'service')
-      .map(item => item.product._id);
+      .filter((item) => item.product.product_type !== "service")
+      .map((item) => item.product._id);
     const quantityWithProductIds = cart
-      .filter(item => item.product.product_type !== 'service')
+      .filter((item) => item.product.product_type !== "service")
       .map((item) => ({
         product_id: item.product._id,
         quantity: item.quantity,
       }));
-    if(productIds.length !== 0){
+    if (productIds.length !== 0) {
       const inventoryCheck = await checkInventory({ productIds });
       const productWithLowInventory = inventoryCheck.filter(
         (item) =>
           item.inventory <
-          quantityWithProductIds.find(
-            (item) => item.product_id
-          ).quantity
+          quantityWithProductIds.find((item) => item.product_id).quantity
       );
       if (productWithLowInventory.length > 0) {
         productWithLowInventory.forEach((item) => {
@@ -109,10 +116,10 @@ function Checkout({
       <button
         onClick={doPayment}
         className={`${
-          isPlacingOrder ? "pointer-events-none" : ""
+          isPlacingOrder || creatingSession ? "pointer-events-none" : ""
         } w-full mt-4 bg-[#00008B] text-white py-3 rounded-3xl text-lg font-medium`}
       >
-        {isPlacingOrder ? (
+        {isPlacingOrder || creatingSession ? (
           <div className="my-1">
             <CartLoader />
           </div>

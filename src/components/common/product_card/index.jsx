@@ -16,6 +16,7 @@ import CartLoader from "../../loader/CartLoader";
 import BuyNowModal from "../buy_now_modal";
 import { toast } from "react-toastify";
 import { getItem } from "../../../utils/local_storage";
+import InventoryStatus from "../../single_product/Product_Information/InventoryStatus"
 
 const ProductCard = ({
   image,
@@ -40,7 +41,7 @@ const ProductCard = ({
   showWishlist = false,
   isProductAdd = false,
   selectedId = null,
-  hsnCode
+  hsnCode,
 }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -115,6 +116,10 @@ const ProductCard = ({
         <div className="absolute top-12 left-3 bg-green-600 text-white text-xs px-2 py-1 rounded-md">
           👀 {activeUsers} viewing now
         </div> */}
+
+        <div className="absolute top-3 right-3 z-10">
+        <InventoryStatus quantity={inventory} />
+        </div>
 
         {/* Product Image */}
         <div className="relative h-56 w-full flex justify-center items-center">

@@ -245,6 +245,7 @@ export default function Cart() {
   const finalPriceAfterTax = (Number(finalPrice) + Number(taxAmount)).toFixed(
     2
   );
+  console.log("cartProducts", cartProducts)
 
   return (
     <>
@@ -280,7 +281,7 @@ export default function Cart() {
                     product.salesperson_discounted_price,
                   dnd_discounted_price: product.dnd_discounted_price,
                 });
-
+                console.log("item", item);
                 return (
                   <div
                     key={item._id}

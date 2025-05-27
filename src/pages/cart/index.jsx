@@ -260,6 +260,8 @@ export default function Cart() {
     }
   }, [addresses]);
 
+  console.log("cartProducts", cartProducts)
+
   return (
     <>
       <div className="m-6 min-h-screen rounded-3xl shadow bg-white">
@@ -294,7 +296,7 @@ export default function Cart() {
                     product.salesperson_discounted_price,
                   dnd_discounted_price: product.dnd_discounted_price,
                 });
-
+                console.log("item", item);
                 return (
                   <div
                     key={item._id}
@@ -450,7 +452,7 @@ export default function Cart() {
                 <span>
                   ₹
                   <span>
-                    ₹{(Number(finalPrice) + Number(taxAmount)).toFixed(2)}
+                    {(Number(finalPrice) + Number(taxAmount)).toFixed(2)}
                   </span>
                 </span>
               </p>

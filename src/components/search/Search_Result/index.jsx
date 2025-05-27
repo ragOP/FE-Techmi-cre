@@ -16,9 +16,9 @@ import LoadingSpinner from "../../loader/LoadingSpinner";
 import { fetchCart } from "../../../pages/cart/helper/fecthCart";
 import { toast } from "react-toastify";
 import { getItem, setItem } from "../../../utils/local_storage";
-import AnimationSlider from "../../common/animations";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
 import ProductEmptyState from "../../empty_state/ProductEmptyState";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 const SearchResult = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const SearchResult = () => {
 
   const [filters, setFilters] = useState({
     page: 1,
-    per_page: 20,
+    per_page: 5,
     category_id: [],
     // brand: [],
     price_range: [],
@@ -60,14 +60,23 @@ const SearchResult = () => {
       : filters.category_id,
   };
 
-  const {
-    data: allProducts,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["search_result_products", params],
-    queryFn: () => fetchProducts({ params }),
-  });
+const {
+  data: allProductsPages,
+  fetchNextPage,
+  hasNextPage,
+  isFetchingNextPage,
+  isLoading,
+} = useInfiniteQuery({
+  queryKey: ["search_result_products", params],
+  queryFn: ({ pageParam = 1 }) =>
+    fetchProducts({ params: { ...params, page: pageParam } }),
+  getNextPageParam: (lastPage, allPages) => {
+    if (lastPage?.length === filters.per_page) {
+      return allPages.length + 1;
+    }
+    return undefined;
+  },
+});
 
   const queryClient = useQueryClient();
   const { mutate: addToCartMutation, isPending } = useMutation({
@@ -128,6 +137,20 @@ const SearchResult = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+  const handleScroll = () => {
+    const bottomReached =
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+    if (bottomReached && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, [hasNextPage, isFetchingNextPage]);
+
+
   return (
     <div className="flex mt-5">
       <Filter
@@ -141,43 +164,42 @@ const SearchResult = () => {
           setDebouncedQuery={setDebouncedQuery}
         />
         {isLoading ? (
-          <LoadingSpinner />
-        ) : isArrayWithValues(allProducts) ? (
-          <div className="grid grid-cols-1 space-y-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-x-4 ">
-            {allProducts &&
-              allProducts.length > 0 &&
-              allProducts.map((product) => {
-                const discountPrice = getDiscountBasedOnRole({
-                  role: localStorageRole,
-                  discounted_price: product.discounted_price,
-                  salesperson_discounted_price:
-                    product.salesperson_discounted_price,
-                  dnd_discounted_price: product.dnd_discounted_price,
-                });
+  <LoadingSpinner />
+) : allProductsPages?.pages?.flat().length > 0 ? (
+  <div className="grid grid-cols-1 space-y-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-x-4 ">
+    {allProductsPages.pages.flat().map((product) => {
+      const discountPrice = getDiscountBasedOnRole({
+        role: localStorageRole,
+        discounted_price: product.discounted_price,
+        salesperson_discounted_price: product.salesperson_discounted_price,
+        dnd_discounted_price: product.dnd_discounted_price,
+      });
 
-                return (
-                  <div key={product._id}>
-                    <ProductCard
-                      image={product.banner_image}
-                      price={product.price}
-                      name={product.name}
-                      discountedPrice={discountPrice}
-                      inventory={product.inventory}
-                      smallDescription={product.small_description}
-                      id={product._id}
-                      onClick={() => navigate(`/product/${product._id}`)}
-                      selectedId={selectedId}
-                      onAddToCart={() => handleAddToCart(product)}
-                      isProductAdd={isPending}
-                      hsnCode={product?.hsn_code}
-                    />
-                  </div>
-                );
-              })}
-          </div>
-        ) : !isLoading && !isArrayWithValues(allProducts) ? (
-          <ProductEmptyState />
-        ) : null}
+      return (
+        <div key={product._id}>
+          <ProductCard
+            image={product.banner_image}
+            price={product.price}
+            name={product.name}
+            discountedPrice={discountPrice}
+            inventory={product.inventory}
+            smallDescription={product.small_description}
+            id={product._id}
+            onClick={() => navigate(`/product/${product._id}`)}
+            selectedId={selectedId}
+            onAddToCart={() => handleAddToCart(product)}
+            isProductAdd={isPending}
+            hsnCode={product?.hsn_code}
+          />
+        </div>
+      );
+    })}
+    {isFetchingNextPage && <LoadingSpinner />}
+  </div>
+) : (
+  <ProductEmptyState />
+)}
+
       </div>
     </div>
   );

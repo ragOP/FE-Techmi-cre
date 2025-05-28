@@ -84,7 +84,7 @@ const CartAlternativeProduct = () => {
     };
 
     if (product.inventory < 1) {
-        toast.error('Item is out of stock');
+      toast.error("Item is out of stock");
       return;
     }
 
@@ -130,6 +130,9 @@ const CartAlternativeProduct = () => {
                         onAddToCart={() => handleAddToCart(product)}
                         isProductAdd={isPending}
                         hsnCode={product?.hsn_code}
+                        isPrescriptionRequired={
+                          product?.is_prescription_required
+                        }
                       />
                     </div>
                   );

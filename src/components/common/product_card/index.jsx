@@ -42,6 +42,7 @@ const ProductCard = ({
   isProductAdd = false,
   selectedId = null,
   hsnCode,
+  isPrescriptionRequired
 }) => {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -259,6 +260,7 @@ const ProductCard = ({
           discounted_price: discountedPrice,
           inventory,
           hsn_code: hsnCode,
+          is_prescription_required: isPrescriptionRequired
         }}
       />
     </>

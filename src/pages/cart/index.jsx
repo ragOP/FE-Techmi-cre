@@ -42,7 +42,6 @@ export default function Cart() {
   const params = {
     user_id: getItem("userId"),
   };
-  const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
 
   const [openAddress, setOpenAddress] = useState(false);
   const [openCoupon, setOpenCoupon] = useState(false);
@@ -52,6 +51,7 @@ export default function Cart() {
   const [discountedPrice, setDiscountedPrice] = useState(0);
   const [address, setAddress] = useState({});
   const [taxAmount, setTaxAmount] = useState(0);
+  const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
   const [prescriptionFile, setPrescriptionFile] = useState(null);
 
   const onOpenAddressDialog = () => setOpenAddress(true);
@@ -255,7 +255,6 @@ export default function Cart() {
   const finalPriceAfterTax = (Number(finalPrice) + Number(taxAmount)).toFixed(
     2
   );
-  console.log("cartProducts", cartProducts);
 
   useEffect(() => {
     if (cart && cart.length > 0) {

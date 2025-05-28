@@ -29,7 +29,7 @@ root.render(
             draggable
             pauseOnHover
             theme="dark"
-            // className="custom-toast-container"
+            className="custom-toast-container"
           />
         </QueryClientProvider>
       </Provider>

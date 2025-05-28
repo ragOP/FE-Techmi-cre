@@ -170,6 +170,7 @@ const SearchResult = () => {
                       onAddToCart={() => handleAddToCart(product)}
                       isProductAdd={isPending}
                       hsnCode={product?.hsn_code}
+                      isPrescriptionRequired={product?.is_prescription_required}
                     />
                   </div>
                 );

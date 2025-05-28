@@ -8,20 +8,37 @@ import { toast } from "react-toastify";
 import { apiService } from "../../../utils/api/apiService";
 import { endpoints } from "../../../utils/endpoints";
 import CartLoader from "../../loader/CartLoader";
-import PaymentProcessing from "../../payment_processing";
 import { load } from "@cashfreepayments/cashfree-js";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { getTaxAmount } from "../../../pages/cart/helper/getTaxAmount";
+import UserSelect from "../../user/UserSelect";
+import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
 
 const BuyNowModal = ({ isOpen, onClose, product }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const localStorageRole = getItem("role");
 
   const [selectedAddress, setSelectedAddress] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [taxAmount, setTaxAmount] = useState(0);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const discountedPrice = getDiscountBasedOnRole({
+    role: localStorageRole,
+    discounted_price: product.discounted_price,
+    salesperson_discounted_price: product.salesperson_discounted_price,
+    dnd_discounted_price: product.dnd_discounted_price,
+    price: product.price,
+  });
+
+  const onSelectUser = (e) => {
+    const selectedUserId = e.target.value;
+    setSelectedUser(selectedUserId);
+  };
 
   const orderId = searchParams.get("orderId");
 
@@ -58,7 +75,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
               quantity,
             },
           ],
-          0, 
+          0,
           addressObj
         );
         setTaxAmount(tax);
@@ -76,7 +93,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
     }, 300);
   };
 
-  const { data: addresses } = useQuery({
+  const { data: addresses, isLoading: isLoadingAddresses } = useQuery({
     queryKey: ["user_addresses"],
     queryFn: () => getAddresses({ id: getItem("userId") }),
   });
@@ -126,11 +143,14 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
         data: {
           addressId: selectedAddress,
           couponId: null,
-          amount: Number(product.discounted_price || product.price) * quantity,
+          amount: (
+            Number(discountedPrice) * quantity +
+            Number(taxAmount)
+          ).toFixed(2),
           orderedForUser: getItem("userId"),
           orderType: "buyNow",
-          url: window.location.href,
           productId: product._id,
+          quantity: quantity,
         },
       });
       return apiResponse?.response?.data?.payment_session_id;
@@ -156,7 +176,6 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
 
     try {
       const paymentSessionId = await createPaymentSession();
-      console.log("Payment session ID:", paymentSessionId);
 
       if (!paymentSessionId) {
         setIsPlacingOrder(false);
@@ -206,54 +225,61 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
           }`}
           onClick={(e) => e.stopPropagation()}
         >
-          {orderId ? (
-            <PaymentProcessing
-              placeOrderMutation={placeOrderMutation}
-              isPlacingOrder={isPlacingOrder}
-              onClose={handleClose}
-            />
-          ) : (
-            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Buy Now</h2>
-                <button
-                  onClick={handleClose}
-                  className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                >
-                  <X size={24} />
-                </button>
+          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Buy Now</h2>
+              <button
+                onClick={handleClose}
+                className="text-gray-400 hover:text-gray-500 focus:outline-none"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Product Info */}
+              <div className="flex items-center space-x-4 border-b pb-4">
+                <img
+                  src={product.banner_image || product.images?.[0]}
+                  alt={product.name}
+                  className="w-20 h-20 object-cover rounded-lg shadow-sm"
+                />
+                <div>
+                  <h3 className="font-medium text-gray-900">{product.name}</h3>
+                  <p className="text-sm text-gray-500 line-clamp-2">
+                    {product.small_description}
+                  </p>
+                  <p className="text-lg font-semibold mt-1 text-blue-600">
+                    ₹{discountedPrice}
+                    <span className="ml-2 text-gray-500 text-base line-through">
+                      ₹{product.price}
+                    </span>
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                {/* Product Info */}
-                <div className="flex items-center space-x-4 border-b pb-4">
-                  <img
-                    src={product.banner_image || product.images?.[0]}
-                    alt={product.name}
-                    className="w-20 h-20 object-cover rounded-lg shadow-sm"
+              {/* Address Selection */}
+              <div>
+                {(localStorageRole === "dnd" ||
+                  localStorageRole === "salesperson") && (
+                  <UserSelect
+                    selectedUser={selectedUser}
+                    onSelectUser={onSelectUser}
                   />
-                  <div>
-                    <h3 className="font-medium text-gray-900">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {product.small_description}
-                    </p>
-                    <p className="text-lg font-semibold mt-1 text-blue-600">
-                      ₹{product.discounted_price || product.price}
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                {/* Address Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Delivery Address
-                  </label>
+                <label
+                  htmlFor="userSelect"
+                  className="block text-md font-semibold mb-1"
+                >
+                  Delivery Address
+                </label>
+                <div className="relative">
                   <select
                     value={selectedAddress}
                     onChange={(e) => setSelectedAddress(e.target.value)}
-                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={isLoadingAddresses}
+                    className="block w-full appearance-none px-4 py-3 pr-10 text-base rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 shadow transition-all duration-200"
                   >
                     <option value="">Select Address</option>
                     {addresses?.map((address) => (
@@ -262,88 +288,101 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
                       </option>
                     ))}
                   </select>
-                </div>
 
-                <div className="border-t pt-4 mt-6">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">
-                      Total Amount
-                    </span>
-                    <span className="text-2xl font-bold text-blue-600">
-                      ₹{(product.discounted_price || product.price) * quantity}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="font-medium text-gray-700">Tax</span>
-                    <span className="text-lg font-semibold text-green-700">
-                      ₹{taxAmount}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Quantity Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quantity
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                      disabled={quantity <= 1}
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
                     >
-                      -
-                    </button>
-                    <span className="px-6 py-2 border rounded-lg min-w-[60px] text-center font-medium">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setQuantity(Math.min(product.inventory, quantity + 1))
-                      }
-                      className="px-4 py-2 border rounded-lg hover:bg-gray-50"
-                      disabled={quantity >= product.inventory}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {product.inventory} items available
-                  </p>
-                </div>
-
-                {/* Total */}
-                <div className="border-t pt-4 mt-6">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">
-                      Total Amount
-                    </span>
-                    <span className="text-2xl font-bold text-blue-600">
-                      ₹
-                      {Number(
-                        (product.discounted_price || product.price) * quantity
-                      ) + Number(taxAmount)}
-                    </span>
+                      <path
+                        d="M7 8l3 3 3-3"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </div>
                 </div>
-
-                {/* Buy Now Button */}
-                <button
-                  onClick={handleBuyNow}
-                  disabled={isPlacingOrder}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
-                >
-                  {isPlacingOrder ? (
-                    <div className="flex justify-center">
-                      <CartLoader />
-                    </div>
-                  ) : (
-                    "Place Order"
-                  )}
-                </button>
               </div>
+
+              <div className="border-t pt-4 mt-6">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700">
+                    Total Amount
+                  </span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    ₹{(product.discounted_price || product.price) * quantity}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="font-medium text-gray-700">Tax</span>
+                  <span className="text-lg font-semibold text-green-700">
+                    ₹{taxAmount}
+                  </span>
+                </div>
+              </div>
+
+              {/* Quantity Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Quantity
+                </label>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    disabled={quantity <= 1}
+                  >
+                    -
+                  </button>
+                  <span className="px-6 py-2 border rounded-lg min-w-[60px] text-center font-medium">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setQuantity(Math.min(product.inventory, quantity + 1))
+                    }
+                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                    disabled={quantity >= product.inventory}
+                  >
+                    +
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  {product.inventory} items available
+                </p>
+              </div>
+
+              {/* Total */}
+              <div className="border-t pt-4 mt-6">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-700">
+                    Total Amount
+                  </span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    ₹{Number(discountedPrice * quantity) + Number(taxAmount)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Buy Now Button */}
+              <button
+                onClick={handleBuyNow}
+                disabled={isPlacingOrder}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+              >
+                {isPlacingOrder ? (
+                  <div className="flex justify-center">
+                    <CartLoader />
+                  </div>
+                ) : (
+                  "Place Order"
+                )}
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

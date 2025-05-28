@@ -105,6 +105,7 @@ const AddressDialog = ({ onClose, setAddress }) => {
           <AddressForm
             initialData={editingAddress}
             onSubmit={(data) => {
+              console.log(data);
               if (editingAddress._id) {
                 modifyAddress({ id: editingAddress._id, payload: data });
               } else {
@@ -149,9 +150,16 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    e.stopPropagation();
+
+    try {
+      onSubmit(formData);
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    }
   };
 
+  console.log(formData);
   return (
     <form onSubmit={handleSubmit} className="p-4">
       <div className="space-y-4">
@@ -233,23 +241,27 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">State</label>
+            <label className="block text-sm font-medium text-gray-700">
+              State
+            </label>
             <select
               name="state"
               value={formData.state || ""}
               onChange={(e) => {
-                const selectedState = statesList.find(state => state.name === e.target.value);
+                const selectedState = statesList.find(
+                  (state) => state.name === e.target.value
+                );
                 handleInputChange({
                   target: {
                     name: "state",
-                    value: selectedState.name
-                  }
+                    value: selectedState.name,
+                  },
                 });
                 handleInputChange({
                   target: {
                     name: "state_code",
-                    value: selectedState.code
-                  }
+                    value: selectedState.code,
+                  },
                 });
               }}
               className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary"
@@ -344,6 +356,11 @@ const AddressForm = ({ initialData, onSubmit, onCancel }) => {
           </button>
           <button
             type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSubmit(e);
+            }}
             className="px-6 py-2 bg-[#00008B] text-white rounded-md hover:bg-[#000070] transition"
           >
             {initialData._id ? "Update" : "Save"} Address
@@ -425,8 +442,6 @@ const AddressList = ({
 }) => {
   return (
     <div className="p-4 flex flex-col gap-4 justify-between">
-     
-
       <div className="space-y-4">
         {isLoading ? (
           [...Array(3)].map((_, i) => (
@@ -454,7 +469,7 @@ const AddressList = ({
         )}
       </div>
 
-       <button
+      <button
         onClick={onAddNew}
         className="w-full mt-2 py-3 border-2 border-dashed border-gray-300 rounded-md hover:border-primary hover:text-primary transition-colors"
       >

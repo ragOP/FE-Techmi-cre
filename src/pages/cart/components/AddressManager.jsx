@@ -10,7 +10,10 @@ const AddressManager = ({ setAddress }) => {
   const [openAddress, setOpenAddress] = useState(false);
   const [address, setAddressState] = useState({});
 
-  const onOpenAddressDialog = () => setOpenAddress(true);
+  const onOpenAddressDialog = (e) => {
+    e.preventDefault();
+    setOpenAddress(true);
+  };
   const onCloseAddressDialog = () => setOpenAddress(false);
 
   const { data: addresses } = useQuery({
@@ -61,7 +64,7 @@ const AddressManager = ({ setAddress }) => {
           </button>
         </div>
         {address && Object.values(address).some((val) => val) && (
-          <div className="p-2 border border-gray-300 rounded-md bg-white shadow-sm max-w-md">
+          <div className="p-2 border border-gray-300 rounded-md bg-white shadow-sm w-full">
             <p className="font-semibold text-gray-900">
               {address.name}, {address?.pincode}
             </p>

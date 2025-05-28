@@ -13,6 +13,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { getTaxAmount } from "../../../pages/cart/helper/getTaxAmount";
 import UserSelect from "../../user/UserSelect";
 import { getDiscountBasedOnRole } from "../../../utils/products/getDiscountBasedOnRole";
+import { PrescriptionUpload } from "../../../pages/cart";
 
 const BuyNowModal = ({ isOpen, onClose, product }) => {
   const navigate = useNavigate();
@@ -26,6 +27,15 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [taxAmount, setTaxAmount] = useState(0);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
+  const [prescriptionFile, setPrescriptionFile] = useState(null);
+
+  const handlePrescriptionUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setPrescriptionFile(file);
+  };
+
+  const handleRemovePrescription = () => setPrescriptionFile(null);
 
   const discountedPrice = getDiscountBasedOnRole({
     role: localStorageRole,
@@ -134,6 +144,15 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
     }
   }, [addresses]);
 
+  console.log("Product in BuyNowModal:", product);
+  useEffect(() => {
+    if (product && product?.is_prescription_required) {
+      setIsPrescriptionRequired(true);
+    } else {
+      setIsPrescriptionRequired(false);
+    }
+  }, [product]);
+
   // Create Payment Session
   const createPaymentSession = async () => {
     try {
@@ -172,6 +191,20 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
       return;
     }
 
+    if (localStorageRole === "salesperson" || localStorageRole === "dnd") {
+      if (!selectedUser) {
+        toast.error("Please select a user to place the order");
+        return;
+      }
+    }
+
+    if (isPrescriptionRequired && !prescriptionFile) {
+      toast.error(
+        "Please upload a prescription file to proceed with the order"
+      );
+      return;
+    }
+
     setIsPlacingOrder(true);
 
     try {
@@ -204,7 +237,7 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[9999] overflow-y-auto"
+      className="fixed inset-0 z-[2] overflow-y-auto"
       aria-labelledby="modal-title"
       role="dialog"
       aria-modal="true"
@@ -306,6 +339,14 @@ const BuyNowModal = ({ isOpen, onClose, product }) => {
                   </div>
                 </div>
               </div>
+
+              {isPrescriptionRequired && (
+                <PrescriptionUpload
+                  prescriptionFile={prescriptionFile}
+                  onUpload={handlePrescriptionUpload}
+                  onRemove={handleRemovePrescription}
+                />
+              )}
 
               <div className="border-t pt-4 mt-6">
                 <div className="flex justify-between items-center">

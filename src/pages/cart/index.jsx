@@ -51,11 +51,20 @@ export default function Cart() {
   const [discountedPrice, setDiscountedPrice] = useState(0);
   const [address, setAddress] = useState({});
   const [taxAmount, setTaxAmount] = useState(0);
+  const [isPrescriptionRequired, setIsPrescriptionRequired] = useState(false);
+  const [prescriptionFile, setPrescriptionFile] = useState(null);
 
   const onOpenAddressDialog = () => setOpenAddress(true);
   const onCloseAddressDialog = () => setOpenAddress(false);
   const onOpenCouponDialog = () => setOpenCoupon(true);
   const onCloseCouponDialog = () => setOpenCoupon(false);
+
+  const handlePrescriptionUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setPrescriptionFile(file);
+  };
+
+  const handleRemovePrescription = () => setPrescriptionFile(null);
 
   const { data: cartProducts, isLoading } = useQuery({
     queryKey: ["cart_products"],
@@ -183,6 +192,7 @@ export default function Cart() {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
+
   useEffect(() => {
     if (discountCoupon.length > 0) {
       const { discountValue, maxDiscount, discountType } = discountCoupon[0];
@@ -245,7 +255,17 @@ export default function Cart() {
   const finalPriceAfterTax = (Number(finalPrice) + Number(taxAmount)).toFixed(
     2
   );
-  console.log("cartProducts", cartProducts)
+
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      const prescriptionNeeded = cart.some(
+        (item) => item.product?.is_prescription_required
+      );
+      setIsPrescriptionRequired(prescriptionNeeded);
+    } else {
+      setIsPrescriptionRequired(false);
+    }
+  }, [cart]);
 
   return (
     <>
@@ -370,7 +390,7 @@ export default function Cart() {
           </div>
           {cart.length > 0 && (
             <div className="w-full md:w-1/3 bg-white p-6 rounded-tr-3xl rounded-br-3xl border-l border-gray-200">
-              <h3 className="text-xl font-bold mb-4">Offers & Discounts</h3>
+              <h3 className="text-xl font-bold mb-1">Offers & Discounts</h3>
               <div className="border-b border-gray-900 p-3 text-gray-800  hover:bg-slate-50 cursor-pointer">
                 <div
                   onClick={onOpenCouponDialog}
@@ -400,17 +420,17 @@ export default function Cart() {
                 )}
               </div>
 
-              <h3 className="text-xl font-bold mt-6 mb-4">Bill Summary</h3>
-              <p className="flex justify-between mb-4 text-gray-600">
+              <h3 className="text-xl font-bold mt-3 mb-3">Bill Summary</h3>
+              <p className="flex justify-between mb-3 text-gray-600">
                 Item Total (MRP) <span>₹{Number(totalPrice).toFixed(2)}</span>
               </p>
-              <p className="flex justify-between mb-4 text-gray-600">
+              <p className="flex justify-between mb-3 text-gray-600">
                 Platform Fee <span>₹{platformFee}</span>
               </p>
-              <p className="flex justify-between mb-4 text-gray-600">
+              <p className="flex justify-between mb-3 text-gray-600">
                 GST <span>₹{platformFee}</span>
               </p>
-              <p className="flex justify-between mb-4 text-[#297C00] font-medium">
+              <p className="flex justify-between mb-3 text-[#297C00] font-medium">
                 Total Discount <span>-₹{Number(discount).toFixed(2)}</span>
               </p>
 
@@ -420,14 +440,14 @@ export default function Cart() {
                   <span>-₹{Number(discountedPrice).toFixed(2)}</span>
                 </p>
               )}
-              <p className="flex justify-between mb-4 text-[#297C00] font-medium">
+              <p className="flex justify-between mb-3 text-[#297C00] font-medium">
                 Shipping Fees{" "}
                 <span>
                   {shippingFee ? `₹${shippingFee}` : "As per delivery address"}
                 </span>
               </p>
               {address && (
-                <p className="flex justify-between mb-4 text-[#297C00] font-medium">
+                <p className="flex justify-between mb-3 text-[#297C00] font-medium">
                   Tax <span>{taxAmount ? `₹${taxAmount}` : "-"}</span>
                 </p>
               )}
@@ -436,7 +456,7 @@ export default function Cart() {
                 To be paid <span>₹{finalPriceAfterTax}</span>
               </p>
               <div className="mt-2 border-t border-gray-900">
-                <div className="flex items-center justify-between pt-4">
+                <div className="flex items-center justify-between pt-1">
                   <h3 className="text-lg font-bold mt-2 mb-2">Delivering to</h3>
                   <button
                     onClick={onOpenAddressDialog}
@@ -467,6 +487,14 @@ export default function Cart() {
                 />
               )}
 
+              {isPrescriptionRequired && (
+                <PrescriptionUpload
+                  prescriptionFile={prescriptionFile}
+                  onUpload={handlePrescriptionUpload}
+                  onRemove={handleRemovePrescription}
+                />
+              )}
+
               <Checkout
                 isPlacingOrder={isPlacingOrder}
                 couponId={discountCoupon?.[0]?._id}
@@ -475,6 +503,8 @@ export default function Cart() {
                 currentSelectedUser={selectedUser}
                 finalPrice={finalPriceAfterTax}
                 cart={cartProducts?.items}
+                isPrescriptionRequired={isPrescriptionRequired}
+                prescriptionFile={prescriptionFile}
               />
             </div>
           )}
@@ -511,3 +541,46 @@ export default function Cart() {
     </>
   );
 }
+
+export const PrescriptionUpload = ({
+  prescriptionFile,
+  onUpload,
+  onRemove,
+}) => (
+  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+    <p className="text-yellow-800 text-sm">
+      Prescription is required for some products in your cart. Please upload a
+      valid prescription to proceed with the order.
+    </p>
+    <div className="mt-3 flex items-center gap-3">
+      <label
+        htmlFor="prescription-upload"
+        className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg font-medium cursor-pointer hover:bg-blue-700 transition text-sm"
+      >
+        {prescriptionFile ? "Change Prescription" : "Upload Prescription"}
+        <input
+          id="prescription-upload"
+          type="file"
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={onUpload}
+        />
+      </label>
+      {prescriptionFile && (
+        <>
+          <span className="text-xs text-green-700 font-medium truncate max-w-[120px]">
+            {prescriptionFile.name}
+          </span>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="ml-1 p-1 rounded-full hover:bg-red-100 transition"
+            aria-label="Remove prescription"
+          >
+            <X size={16} className="text-red-500" />
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+);

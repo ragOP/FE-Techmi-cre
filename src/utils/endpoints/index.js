@@ -1,6 +1,7 @@
 export const endpoints = {
   login: "api/auth/user/login",
   signup: "api/auth/user/register",
+  user: "api/auth/user",
   product: "api/product?is_active=true",
   category: "api/category",
   service: "api/service?is_active=true",

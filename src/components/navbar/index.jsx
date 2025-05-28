@@ -214,6 +214,12 @@ const Navbar = ({ logo }) => {
             {isDropdownOpen && (
               <div className="absolute top-12 right-0 bg-white shadow-md rounded-md w-40 z-50">
                 <button
+                  onClick={() => navigate("/edit-profile")}
+                  className="w-full text-left px-4 py-2 text-[#00008B] hover:bg-gray-100"
+                >
+                  Edit Profile
+                </button>
+                <button
                   onClick={onLogoutUser}
                   className="w-full text-left px-4 py-2 text-[#00008B] hover:bg-gray-100"
                 >

@@ -82,7 +82,12 @@ const Home = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <DiscountBanner />
+          {/* <DiscountBanner /> */}
+          {internalPageConfig?.flyer1 &&
+            <div className="w-full mt-20">
+              <img src={internalPageConfig?.flyer1} alt="Pink Banner" />
+            </div>
+          }
         </motion.div>
 
         {/* SellingServices */}

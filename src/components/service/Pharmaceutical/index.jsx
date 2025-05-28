@@ -20,10 +20,9 @@ const Pharmaceutical = ({internalPageConfig}) => {
       <CategoriesPharma />
       <Diabetes internalPageConfig={internalPageConfig} />
       <Newproduct />
-      <Knowmore />
+      <Knowmore sliderImages={internalPageConfig?.sliderImages} />
       <HealthCondition />
       <Trendingnew />
-
     </div>
   );
 };

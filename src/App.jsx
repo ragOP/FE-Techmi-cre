@@ -33,6 +33,7 @@ const Cart = lazy(() => import("./pages/cart"));
 const SingleProduct = lazy(() => import("./pages/single_product"));
 const ForgetPassword = lazy(() => import("./pages/forget_password"));
 const ResetPassword = lazy(() => import("./pages/reset_password"));
+const EditProfile = lazy(() => import("./pages/edit_profile"));
 
 const App = () => {
   const location = useLocation();
@@ -143,6 +144,9 @@ const App = () => {
             </Route>
             <Route element={<ProtectedRoute />}>
               <Route path="/payment-processing" element={<PaymentProcessing />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/edit-profile" element={<EditProfile />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

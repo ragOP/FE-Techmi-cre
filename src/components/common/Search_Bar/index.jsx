@@ -31,13 +31,13 @@ const SearchBar = ({ debouncedQuery, setDebouncedQuery }) => {
         <h2 className="text-xl font-semibold text-black">
           What are you looking for?
         </h2>
-        <div className="flex items-center text-sm text-gray-600 gap-x-2">
+        {/* <div className="flex items-center text-sm text-gray-600 gap-x-2">
           <img src={Vector} alt="Order Icon" className="w-4 h-4" />
           <span>Order with prescription.</span>
           <a href="#" className="text-[#00008B] font-semibold">
             UPLOAD NOW &gt;
           </a>
-        </div>
+        </div> */}
       </div>
 
       <div className="relative w-full">

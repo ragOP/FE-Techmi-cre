@@ -16,6 +16,8 @@ function Checkout({
   currentSelectedUser,
   finalPrice,
   cart,
+  isPrescriptionRequired,
+  prescriptionFile,
 }) {
   const navigate = useNavigate();
   let cashfree;
@@ -68,6 +70,14 @@ function Checkout({
         return;
       }
     }
+
+    if (isPrescriptionRequired && !prescriptionFile) {
+      toast.error(
+        "Please upload a prescription file to proceed with the order"
+      );
+      return;
+    }
+
     const productIds = cart
       .filter((item) => item.product.product_type !== "service")
       .map((item) => item.product._id);
@@ -77,6 +87,7 @@ function Checkout({
         product_id: item.product._id,
         quantity: item.quantity,
       }));
+
     if (productIds.length !== 0) {
       const inventoryCheck = await checkInventory({ productIds });
       const productWithLowInventory = inventoryCheck.filter(

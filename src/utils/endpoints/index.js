@@ -25,4 +25,7 @@ export const endpoints = {
   inventoryCheck: "api/inventory/check",
   testimonals: "api/testimonials",
   buyNow: "api/order/buy-now",
+  faq: "api/faq",
+  terms_and_conditions: "api/terms-condition",
+  privacy_policy: "api/privacy-policy",
 };

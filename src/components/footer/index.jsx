@@ -16,20 +16,21 @@ const Footer = ({footerConfig}) => {
     },
     data2: {
       information: [
-        { id: 1, label: "About us", link: "#" },
-        { id: 2, label: "Delivery Information", link: "#" },
-        { id: 3, label: "Privacy Policy", link: "#" },
-        { id: 4, label: "Sales", link: "#" },
-        { id: 5, label: "Terms & Conditions", link: "#" },
+        { id: 1, label: "Frequently Asked Questions", link: "/faq" },
+        // { id: 2, label: "Delivery Information", link: "#" },
+        { id: 3, label: "Privacy Policy", link: "/privacy-policy" },
+        // { id: 4, label: "Sales", link: "#" },
+        { id: 5, label: "Terms & Conditions", link: "/terms-and-conditions" },
       ],
     },
     data3: {
       account: [
-        { id: 1, label: "Dashboard", link: "#" },
-        { id: 2, label: "My orders", link: "#" },
-        { id: 3, label: "Account details", link: "#" },
-        { id: 4, label: "Returns", link: "#" },
-        { id: 5, label: "Wishlist", link: "#" },
+        { id: 1, label: "Dashboard", link: "/" },
+        { id: 2, label: "My orders", link: "/orders" },
+        { id: 3, label: "Account details", link: "/edit-profile" },
+        { id: 4, label: "My Cart", link: "/cart" },
+        // { id: 4, label: "Returns", link: "#" },
+        // { id: 5, label: "Wishlist", link: "#" },
       ],
     },
   };

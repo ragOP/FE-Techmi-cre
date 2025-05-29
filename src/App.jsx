@@ -34,6 +34,9 @@ const SingleProduct = lazy(() => import("./pages/single_product"));
 const ForgetPassword = lazy(() => import("./pages/forget_password"));
 const ResetPassword = lazy(() => import("./pages/reset_password"));
 const EditProfile = lazy(() => import("./pages/edit_profile"));
+const FaqPage = lazy(() => import("./pages/faq"));
+const TermsAndConditions = lazy(() => import("./pages/terms_and_conditions"));
+const PrivacyPolicy = lazy(() => import("./pages/privacy_policy"));
 
 const App = () => {
   const location = useLocation();
@@ -133,6 +136,9 @@ const App = () => {
             />
             <Route path="/blogs" element={<Blog />} />
             <Route path="/blogs/:id" element={<SingleBlog />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/order" element={<Order />} />
             </Route>

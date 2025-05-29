@@ -6,20 +6,30 @@ import { getBlogData } from "./helper";
 import { useEffect, useState } from "react";
 import { timeAgo } from "../../utils/check_date_diffrence";
 import { truncateString } from "../../utils/truncate_string";
+import useDebounce from "../../hooks/useDebounce"
 
 export default function Blog() {
   const navigate = useNavigate();
 
   const [posts, setPosts] = useState([]);
   const [latestPosts, setLatestPost] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const params = {
     featured: true,
   };
 
+  const onSearchChnage = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
   const { data: blogData, isLoading } = useQuery({
-    queryKey: ["blog_data_featured"],
-    queryFn: () => getBlogData({ params }),
+    queryKey: ["blog_data_featured", debouncedSearchQuery ],
+    queryFn: () =>
+      getBlogData({
+        params: { featured: true, search: debouncedSearchQuery  },
+      }),
     select: (data) => data?.response?.data,
   });
 
@@ -130,6 +140,8 @@ export default function Blog() {
           <div className="flex gap-2">
             <input
               type="text"
+              value={searchQuery}
+              onChange={onSearchChnage}
               placeholder="Search here..."
               className="w-full border border-gray-300 p-2 rounded-lg"
             />

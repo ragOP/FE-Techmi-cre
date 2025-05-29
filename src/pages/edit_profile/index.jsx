@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import AddressManager from "../cart/components/AddressManager"; 
+import AddressManager from "../cart/components/AddressManager";
 import { getUserDetails } from "./helpers/getUserDetails";
 import { updateUserDetails } from "./helpers/updateUserDetails";
 import { getItem } from "../../utils/local_storage";
@@ -9,21 +9,22 @@ import { toast } from "react-toastify";
 const EditProfilePage = () => {
   const queryClient = useQueryClient();
   const userId = getItem("userId");
-  
+
   const [form, setForm] = useState({
     name: "",
     mobile_number: "",
   });
-  
+
+  const [errors, setErrors] = useState({});
   const [address, setAddress] = useState({});
   const [isDirty, setIsDirty] = useState(false);
 
   // Fetch user data
-  const { 
-    data: user, 
-    isLoading: userLoading, 
+  const {
+    data: user,
+    isLoading: userLoading,
     error: userError,
-    isError: isUserError 
+    isError: isUserError,
   } = useQuery({
     queryKey: ["user_details", userId],
     queryFn: () => getUserDetails({ id: userId }),
@@ -31,11 +32,11 @@ const EditProfilePage = () => {
   });
 
   // Update user mutation
-  const { 
-    mutate: updateProfile, 
-    isPending: isUpdating, 
-    isSuccess, 
-    isError: isUpdateError, 
+  const {
+    mutate: updateProfile,
+    isPending: isUpdating,
+    isSuccess,
+    isError: isUpdateError,
   } = useMutation({
     mutationFn: updateUserDetails,
     onSuccess: (data) => {
@@ -51,6 +52,23 @@ const EditProfilePage = () => {
     },
   });
 
+  // Form Validation
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "Name cannot be empty";
+    }
+
+    if (!form.mobile_number.trim()) {
+      newErrors.mobile_number = "Mobile number cannot be empty";
+    } else if (!/^\d{10}$/.test(form.mobile_number.trim())) {
+      newErrors.mobile_number = "Mobile number must be 10 digits";
+    }
+
+    return newErrors;
+  };
+
   // Initialize form with user data
   useEffect(() => {
     if (user) {
@@ -63,20 +81,30 @@ const EditProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
     setIsDirty(true);
 
+    setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleSave = (e) => {
     e.preventDefault();
+
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({}); // Clear errors if valid
 
     const updateData = {
       id: userId,
       updates: {
         name: form.name.trim(),
         mobile_number: form.mobile_number.trim(),
-      }
+      },
     };
 
     updateProfile(updateData);
@@ -116,12 +144,15 @@ const EditProfilePage = () => {
     return (
       <div className="max-w-xl mx-auto p-6">
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <h2 className="text-lg font-semibold text-red-800 mb-2">Error Loading Profile</h2>
+          <h2 className="text-lg font-semibold text-red-800 mb-2">
+            Error Loading Profile
+          </h2>
           <p className="text-red-600">
-            {userError?.message || "Failed to load user profile. Please try again."}
+            {userError?.message ||
+              "Failed to load user profile. Please try again."}
           </p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           >
             Retry
@@ -146,10 +177,13 @@ const EditProfilePage = () => {
     <div className="max-w-xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Edit Profile</h1>
 
-      <form  className="space-y-6">
+      <form className="space-y-6">
         {/* Name Field */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Full Name *
           </label>
           <input
@@ -161,11 +195,17 @@ const EditProfilePage = () => {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 }`}
             placeholder="Enter your full name"
           />
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+          )}
         </div>
 
         {/* Email Field (Read-only) */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Email Address
           </label>
           <input
@@ -180,7 +220,10 @@ const EditProfilePage = () => {
 
         {/* Mobile Field */}
         <div>
-          <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="mobile"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             Mobile Number
           </label>
           <input
@@ -192,14 +235,17 @@ const EditProfilePage = () => {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 `}
             placeholder="Enter your mobile number"
           />
+          {errors.mobile_number && (
+            <p className="text-red-500 text-sm mt-1">{errors.mobile_number}</p>
+          )}
         </div>
 
         {/* Address Section */}
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-3">Address Information</h3>
-          <AddressManager 
-            setAddress={setAddress} 
-          />
+          <h3 className="text-lg font-medium text-gray-900 mb-3">
+            Address Information
+          </h3>
+          <AddressManager setAddress={setAddress} />
         </div>
 
         {/* Action Buttons */}
@@ -212,9 +258,25 @@ const EditProfilePage = () => {
           >
             {isUpdating ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Saving...
               </span>
@@ -222,7 +284,7 @@ const EditProfilePage = () => {
               "Save Changes"
             )}
           </button>
-          
+
           {isDirty && (
             <button
               type="button"
@@ -234,7 +296,6 @@ const EditProfilePage = () => {
             </button>
           )}
         </div>
-        
       </form>
     </div>
   );

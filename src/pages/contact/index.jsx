@@ -11,7 +11,7 @@ import CartLoader from "../../components/loader/CartLoader";
 
 const position = [28.5691, 77.2786];
 
-const Contact = ({footerConfig}) => {
+const Contact = ({ footerConfig }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -19,6 +19,7 @@ const Contact = ({footerConfig}) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
+  const [errors, setErrors] = useState({ name: "", email: "", subject: "" });
 
   const { mutate: submitQuery, isPending } = useMutation({
     mutationFn: async (formData) => {
@@ -32,12 +33,42 @@ const Contact = ({footerConfig}) => {
     },
   });
 
+  const validateFields = () => {
+    let valid = true;
+    const newErrors = { name: "", email: "", subject: "" };
+
+    // Name: No special symbols
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+      newErrors.name = "Name must not contain special characters like #, $, %, etc. or Numbers.";
+      valid = false;
+    }
+
+    // Email: Valid format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Not a valid email address.";
+      valid = false;
+    }
+
+    // Subject/Message: Minimum 10 characters
+    if (subject.trim().length < 10) {
+      newErrors.subject = "Message must be at least 10 characters long.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    if(!name || !email || !subject) {
+    if (!name || !email || !subject) {
       toast.error("Please fill all the fields");
       return;
     }
+
+    const isValid = validateFields();
+    if (!isValid) return;
+
     const formData = { name, email, subject };
     submitQuery(formData);
   };
@@ -194,6 +225,9 @@ const Contact = ({footerConfig}) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.5, duration: 1 }}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
             <motion.input
               type="email"
               placeholder="Your Email"
@@ -204,6 +238,9 @@ const Contact = ({footerConfig}) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.6, duration: 1 }}
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
             <motion.textarea
               placeholder="Your Message"
               value={subject}
@@ -213,12 +250,23 @@ const Contact = ({footerConfig}) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.7, duration: 1 }}
             />
+            {errors.subject && (
+              <p className="text-red-500 text-sm mt-1">{errors.subject}</p>
+            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleSubmitForm}
-              className={`${isPending? 'pointer-events-none': ''} w-full bg-blue-900 text-white p-3 rounded-3xl font-semibold text-sm md:text-lg hover:bg-blue-700 transition-all`}
+              className={`${
+                isPending ? "pointer-events-none" : ""
+              } w-full bg-blue-900 text-white p-3 rounded-3xl font-semibold text-sm md:text-lg hover:bg-blue-700 transition-all`}
             >
-             {isPending? <div className="my-2"><CartLoader /></div>  : "Submit Message"}
+              {isPending ? (
+                <div className="my-2">
+                  <CartLoader />
+                </div>
+              ) : (
+                "Submit Message"
+              )}
             </motion.button>
           </form>
         </motion.div>
